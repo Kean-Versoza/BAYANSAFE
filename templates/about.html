@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="panel">
+    <section class="intro-section">
+        <p>Every Filipino faces the threat of natural disasters. <br>
+            Typhoons, earthquakes, floods, volcanic eruptions—they're part of life here. <br>
+            But what do you do when danger strikes?</p>
+        <p>BAYANSAFE is a game designed to teach you how to stay safe during disasters. Instead of boring textbooks, you'll face interactive scenarios that test your real-world disaster knowledge. <br>
+            These aren't just questions—they're skills that could save your life.</p>
+    </section> <br>
+
+    <!-- Content Split Layout to save vertical space -->
+    <div class="content-columns">
+        <div class="column">
+            <p class="heading">How It Works:</p>
+            <ul class="features-list">
+                <li>Enter a disaster scenario</li>
+                <li>Choose the safest action from multiple options</li>
+                <li>Get instant feedback explaining choices</li>
+                <li>Learn the correct safety procedures</li>
+                <li>Earn points and track your progress</li>
+            </ul>
+        </div>
+
+<div class="column">
+    <p class="heading">Play Across Multiple Disasters:</p>
+    <div class="disaster-grid">
+        <div class="disaster">
+            <p>
+                <img src="{{ url_for('static', filename='images/volcano.png') }}" alt="" class="disaster-icon"> 
+                Volcanic Eruptions
+            </p>
+            <ul><li>Fire &amp; Thermal hazards</li></ul>
+        </div>
+
+        <div class="disaster">
+            <p>
+                <img src="{{ url_for('static', filename='images/fire.png') }}" alt="" class="disaster-icon"> 
+                Wild Fires
+            </p>
+            <ul><li>Rapidly spreading flames</li></ul>
+        </div>
+
+            <div class="disaster">
+            <p>
+                    <img src="{{ url_for('static', filename='images/earthquake.png') }}" alt="" class="disaster-icon"> 
+                    Earthquakes
+                </p>
+                <ul>
+                    <li>Landslides &amp; terrain collapse</li> 
+                    <li>Tsunamis &amp; tidal waves</li>
+                </ul>
+            </div>
+
+        <div class="disaster">
+             <p>
+                <img src="{{ url_for('static', filename='images/flood.png') }}" alt="" class="disaster-icon"> 
+                Flash Floods
+            </p>
+            <ul><li>Evacuation &amp; safety rules</li></ul>
+        </div>
+
+        <div class="disaster">
+            <p>
+                <img src="{{ url_for('static', filename='images/typhoon.png') }}" alt="" class="disaster-icon"> 
+                Typhoons
+            </p>
+            <ul><li>Severe flooding response</li></ul>
+        </div>
+    </div>
+</div>
+</main>
+{% endblock %}

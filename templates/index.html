@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="hero">
+    <!-- Single combined retro sign container -->
+    <div class="main-banner">
+        <img src="{{ url_for('static', filename='images/welcome-sign.png') }}" alt="WELCOME TO BAYANSAFE">
+    </div>
+
+    <!-- Protected viewport-fit bottom tagline -->
+    <div class="tagline">
+        <p>A Philippine Smart Community Disaster Intelligence and Preparedness Response Game</p>
+    </div>
+</main>
+{% endblock %}
