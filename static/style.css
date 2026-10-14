@@ -581,3 +581,192 @@ body::before {
     .hero .tagline,
     .register-page .tagline { font-size: 1.05rem; }
 }
+
+/* ---------- Skeleton loader between pages ---------- */
+.page-skeleton {
+    position: fixed;
+    inset: 0;
+    z-index: 150;                         /* above the real nav and logo, so they get skeletons too */
+    background: linear-gradient(180deg, rgba(143, 208, 255, 0.95) 0%, rgba(190, 226, 150, 0.95) 100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.page-skeleton.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Shimmer */
+.sk {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.35) 25%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.35) 75%);
+    background-size: 200% 100%;
+    animation: sk-shimmer 1.3s ease-in-out infinite;
+    border-radius: 0.6rem;
+}
+@keyframes sk-shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+
+/* ----- Nav bar + brand logo (same variables as the real top bar) ----- */
+.sk-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: var(--bar-pad, 1.75rem) 2.5rem;
+    min-height: 7.7rem;
+}
+.sk-logo {
+    height: var(--logo-h, 9.5rem);
+    aspect-ratio: 3.3 / 1;                  /* logo width : height. Adjust to match your logo.png */
+    max-width: 60vw;
+}
+.page-skeleton[data-view="home"] .sk-logo { display: none; }   /* Home has no logo */
+
+.sk-nav {
+    position: absolute;
+    top: calc(var(--bar-pad, 1.75rem) + var(--logo-h, 9.5rem) / 2);   /* same line as the real nav */
+    right: var(--nav-right, 6rem);
+    transform: translateY(-50%);
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 3rem;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.sk-nav .sk {
+    flex: none;
+    width: 9.4rem;
+    height: 2.9rem;
+    border-radius: 1.5rem;
+}
+
+/* ----- Page areas ----- */
+.sk-view {
+    display: none;
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    flex-direction: column;
+    align-items: center;
+}
+.page-skeleton[data-view="home"] .sk-home,
+.page-skeleton[data-view="about"] .sk-about,
+.page-skeleton[data-view="registration"] .sk-register { display: flex; }
+
+.sk-home { top: 7.7rem; padding: 1.5rem 1rem 0; }
+.sk-about,
+.sk-register { top: calc(var(--bar-pad, 1.75rem) * 2 + var(--logo-h, 9.5rem)); }   /* starts below the logo bar */
+
+/* Tagline: two lines, same position as the real tagline */
+.sk-tag {
+    position: absolute;
+    bottom: 1.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 53rem;
+    padding: 0 1.25rem;
+}
+.sk-tl {
+    height: 2.59rem;                      /* same line height as the real tagline text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sk-tbar { height: 1.45rem; max-width: 100%; }
+.sk-t1 { width: 42rem; }
+.sk-t2 { width: 49rem; }
+
+/* Home sign */
+.sk-sign {
+    width: min(44rem, 94vw);
+    height: 23.5rem;
+    border-radius: 1rem;
+}
+
+/* About info panel (same width, padding, border, and radius as the real .panel) */
+.sk-card {
+    width: min(92%, 58.75rem);
+    margin-top: 1.5rem;
+    padding: 1.25rem 2.2rem 1.5rem;
+    background: rgba(255, 255, 255, 0.4);
+    border: 3px solid rgba(59, 36, 16, 0.3);
+    border-radius: 0.75rem;
+}
+.sk-line { height: 0.95rem; }
+.sk-w-full { width: 100%; }
+.sk-w-90 { width: 90%; }
+.sk-w-80 { width: 80%; }
+.sk-w-70 { width: 70%; }
+.sk-w-60 { width: 60%; }
+.sk-w-50 { width: 50%; }
+
+.sk-para {
+    display: flex;
+    flex-direction: column;
+    gap: 0.54rem;
+    margin-bottom: 1.04rem;
+}
+.sk-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin-top: 0.625rem;
+}
+.sk-col { display: flex; flex-direction: column; gap: 0.8rem; min-width: 0; }
+.sk-hd {
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px dashed rgba(59, 36, 16, 0.18);
+    margin-bottom: 0.2rem;
+}
+.sk-li { margin-left: 1.1rem; }
+
+/* Registration button (centred the same way as the real page) */
+.sk-register {
+    justify-content: center;
+    padding: 1rem 1rem 7.5rem;
+}
+.sk-btn {
+    width: 20.5rem;
+    max-width: 80vw;
+    height: 4.5rem;
+    border-radius: 0.5rem;
+}
+
+/* ----- Responsive (mirrors your real breakpoints) ----- */
+@media (max-width: 900px) {
+    .sk-nav .sk { width: 6rem; }
+}
+@media (max-width: 700px) {
+    .sk-topbar {
+        flex-direction: column;
+        justify-content: center;
+        padding: 0.9rem 1rem;
+        gap: 0.6rem;
+    }
+    .sk-nav { position: static; transform: none; }
+    .sk-about,
+    .sk-register { top: 11rem; }
+    .sk-cols { grid-template-columns: 1fr; gap: 1rem; }
+    .sk-sign { height: auto; aspect-ratio: 1.87 / 1; width: min(94vw, 34rem); }
+    .sk-tag { bottom: 1rem; }
+    .sk-tl { height: 1.7rem; }
+    .sk-tbar { height: 1rem; }
+    .sk-t1 { width: 80vw; }
+    .sk-t2 { width: 88vw; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sk { animation: none; }
+}
