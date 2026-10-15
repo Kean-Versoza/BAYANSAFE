@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,140 +7,117 @@
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body data-page="{{ page }}">
-    <div class="frame {{ 'frame-home' if page == 'home' else 'frame-inner' }}">
+<body data-section="home">
 
-        <header class="topbar">
-            {% if page != 'home' %}
-            <a class="logo" href="{{ url_for('home') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BAYANSAFE"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-            </a>
-            {% endif %}
+    <!-- Fixed nav: always visible while scrolling -->
+    <nav class="nav-pill">
+        <a href="#home" data-target="home" class="active">HOME</a>
+        <a href="#about" data-target="about">ABOUT</a>
+        <a href="#registration" data-target="registration">REGISTER</a>
+    </nav>
 
-            <nav class="nav-pill">
-                <a href="{{ url_for('home') }}" class="{{ 'active' if page == 'home' }}">HOME</a>
-                <a href="{{ url_for('about') }}" class="{{ 'active' if page == 'about' }}">ABOUT</a>
-                <a href="{{ url_for('registration') }}" class="{{ 'active' if page == 'registration' }}">REGISTER</a>
-            </nav>
-        </header>
+    {% block content %}{% endblock %}
 
-        {% block content %}{% endblock %}
-    </div>
+    <!-- KEEP your existing <div id="pageSkeleton" ...> ... </div> and <noscript> here -->
 
-            <!-- Skeleton loader shown between pages -->
-            <div id="pageSkeleton" class="page-skeleton is-active" data-view="home" aria-hidden="true">
+<script>
+(function () {
+    var sk = document.getElementById('pageSkeleton');
+    var navLinks = document.querySelectorAll('.nav-pill a');
+    var jumpLinks = document.querySelectorAll('a[data-target]');
+    var sections = document.querySelectorAll('.section');
 
-                <!-- Nav bar + brand logo (logo is hidden on Home, like the real page) -->
-                <div class="sk-topbar">
-                    <div class="sk sk-logo"></div>
-                    <div class="sk-nav">
-                        <span class="sk"></span>
-                        <span class="sk"></span>
-                        <span class="sk"></span>
-                    </div>
-                </div>
+    /* ---- settings ---- */
+    var SHOW_LOADER_ON_NAV = true;   // true: skeleton flashes when you use the nav. false: smooth scroll only
+    var MIN_SHOW = 450;              // ms the skeleton stays after the page loads
+    var LEAVE_DELAY = 300;           // ms the skeleton fades in before a nav jump
+    var NAV_LOADER_MS = 400;         // ms the skeleton stays after a nav jump
 
-                <!-- Home -->
-                <div class="sk-view sk-home">
-                    <div class="sk sk-sign"></div>
-                    <div class="sk-tag">
-                        <div class="sk-tl"><div class="sk sk-tbar sk-t1"></div></div>
-                        <div class="sk-tl"><div class="sk sk-tbar sk-t2"></div></div>
-                    </div>
-                </div>
+    function viewFor(id) {
+        id = (id || '').replace('#', '');
+        return (id === 'about' || id === 'registration') ? id : 'home';
+    }
+    function show(view) {
+        if (!sk) return;
+        if (view) sk.dataset.view = view;
+        sk.classList.add('is-active');
+    }
+    function hide() { if (sk) sk.classList.remove('is-active'); }
 
-                <!-- About -->
-                <div class="sk-view sk-about">
-                    <div class="sk-card">
-                        <div class="sk-para">
-                            <div class="sk sk-line sk-w-80"></div>
-                            <div class="sk sk-line sk-w-90"></div>
-                            <div class="sk sk-line sk-w-50"></div>
-                        </div>
-                        <div class="sk-para">
-                            <div class="sk sk-line sk-w-full"></div>
-                            <div class="sk sk-line sk-w-90"></div>
-                            <div class="sk sk-line sk-w-70"></div>
-                        </div>
-                        <div class="sk-cols">
-                            <div class="sk-col">
-                                <div class="sk-hd"><div class="sk sk-line sk-w-50"></div></div>
-                                <div class="sk sk-line sk-li sk-w-70"></div>
-                                <div class="sk sk-line sk-li sk-w-90"></div>
-                                <div class="sk sk-line sk-li sk-w-80"></div>
-                                <div class="sk sk-line sk-li sk-w-70"></div>
-                                <div class="sk sk-line sk-li sk-w-80"></div>
-                            </div>
-                            <div class="sk-col">
-                                <div class="sk-hd"><div class="sk sk-line sk-w-50"></div></div>
-                                <div class="sk sk-line sk-w-90"></div>
-                                <div class="sk sk-line sk-li sk-w-60"></div>
-                                <div class="sk sk-line sk-w-70"></div>
-                                <div class="sk sk-line sk-li sk-w-60"></div>
-                                <div class="sk sk-line sk-w-60"></div>
-                                <div class="sk sk-line sk-li sk-w-70"></div>
-                                <div class="sk sk-line sk-li sk-w-50"></div>
-                                <div class="sk sk-line sk-w-60"></div>
-                                <div class="sk sk-line sk-li sk-w-70"></div>
-                                <div class="sk sk-line sk-w-60"></div>
-                                <div class="sk sk-line sk-li sk-w-80"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    function setActive(id) {
+        document.body.dataset.section = id;
+        navLinks.forEach(function (a) {
+            a.classList.toggle('active', a.dataset.target === id);
+        });
+    }
 
-                <!-- Registration -->
-                <div class="sk-view sk-register">
-                    <div class="sk sk-btn"></div>
-                    <div class="sk-tag">
-                        <div class="sk-tl"><div class="sk sk-tbar sk-t1"></div></div>
-                        <div class="sk-tl"><div class="sk sk-tbar sk-t2"></div></div>
-                    </div>
-                </div>
-            </div>
+    /* 1. Loader on first load, reload, or opening the site */
+    if (sk) sk.dataset.view = viewFor(location.hash);
+    window.addEventListener('load', function () {
+        setTimeout(hide, Math.max(0, MIN_SHOW - performance.now()));
+    });
+    setTimeout(hide, 4000);   // safety net
 
-            <noscript><style>.page-skeleton { display: none; }</style></noscript>
+    /* 2. Back / forward buttons restore the page from memory: replay the loader */
+    window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+        show(viewFor(document.body.dataset.section));
+        setTimeout(hide, MIN_SHOW);
+    });
 
-            <script>
-            (function () {
-                var sk = document.getElementById('pageSkeleton');
-                if (!sk) return;
+    /* 3. The yellow nav tab follows the section on screen */
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (en.isIntersecting) setActive(en.target.id);
+            });
+        }, { rootMargin: '-45% 0px -45% 0px' });
+        sections.forEach(function (s) { io.observe(s); });
+    }
 
-                var MIN_SHOW = 450;      // ms the skeleton stays up after a page loads (raise it for a longer animation)
-                var LEAVE_DELAY = 300;   // ms the skeleton fades in before the next page opens
+    /* 4. Nav tabs and the logo jump to their section */
+    jumpLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            var id = link.dataset.target;
+            var target = document.getElementById(id);
+            if (!target) return;
+            e.preventDefault();
 
-                sk.dataset.view = document.body.dataset.page || 'home';
+            if (SHOW_LOADER_ON_NAV && sk && document.body.dataset.section !== id) {
+                show(id);
+                setTimeout(function () {
+                    window.scrollTo({ top: target.offsetTop, behavior: 'instant' });
+                    setActive(id);
+                    setTimeout(hide, NAV_LOADER_MS);
+                }, LEAVE_DELAY);
+            } else {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+            history.replaceState(null, '', '#' + id);
+        });
+    });
 
-                function hide() { sk.classList.remove('is-active'); }
+    /* 5. Registration: open the form */
+    var openBtn = document.getElementById('openFormBtn');
+    var regForm = document.getElementById('regCardForm');
+    if (openBtn && regForm) {
+        openBtn.addEventListener('click', function () {
+            openBtn.style.display = 'none';
+            regForm.classList.remove('hidden-form');
+        });
+    }
 
-                // Arriving: wait for the page to finish loading, then fade the skeleton out
-                window.addEventListener('load', function () {
-                    setTimeout(hide, Math.max(0, MIN_SHOW - performance.now()));
-                });
-                window.addEventListener('pageshow', function (e) { if (e.persisted) hide(); });  // back button
-                setTimeout(hide, 4000);                                                          // safety net
-
-                function viewFor(path) {
-                    if (path.indexOf('about') > -1) return 'about';
-                    if (path.indexOf('registration') > -1) return 'registration';
-                    return 'home';
-                }
-
-                // Leaving: show the skeleton, then go to the next page
-                document.querySelectorAll('.nav-pill a, .logo').forEach(function (link) {
-                    link.addEventListener('click', function (e) {
-                        if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
-                        var url = new URL(link.href, location.href);
-                        if (url.origin !== location.origin || url.pathname === location.pathname) return;
-
-                        e.preventDefault();
-                        sk.dataset.view = viewFor(url.pathname);   // shows the skeleton of the page you're going to
-                        sk.classList.add('is-active');
-                        setTimeout(function () { window.location.href = url.href; }, LEAVE_DELAY);
-                    });
-                });
-            })();
-            </script>
+    /* 6. Show / hide password (works for every password field) */
+    document.querySelectorAll('.toggle-password-eye').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = btn.parentElement.querySelector('input');
+            var showPw = input.type === 'password';
+            input.type = showPw ? 'text' : 'password';
+            btn.classList.toggle('is-visible', showPw);
+            btn.setAttribute('aria-label', showPw ? 'Hide password' : 'Show password');
+        });
+    });
+})();
+</script>
 </body>
 </html>
