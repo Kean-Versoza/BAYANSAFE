@@ -71,16 +71,6 @@ body::before {
     z-index: 1;
 }
 
-/* ---------- Brand Logo (About + Registration sections) ---------- */
-.logo img {
-    height: var(--logo-h);
-    width: auto;
-    max-width: 60vw;
-    display: block;
-    object-fit: contain;
-    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
-}
-
 /* ---------- Top area at the start of every section ---------- */
 .section-top {
     display: flex;
@@ -91,6 +81,20 @@ body::before {
     width: 100%;
     flex-shrink: 0;
 }
+
+/* ---------- Brand Logo (About + Registration sections) ---------- */
+.logo img {
+    height: var(--logo-h);
+    width: auto;
+    max-width: 60vw;
+    display: block;
+    object-fit: contain;
+    height: 9.5rem;
+    width: auto;
+    max-width: 60vw;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+}
+
 .logo { 
     align-self: center; 
     position: fixed;
@@ -98,7 +102,8 @@ body::before {
     left: var(--nav-left);
     transform: translateY(-50%);
     margin: 0;
-    z-index: 120;
+    /* Elevated to absolute highest layout hierarchy layer so it stays in front of scrolling text */
+    z-index: 99999 !important; 
 }
 
 .section-top--logo {
@@ -156,16 +161,6 @@ body::before {
     background: var(--yellow);
     border: 2px solid #3b2410;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* ---------- Brand Logo (inner pages) ---------- */
-.logo img {
-    height: 9.5rem;
-    width: auto;
-    max-width: 60vw;
-    display: block;
-    object-fit: contain;
-    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
 }
 
 /* ---------- Home Page Banner ---------- */
