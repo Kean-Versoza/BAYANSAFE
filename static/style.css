@@ -234,8 +234,9 @@ body::before {
 .panel {
     display: block;
     position: relative;
-    width: 92%;
-    max-width: 58.75rem;
+    /* Reduced width percentage from 92% to 88% and maximum cap from 58.75rem to 50rem */
+    width: 88%;
+    max-width: 50rem; 
     height: auto;
     margin: 1.5rem auto 1.5rem;
     padding: 1.25rem 2.2rem 1.5rem;
@@ -249,7 +250,7 @@ body::before {
     font-size: 1.0625rem;
     line-height: 1.4;
     color: #1a0500;
-    z-index: 10;
+    z-index: 0;
 }
 
 .panel p,
