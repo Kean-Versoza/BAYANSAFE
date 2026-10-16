@@ -1,7 +1,15 @@
-from flask import Flask, render_template, redirect, url_for
 from datetime import datetime
+from flask import Flask, render_template, redirect, url_for
+from footer_config import FOOTER
 
 app = Flask(__name__)
+
+
+# Makes `footer` and `current_year` available in every template
+@app.context_processor
+def inject_footer():
+    return {'footer': FOOTER, 'current_year': datetime.now().year}
+
 
 @app.route('/')
 def home():
@@ -15,6 +23,7 @@ def about():
 @app.route('/registration')
 def registration():
     return redirect(url_for('home') + '#registration')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
