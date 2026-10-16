@@ -18,7 +18,111 @@
 
     {% block content %}{% endblock %}
 
-    <!-- KEEP your existing <div id="pageSkeleton" ...> ... </div> and <noscript> here -->
+    <!-- ============ FOOTER: edit the text right here ============ -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <a class="footer-logo" href="#home" data-target="home">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BAYANSAFE">
+                </a>
+                <!-- Optional rating badges. Save the images in static/images/badges/ and remove the comment marks: -->
+                <div class="footer-badges">
+                    <img src="{{ url_for('static', filename='images/badges/all-ages.png') }}" alt="Suitable for all ages">
+                </div>
+            </div>
+
+            <p>Copyright &copy; <span id="footerYear">2026</span> BAYANSAFE. ALL RIGHTS RESERVED.</p>
+            <p class="footer-contact">
+                Contact: <a href="mailto:yourteam@example.com">yourteam@example.com</a>
+                <span class="sep">|</span><a href="#">Privacy Policy</a>
+                <span class="sep">|</span><a href="#">Terms of Service</a>
+            </p>
+            <p>BayanSafe is an educational game about disaster preparedness in the Philippines.</p>
+            <p>Add credits, trademark notes, or school and project details here.</p>
+        </div>
+    </footer>
+
+    <!-- Cookie bar (stays hidden after someone clicks OK) -->
+    <div class="cookie-banner" id="cookieBanner" hidden>
+        <p>This site uses cookies to improve your experience. By continuing to browse, you agree to their use as described in our <a href="#">Privacy Policy</a>.</p>
+        <button type="button" id="cookieOk">OK</button>
+    </div>
+
+    <!-- Skeleton loader shown between sections -->
+    <div id="pageSkeleton" class="page-skeleton is-active" data-view="home" aria-hidden="true">
+
+        <!-- Nav bar + brand logo (logo is hidden on Home, like the real page) -->
+        <div class="sk-topbar">
+            <div class="sk sk-logo"></div>
+            <div class="sk-nav">
+                <span class="sk"></span>
+                <span class="sk"></span>
+                <span class="sk"></span>
+            </div>
+        </div>
+
+        <!-- Home -->
+        <div class="sk-view sk-home">
+            <div class="sk sk-sign"></div>
+            <div class="sk-tag">
+                <div class="sk-tl"><div class="sk sk-tbar sk-t1"></div></div>
+                <div class="sk-tl"><div class="sk sk-tbar sk-t2"></div></div>
+            </div>
+        </div>
+
+        <!-- About -->
+        <div class="sk-view sk-about">
+            <div class="sk-card">
+                <div class="sk-para">
+                    <div class="sk sk-line sk-w-80"></div>
+                    <div class="sk sk-line sk-w-90"></div>
+                    <div class="sk sk-line sk-w-50"></div>
+                </div>
+                <div class="sk-para">
+                    <div class="sk sk-line sk-w-full"></div>
+                    <div class="sk sk-line sk-w-90"></div>
+                    <div class="sk sk-line sk-w-70"></div>
+                </div>
+                <div class="sk-cols">
+                    <div class="sk-col">
+                        <div class="sk-hd"><div class="sk sk-line sk-w-50"></div></div>
+                        <div class="sk sk-line sk-li sk-w-70"></div>
+                        <div class="sk sk-line sk-li sk-w-90"></div>
+                        <div class="sk sk-line sk-li sk-w-80"></div>
+                        <div class="sk sk-line sk-li sk-w-70"></div>
+                        <div class="sk sk-line sk-li sk-w-80"></div>
+                    </div>
+                    <div class="sk-col">
+                        <div class="sk-hd"><div class="sk sk-line sk-w-50"></div></div>
+                        <div class="sk sk-line sk-w-90"></div>
+                        <div class="sk sk-line sk-li sk-w-60"></div>
+                        <div class="sk sk-line sk-w-70"></div>
+                        <div class="sk sk-line sk-li sk-w-60"></div>
+                        <div class="sk sk-line sk-w-60"></div>
+                        <div class="sk sk-line sk-li sk-w-70"></div>
+                        <div class="sk sk-line sk-li sk-w-50"></div>
+                        <div class="sk sk-line sk-w-60"></div>
+                        <div class="sk sk-line sk-li sk-w-70"></div>
+                        <div class="sk sk-line sk-w-60"></div>
+                        <div class="sk sk-line sk-li sk-w-80"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration -->
+        <div class="sk-view sk-register">
+            <div class="sk sk-btn"></div>
+            <div class="sk-tag">
+                <div class="sk-tl"><div class="sk sk-tbar sk-t1"></div></div>
+                <div class="sk-tl"><div class="sk sk-tbar sk-t2"></div></div>
+            </div>
+        </div>
+
+        
+    </div>
+
+    <noscript><style>.page-skeleton { display: none; }</style></noscript>
 
 <script>
 (function () {
@@ -117,6 +221,22 @@
             btn.setAttribute('aria-label', showPw ? 'Hide password' : 'Show password');
         });
     });
+
+    /* 7. Footer: current year */
+    var yr = document.getElementById('footerYear');
+    if (yr) yr.textContent = new Date().getFullYear();
+
+    /* 8. Cookie bar: show until someone clicks OK */
+    var banner = document.getElementById('cookieBanner');
+    var okBtn = document.getElementById('cookieOk');
+    if (banner && okBtn) {
+        var KEY = 'bayansafe_cookie_ok';
+        try { if (!localStorage.getItem(KEY)) banner.hidden = false; } catch (e) { banner.hidden = false; }
+        okBtn.addEventListener('click', function () {
+            banner.hidden = true;
+            try { localStorage.setItem(KEY, '1'); } catch (e) {}
+        });
+    }
 })();
 </script>
 </body>
