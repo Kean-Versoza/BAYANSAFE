@@ -4,13 +4,6 @@ from footer_config import FOOTER
 
 app = Flask(__name__)
 
-
-# Makes `footer` and `current_year` available in every template
-@app.context_processor
-def inject_footer():
-    return {'footer': FOOTER, 'current_year': datetime.now().year}
-
-
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -24,6 +17,15 @@ def about():
 def registration():
     return redirect(url_for('home') + '#registration')
 
+# Legal pages (separate pages, no loader)
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+# Keep this block LAST. Routes written below it are never registered.
 if __name__ == '__main__':
     app.run(debug=True)

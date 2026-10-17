@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Legal{% endblock %} | BayanSafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Back to the main site (same spot as the nav on the main site) -->
+    <nav class="nav-pill nav-pill--single">
+        <a href="{{ url_for('home') }}">&larr; BACK TO BAYANSAFE</a>
+    </nav>
+
+    <div class="frame frame-inner legal-frame">
+
+        <header class="legal-top">
+            <a class="legal-logo" href="{{ url_for('home') }}" aria-label="Back to BAYANSAFE">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BAYANSAFE">
+            </a>
+        </header>
+
+        <main class="panel legal-panel">
+            {% block legal %}{% endblock %}
+            <a class="legal-back" href="{{ url_for('home') }}">&larr; Back to BAYANSAFE</a>
+        </main>
+
+        <footer class="site-footer legal-footer">
+            <div class="footer-inner">
+                <p>Copyright &copy; <span id="legalYear">2026</span> BAYANSAFE. ALL RIGHTS RESERVED.</p>
+                <p class="footer-contact">
+                    <a href="{{ url_for('home') }}">BAYANSAFE</a>
+                    <span class="sep">|</span><a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <span class="sep">|</span><a href="{{ url_for('terms') }}">Terms of Service</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>document.getElementById('legalYear').textContent = new Date().getFullYear();</script>
+</body>
+</html>
