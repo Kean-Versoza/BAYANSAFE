@@ -2,6 +2,9 @@ node_modules/
 client/dist/
 client/node_modules/
 
+# Vercel CLI local state
+.vercel/
+
 # Python leftovers (the old Flask version)
 __pycache__/
 *.pyc

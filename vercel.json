@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    { "source": "/api", "destination": "/api/not-found" },
+    { "source": "/api/(.*)", "destination": "/api/not-found" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

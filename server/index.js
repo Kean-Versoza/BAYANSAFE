@@ -4,14 +4,13 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 
 import footerConfig from './footerConfig.js';
-import { createUser } from './store.js';
+import { registerAccount } from './register.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3001;
 
 const app = express();
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -39,36 +38,11 @@ app.get('/api/footer', (req, res) => {
 });
 
 // Registration. The old Flask form was never wired up; now it really posts.
+// The rules live in register.js so the Vercel function (api/register.js)
+// accepts and rejects exactly the same requests.
 app.post('/api/register', (req, res) => {
-  const { username = '', email = '', password = '', terms } = req.body ?? {};
-  const errors = [];
-
-  if (String(username).trim().length < 3) {
-    errors.push('Username must be at least 3 characters long.');
-  }
-  if (!EMAIL_RE.test(String(email).trim())) {
-    errors.push('Please enter a valid email address.');
-  }
-  if (String(password).length < 8) {
-    errors.push('Password must be at least 8 characters long.');
-  }
-  if (!terms) {
-    errors.push('You must agree to the safety terms.');
-  }
-
-  if (errors.length) {
-    return res.status(400).json({ ok: false, errors });
-  }
-
-  try {
-    const account = createUser({ username, email, password });
-    return res.status(201).json({
-      ok: true,
-      message: `Welcome, ${account.username}! Your account has been created.`,
-    });
-  } catch (err) {
-    return res.status(409).json({ ok: false, errors: [err.message] });
-  }
+  const { status, body } = registerAccount(req.body);
+  res.status(status).json(body);
 });
 
 // Unknown API routes must never fall through to the SPA shell

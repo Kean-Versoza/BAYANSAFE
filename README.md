@@ -4,7 +4,8 @@
 
 A Philippine Smart Community Disaster Intelligence and Preparedness Response Game.
 
-Built with **React** (Vite) on the frontend and **Node.js + Express** on the backend.
+Built with **React** (Vite) on the frontend and **Node.js** on the backend
+(Express locally, Vercel functions in production).
 
 ---
 
@@ -12,6 +13,11 @@ Built with **React** (Vite) on the frontend and **Node.js + Express** on the bac
 
 ```
 BAYANSAFE/
+├── api/                         # Vercel functions (one per endpoint, used when deployed)
+│   ├── footer.js                #   GET  /api/footer
+│   ├── health.js                #   GET  /api/health
+│   ├── register.js              #   POST /api/register
+│   └── not-found.js             #   JSON 404 for unknown /api/* paths
 ├── client/                      # React frontend (Vite)
 │   ├── index.html
 │   ├── vite.config.js
@@ -27,10 +33,12 @@ BAYANSAFE/
 │       ├── config/footer.js     # Fallback footer text
 │       ├── lib/skeleton.js      # The page skeleton loader
 │       └── styles/style.css     # All site styling
-├── server/                      # Node.js backend (Express)
+├── server/                      # Node.js backend (Express, used by dev + `npm start`)
 │   ├── index.js                 # API + static hosting + SPA fallback
 │   ├── footerConfig.js          # Footer / cookie text (edit here)
+│   ├── register.js              # Registration rules (shared with api/register.js)
 │   └── store.js                 # In-memory account store (scrypt hashes)
+├── vercel.json                  # Vercel build + routing configuration
 └── package.json                 # Root scripts and backend dependencies
 ```
 
@@ -60,6 +68,48 @@ npm start            # serves the built site + API on http://localhost:3001
 ```
 
 Set `PORT` to change the server port.
+
+## Deploying to Vercel
+
+The repository is already configured for Vercel — import it and deploy, there
+are no build settings to fill in.
+
+1. Push the repository to GitHub.
+2. On vercel.com choose **Add New → Project** and import the repository.
+3. Leave **Root Directory** at the repository root and press **Deploy**.
+
+`vercel.json` takes care of the rest:
+
+- **Build command:** `npm run build` (the root script installs the client and builds it into `client/dist`).
+- **Output directory:** `client/dist`.
+- **Frontend:** every non-API path is rewritten to `index.html`, so client-side routes such as `/privacy` work on a hard refresh or a shared link.
+- **API:** each file in `api/` becomes a function — `/api/health`, `/api/footer`, `/api/register`. Unknown `/api/*` paths get a JSON 404 rather than the SPA shell.
+
+Vercel gives the filesystem precedence over rewrites, so the `api/` functions
+always win over the catch-all rewrite to `index.html`.
+
+### What is shared with the local server
+
+Express (`server/`, used by `npm run dev` and `npm start`) and the Vercel
+functions share their logic, so there is nothing to keep in sync by hand:
+
+| Endpoint            | Express                     | Vercel function    | Shared module                                   |
+| ------------------- | --------------------------- | ------------------ | ----------------------------------------------- |
+| `GET /api/health`   | `server/index.js`           | `api/health.js`    | –                                               |
+| `GET /api/footer`   | `server/index.js`           | `api/footer.js`    | `server/footerConfig.js`                        |
+| `POST /api/register`| `server/index.js`           | `api/register.js`  | `server/register.js` + `server/store.js`        |
+
+Editing `server/footerConfig.js` or `server/register.js` updates both backends.
+
+### Before relying on registration in production
+
+Accounts live in memory (`server/store.js`). That is fine locally, but on Vercel
+each function instance has its own memory and is recycled at any time, so a
+registration can silently disappear and the duplicate-email check becomes
+unreliable. The form still submits and shows its success message; nothing is
+kept. To persist accounts, replace `server/store.js` with a database (Vercel
+Postgres, Neon, Supabase, ...) — the rest of the code only calls `createUser`,
+`findAccount` and `verifyUser`.
 
 ## API
 
