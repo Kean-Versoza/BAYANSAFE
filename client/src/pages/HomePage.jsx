@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import CookieBanner from '../components/CookieBanner';
 import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
+import usePageSnap from '../hooks/usePageSnap';
 import AboutSection from '../sections/AboutSection';
 import HomeSection from '../sections/HomeSection';
 import RegistrationSection from '../sections/RegistrationSection';
@@ -21,6 +22,9 @@ import {
 export default function HomePage() {
   const skeletonRef = useRef(null);
   const [section, setSection] = useState(() => viewFor(window.location.hash));
+
+  // One-page-at-a-time scrolling while every section fits on screen
+  usePageSnap();
 
   const showSkeleton = useCallback((view) => {
     const skeleton = skeletonRef.current;

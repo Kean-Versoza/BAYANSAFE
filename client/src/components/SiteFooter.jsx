@@ -1,5 +1,4 @@
-import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import FooterLinks from './FooterLinks';
 import useFooter from '../hooks/useFooter';
 
 /**
@@ -16,17 +15,6 @@ export default function SiteFooter({ onJump }) {
     event.preventDefault();
     onJump('home');
   };
-
-  const renderLink = (link) => (
-    <Fragment key={`${link.label}-${link.url}`}>
-      <span className="sep">|</span>
-      {link.url.startsWith('/') ? (
-        <Link to={link.url}>{link.label}</Link>
-      ) : (
-        <a href={link.url}>{link.label}</a>
-      )}
-    </Fragment>
-  );
 
   return (
     <footer className="site-footer" id="site-footer">
@@ -50,9 +38,7 @@ export default function SiteFooter({ onJump }) {
         </p>
 
         <p className="footer-contact">
-          Contact:{' '}
-          <a href={`mailto:${footer.email}`}>{footer.email}</a>
-          {footer.links.map(renderLink)}
+          <FooterLinks links={footer.links} />
         </p>
 
         {footer.notes.map((note) => (

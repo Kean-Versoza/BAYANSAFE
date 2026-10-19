@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import FooterLinks from '../components/FooterLinks';
+import defaultFooter from '../config/footer';
 
 /** Shared shell for the Privacy Policy and Terms of Service pages. */
 export default function LegalLayout({ title, children }) {
@@ -41,9 +43,7 @@ export default function LegalLayout({ title, children }) {
             <p className="footer-contact">
               <Link to="/">BAYANSAFE</Link>
               <span className="sep">|</span>
-              <Link to="/privacy">Privacy Policy</Link>
-              <span className="sep">|</span>
-              <Link to="/terms">Terms of Service</Link>
+              <FooterLinks links={defaultFooter.links} />
             </p>
           </div>
         </footer>

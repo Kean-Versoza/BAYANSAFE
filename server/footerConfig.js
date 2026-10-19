@@ -6,6 +6,10 @@
  *
  * Image paths are URLs served from `client/public/images/`.
  */
+
+/** Contact address - the footer's "Contact us" link opens it. */
+const CONTACT_EMAIL = 'versozakean@gmail.com';
+
 const footerConfig = {
   // Logo shown on the left
   logo: '/images/logo.png',
@@ -20,12 +24,17 @@ const footerConfig = {
   // The current year is added automatically before this text
   copyright: 'BAYANSAFE. ALL RIGHTS RESERVED.',
 
-  email: 'versozakean@gmail.com',
+  email: CONTACT_EMAIL,
 
-  // Links starting with "/" are handled by the React router (no page reload)
+  // Links starting with "/" are handled by the React router (no page reload),
+  // anything else (mailto:, https://) is used as-is, and '#' is a placeholder -
+  // the label shows but the link does nothing.
   links: [
     { label: 'Privacy Policy', url: '/privacy' },
     { label: 'Terms of Service', url: '/terms' },
+    { label: 'About us', url: '#' },
+    { label: 'Contact us', url: `mailto:${CONTACT_EMAIL}` },
+    { label: 'Help Center', url: '#' },
   ],
 
   // Small print: one paragraph per line (sample text, change it to yours)

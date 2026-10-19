@@ -669,6 +669,7 @@
         color: #6b5a4a;
         font-size: 0.85rem;
         line-height: 1.7;
+        text-align: center;                 /* copyright, links and notes all sit centred */
     }
     .footer-inner {
         max-width: 62rem;
@@ -677,6 +678,7 @@
     .footer-top {
         display: flex;
         align-items: center;
+        justify-content: center;            /* logo and badges as one centred group */
         flex-wrap: wrap;
         gap: 1.25rem 3rem;
         margin-bottom: 1rem;
@@ -869,4 +871,19 @@
 .reg-form .btn-submit:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* ---------- One-page-at-a-time scrolling (main page only) ----------
+   usePageSnap owns every scroll gesture on the main page: each wheel flick,
+   touch swipe or key press runs a monotonic rAF turn to exactly one screen.
+   The browser's own helpers are switched off while that controller is in
+   charge, because each of them can move the page on its own:
+   - scroll-snap drags the page back after a partial gesture (the "backswing"),
+   - scroll anchoring can jump the page while content above it changes,
+   - overscroll adds the rubber-band bounce / pull-to-refresh on top of it.
+   The class only exists while HomePage is mounted, so /privacy and /terms
+   keep 100% native scrolling. */
+html.snap-scroll {
+    overscroll-behavior: none;
+    overflow-anchor: none;
 }
