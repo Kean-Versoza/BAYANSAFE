@@ -43,7 +43,7 @@
         inset: 0;
         z-index: -1;
         background:
-            url('images/bg.png') center 75% / cover no-repeat,
+            url('/images/bg.png') center 75% / cover no-repeat,
             linear-gradient(#4fb3ff 0%, #8fd0ff 45%, #6fbf3f 100%);
     }
 
@@ -846,3 +846,27 @@
         .legal-panel { padding: 1.25rem 1.2rem 1.5rem; }
         .legal-panel h1 { font-size: 1.7rem; }
     }
+/* ---------- Registration feedback message ---------- */
+.reg-form .form-message {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    border-radius: 0.45rem;
+    padding: 0.6rem 0.75rem;
+    border: 2px solid transparent;
+}
+.reg-form .form-message.is-error {
+    background: #ffe3e3;
+    color: #8a1111;
+    border-color: #8a1111;
+}
+.reg-form .form-message.is-success {
+    background: #e6f7e1;
+    color: #24611a;
+    border-color: #24611a;
+}
+.reg-form .btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
