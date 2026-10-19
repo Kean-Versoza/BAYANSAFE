@@ -667,7 +667,8 @@
         border-top: 3px solid #3b2410;
         padding: 2rem 2.5rem 6rem;          /* extra bottom space so the cookie bar never hides the last line */
         color: #6b5a4a;
-        font-size: 0.85rem;
+        font-size: 1rem;                    /* was 0.85rem - footer text is easier to read now */
+        font-weight: 600;                   /* semi-bold (Open Sans 600 is loaded in index.html) */
         line-height: 1.7;
         text-align: center;                 /* copyright, links and notes all sit centred */
     }

@@ -40,7 +40,8 @@ const footerConfig = {
   // Small print: one paragraph per line (sample text, change it to yours)
   notes: [
     'BayanSafe is an educational game about disaster preparedness in the Philippines.',
-    'Add credits, trademark notes, or school and project details here.',
+    'BayanSafe is a collaboration project between 3 subjects across different principles and creative approaches.',
+    'And it is created by a team of students from the Quezon City University (QCU) consisting of 11 members.',
   ],
 
   // Cookie bar at the bottom of the screen
