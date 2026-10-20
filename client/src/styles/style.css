@@ -1059,5 +1059,85 @@ html.snap-scroll {
 
         .rfid-link:hover { background: #ffe14d; }
     }
-/* The "Send us a message" form lives on its own page (/help).
-   Its styles are in styles/help.css. */
+/* ============================================================
+   The "Send us a message" form
+   ============================================================
+   The form itself. It keeps this same design wherever it is
+   used - it used to sit in the footer and now has its own page
+   at /help, which only centers it (see styles/help.css).
+   ============================================================ */
+/* ---------- Contact form ---------- */
+    .contact-form {
+        margin-top: 1.5rem;
+        max-width: 34rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .contact-form-title {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #3b2410;
+        margin-bottom: 0.1rem;
+    }
+    .contact-form-row {
+        display: flex;
+        gap: 0.6rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 2px solid #3b2410;
+        border-radius: 0.4rem;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1a0500;
+        background: #ffffff;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder {
+        color: #666666;
+        font-weight: 400;
+    }
+    .contact-form textarea {
+        resize: vertical;
+        min-height: 5rem;
+    }
+    .contact-form-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .contact-form .btn-yellow {
+        background: var(--yellow);
+        color: var(--text);
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #3b2410;
+        border-radius: 0.4rem;
+        padding: 0.55rem 1.4rem;
+        cursor: pointer;
+        box-shadow: 0 0.25rem 0 #3b2410;
+        transition: transform 0.05s, box-shadow 0.05s, background 0.15s;
+    }
+    .contact-form .btn-yellow:hover { background: #ffe14d; }
+    .contact-form .btn-yellow:active {
+        transform: translateY(2px);
+        box-shadow: 0 0.1rem 0 #3b2410;
+    }
+    .contact-form .btn-yellow:disabled {
+        opacity: 0.7;
+        cursor: wait;
+    }
+    .contact-status {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+    .contact-status--ok { color: #1c5b26; }
+    .contact-status--error { color: #8a1c1c; }
