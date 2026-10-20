@@ -2,6 +2,8 @@ import { Router } from 'express';
 
 import { query, checkDatabase } from '../db/pool.js';
 import { describeError } from '../db/pool.js';
+import { findByRfid } from '../services/users.js';
+import { normalizeCardNumber } from '../../../shared/rfid.js';
 import {
   checkPassword,
   clearSessionCookie,
@@ -115,6 +117,7 @@ router.get('/stats', requireAdmin, async (req, res) => {
         (SELECT count(*)::int FROM users)                              AS accounts,
         (SELECT count(*)::int FROM users WHERE created_at >= date_trunc('day', now())) AS today,
         (SELECT count(*)::int FROM users WHERE created_at >= now() - interval '7 days')  AS week,
+        (SELECT count(*)::int FROM users WHERE rfid_uid IS NOT NULL)    AS cards,
         (SELECT count(*)::int FROM email_log)                         AS emails,
         (SELECT count(*)::int FROM email_log WHERE ok = FALSE)        AS emails_failed,
         (SELECT count(*)::int FROM email_log WHERE created_at >= date_trunc('day', now())) AS emails_today
@@ -157,9 +160,9 @@ router.get('/users', requireAdmin, async (req, res) => {
     const pattern = `%${search}%`;
 
     const { rows } = await query(
-      `SELECT id, username, email, created_at
+      `SELECT id, username, email, rfid_uid, created_at
          FROM users
-        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2)
+        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2)
         ORDER BY created_at DESC
         LIMIT $3 OFFSET $4`,
       [search, pattern, limit, offset],
@@ -168,7 +171,7 @@ router.get('/users', requireAdmin, async (req, res) => {
     const { rows: counts } = await query(
       `SELECT count(*)::int AS count
          FROM users
-        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2)`,
+        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2)`,
       [search, pattern],
     );
 
@@ -178,6 +181,7 @@ router.get('/users', requireAdmin, async (req, res) => {
         id: u.id,
         username: u.username,
         email: u.email,
+        rfidUid: u.rfid_uid ?? null,
         createdAt: u.created_at,
       })),
       total: counts[0].count,
@@ -238,6 +242,64 @@ router.get('/status', requireAdmin, async (req, res) => {
       message: mail.message,
     },
   });
+});
+
+/**
+ * PATCH /api/admin/users/:id/card
+ * Links a card to an account, or takes the card away again.
+ */
+router.patch('/users/:id/card', requireAdmin, async (req, res) => {
+  const id = req.params.id;
+
+  // Only a real UUID can be changed, so a wrong id cannot touch the wrong row
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return res.status(400).json({ ok: false, error: 'That is not a valid account id.' });
+  }
+
+  const typed = typeof req.body?.card === 'string' ? req.body.card.trim() : '';
+  const card = typed ? normalizeCardNumber(typed) : '';
+  if (typed && !card) {
+    return res.status(400).json({
+      ok: false,
+      error: 'That card number does not look right. Type the full number.',
+    });
+  }
+
+  try {
+    if (card) {
+      const used = await findByRfid(card);
+      if (used && used.id !== id) {
+        return res.status(409).json({
+          ok: false,
+          error: 'That card is already linked to another account.',
+        });
+      }
+    }
+
+    const { rows } = await query(
+      'UPDATE users SET rfid_uid = $2 WHERE id = $1 RETURNING username, rfid_uid',
+      [id, card || null],
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ ok: false, error: 'That account does not exist.' });
+    }
+
+    res.json({
+      ok: true,
+      message: card
+        ? `Card ${card} is now linked to ${rows[0].username}.`
+        : `The card of ${rows[0].username} was taken away.`,
+      rfidUid: rows[0].rfid_uid ?? null,
+    });
+  } catch (err) {
+    // 23505 = the card is already used by somebody else
+    if (err.code === '23505') {
+      return res.status(409).json({ ok: false, error: 'That card is already linked to another account.' });
+    }
+    console.error('Could not change the card:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
 });
 
 /**

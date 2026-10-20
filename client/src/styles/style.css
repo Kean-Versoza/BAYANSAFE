@@ -154,7 +154,7 @@
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        min-width: 9.4rem;
+        min-width: 8.6rem;
         padding: 0 0.9rem;
         height: 2.9rem;
         border-radius: 1.5rem;
@@ -536,6 +536,173 @@
     .toggle-password-eye.is-visible .icon-eye { display: block; }
     .toggle-password-eye.is-visible .icon-eye-off { display: none; }
 
+    /* ---------- RFID card field ---------- */
+    .rfid-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px dashed #3b2410;
+        border-radius: 0.45rem;
+        background: #fffbe6;
+    }
+
+    .rfid-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .rfid-label {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #3b2410;
+        letter-spacing: 0.05rem;
+    }
+
+    .rfid-status {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.05rem;
+        padding: 0.15rem 0.45rem;
+        border: 2px solid #3b2410;
+        border-radius: 999px;
+        background: #ffe14d;
+        color: #1a0500;
+        white-space: nowrap;
+    }
+
+    .rfid-status--idle { background: #e6e6e6; }
+    .rfid-status--connecting { background: #ffe9a8; }
+    .rfid-status--error {
+        background: #fde8e8;
+        color: #8a1c1c;
+        border-color: #8a1c1c;
+    }
+
+    .rfid-row {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .rfid-field input[type="text"] {
+        width: 100%;
+        padding: 0.75rem 2.2rem 0.75rem 0.75rem;
+        border: 2px solid #3b2410;
+        border-radius: 0.35rem;
+        background: #ffffff;
+        color: #000000;
+        font-family: 'Courier New', monospace;
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
+
+    .rfid-field input.is-read {
+        background: #e4f7e6;
+        border-color: #1c5b26;
+    }
+
+    .rfid-clear {
+        position: absolute;
+        right: 0.5rem;
+        width: 1.6rem;
+        height: 1.6rem;
+        border: 2px solid #3b2410;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #3b2410;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .rfid-clear:hover { background: #ffe14d; }
+
+    .rfid-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        min-height: 1.1rem;
+    }
+
+    .rfid-message {
+        margin: 0;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #1c5b26;
+    }
+
+    .rfid-link {
+        padding: 0;
+        background: none;
+        border: none;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #3b2410;
+        text-decoration: underline;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .rfid-link:hover { color: #1a0500; }
+
+    .rfid-field.is-taken {
+        border-color: #8a1c1c;
+        background: #fde8e8;
+    }
+
+    .rfid-field.is-taken .rfid-message { color: #8a1c1c; }
+
+    .rfid-field.is-taken .rfid-status {
+        background: #fde8e8;
+        color: #8a1c1c;
+        border-color: #8a1c1c;
+    }
+
+    /* ---------- The RFID field on a phone ---------- */
+    @media (max-width: 700px) {
+        .rfid-field { padding: 0.6rem; }
+
+        .rfid-head {
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .rfid-label { font-size: 0.85rem; }
+        .rfid-status { font-size: 0.65rem; padding: 0.1rem 0.4rem; }
+
+        .rfid-field input[type="text"] {
+            font-size: 16px;
+            letter-spacing: 0.04em;
+        }
+
+        /* the note and the button of the reader go under each other */
+        .rfid-foot {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+
+        .rfid-message { font-size: 0.72rem; }
+
+        /* the button of the reader is a real button on a phone */
+        .rfid-link {
+            font-size: 0.78rem;
+            padding: 0.55rem 0.8rem;
+            border: 2px solid #3b2410;
+            border-radius: 0.35rem;
+            background: #ffffff;
+        }
+
+        .rfid-link:hover { background: #ffe14d; }
+    }
+
     /* =====================================================
     RESPONSIVE ADJUSTMENTS
     (the rem scaling above handles most sizes; these only
@@ -558,21 +725,44 @@
         .nav-pill a { min-width: 6rem; }
     }
 
+    /* On a small tablet the logo and the navigation would sit on top of
+       each other, so the logo becomes a little smaller. */
+    @media (max-width: 820px) {
+        :root { --logo-h: 6rem; }
+    }
+
     /* Phones / very narrow windows: only here do things stack */
     @media (max-width: 700px) {
-        html { font-size: 14px; }
+        html { font-size: 15px; }
         :root { --logo-h: 4.5rem; }
 
         .section-top {
             justify-content: center;
             padding: 4.8rem 1rem 0.9rem;
         }
+        /* The navigation becomes a bar across the top of the phone, so the
+           four tabs all get a finger-sized target. */
         .nav-pill {
-            top: 0.6rem;
-            right: auto;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0.5rem;
+            right: 0.5rem;
+            left: 0.5rem;
+            transform: none;
+            justify-content: space-between;
+            gap: 0.2rem;
+            padding: 0.35rem 0.4rem;
         }
+
+        .nav-pill a {
+            flex: 1;
+            min-width: 0;
+            padding: 0 0.3rem;
+            font-size: 0.85rem;
+            height: 2.5rem;
+            letter-spacing: 0.01em;
+        }
+
+        /* the one link of the legal pages keeps its own size */
+        .nav-pill--single a { flex: 0 0 auto; }
 
         .main-banner img {
             height: auto;
@@ -586,18 +776,54 @@
         .panel {
             width: 94%;
             padding: 1rem 1.1rem 1.25rem;
-            font-size: 1rem;
+            font-size: 1.05rem;
         }
 
         .hero,
-        .register-page { padding-bottom: 9rem; }
+        .register-page { padding-bottom: 2rem; }
+
+        /* iOS zooms in when the text of a field is smaller than 16 pixels,
+           so the fields of the phone get a bigger text. */
+        .reg-form input[type="email"],
+        .reg-form input[type="text"],
+        .reg-form input[type="password"],
+        .account-field input,
+        .contact-form input,
+        .contact-form textarea {
+            font-size: 16px;
+        }
+
+        /* the little things you have to touch with a finger get bigger */
+        .toggle-password-eye {
+            width: 2.4rem;
+            height: 2.4rem;
+            right: 0.5rem;
+        }
+
+        .reg-form .terms input[type="checkbox"] {
+            width: 1.4rem;
+            height: 1.4rem;
+        }
+
+        .cookie-banner button {
+            padding: 0.6rem 1.6rem;
+        }
 
         .tagline,
         .hero .tagline,
         .register-page .tagline {
-            font-size: 1.2rem;
-            bottom: 1rem;
-            letter-spacing: 0.05rem;
+            position: static;
+            transform: none;
+            left: auto;
+            bottom: auto;
+            width: auto;
+            max-width: none;
+            margin: 0.9rem 0 0;
+            padding: 0 1.25rem;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            letter-spacing: 0.04rem;
+            text-align: center;
             text-shadow:
                 1px  1px 0 #1a0500,
             -1px  1px 0 #1a0500,
@@ -614,16 +840,15 @@
 
     /* Very small phones */
     @media (max-width: 400px) {
-        .nav-pill { gap: 0.25rem; padding: 0.4rem 0.5rem; }
+        .nav-pill { gap: 0.15rem; padding: 0.3rem; }
         .nav-pill a {
-            min-width: 0;
-            padding: 0 0.6rem;
-            font-size: 0.8rem;
-            height: 2.1rem;
+            padding: 0 0.2rem;
+            font-size: 0.78rem;
+            height: 2.4rem;
         }
         .tagline,
         .hero .tagline,
-        .register-page .tagline { font-size: 1.05rem; }
+        .register-page .tagline { font-size: 0.95rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -855,6 +1080,7 @@
             padding: 0.9rem 1rem;
             text-align: center;
         }
+        .cookie-banner button { padding: 0.65rem 1.8rem; }
     }
 
         /* ---------- Privacy Policy + Terms of Service pages ---------- */

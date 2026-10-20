@@ -4,6 +4,10 @@ node_modules/
 # Build output
 client/dist/
 
+# The cache of Vite
+client/.vite/
+client/node_modules/.vite/
+
 # Environment
 .env
 .env.local

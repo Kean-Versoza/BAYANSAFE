@@ -115,6 +115,26 @@ export default function AdminPage() {
     }
   };
 
+  /* ---- the card of a player ---- */
+  const setCard = async (user) => {
+    const answer = window.prompt(
+      `Card number for ${user.username}:\n\nLeave it empty to take the card away.`,
+      user.rfidUid ?? '',
+    );
+    if (answer === null) return;
+
+    try {
+      const body = await api(`/api/admin/users/${user.id}/card`, {
+        method: 'PATCH',
+        body: JSON.stringify({ card: answer.trim() }),
+      });
+      setMessage({ type: 'ok', text: body.message });
+      load().catch(() => {});
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
   /* ---- the sign in screen ---- */
   if (session.known && !session.signedIn) {
     return (
@@ -193,6 +213,10 @@ export default function AdminPage() {
           <span className="admin-tile-label">New this week</span>
         </div>
         <div className="admin-tile">
+          <span className="admin-tile-value">{stats?.totals.cards ?? '-'}</span>
+          <span className="admin-tile-label">Cards linked</span>
+        </div>
+        <div className="admin-tile">
           <span className="admin-tile-value">{stats?.totals.emails ?? '-'}</span>
           <span className="admin-tile-label">Emails sent</span>
         </div>
@@ -269,11 +293,12 @@ export default function AdminPage() {
             <span className="admin-toolbar-count">{total} account(s)</span>
           </div>
 
-          <table className="admin-table">
+          <table className="admin-table admin-table--users">
             <thead>
               <tr>
                 <th>Username</th>
                 <th>Email</th>
+                <th>Card</th>
                 <th>Registered</th>
                 <th />
               </tr>
@@ -281,7 +306,7 @@ export default function AdminPage() {
             <tbody>
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="admin-empty">
+                  <td colSpan={5} className="admin-empty">
                     No accounts yet.
                   </td>
                 </tr>
@@ -290,8 +315,12 @@ export default function AdminPage() {
                 <tr key={user.id}>
                   <td className="admin-strong">{user.username}</td>
                   <td>{user.email}</td>
+                  <td className="admin-card">{user.rfidUid ?? '-'}</td>
                   <td className="admin-muted">{formatDate(user.createdAt)}</td>
                   <td className="admin-actions">
+                    <button type="button" onClick={() => setCard(user)}>
+                      Card
+                    </button>
                     <button type="button" onClick={() => removeUser(user)}>
                       Remove
                     </button>
@@ -305,7 +334,7 @@ export default function AdminPage() {
 
       {tab === 'emails' && (
         <section className="admin-panel">
-          <table className="admin-table">
+          <table className="admin-table admin-table--emails">
             <thead>
               <tr>
                 <th>To</th>

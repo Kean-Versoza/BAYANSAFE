@@ -18,6 +18,10 @@ export default defineConfig({
 
   server: {
     port: 5173,
+    // Two dev servers on the same project break each other (they share the
+    // cache in node_modules/.vite), so the second one stops with a clear
+    // message instead of quietly moving to another port.
+    strictPort: true,
     // The shared folder lives above client/, so Vite has to be allowed to read it
     fs: {
       allow: [projectRoot],

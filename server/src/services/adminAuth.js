@@ -1,5 +1,7 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
+import { clearCookie, readCookies, setCookie } from './cookies.js';
+
 /**
  * The admin sign in.
  *
@@ -54,36 +56,16 @@ export function verifyToken(token) {
 }
 
 /** Reads the cookies out of a request. */
-export function readCookies(header = '') {
-  const jar = {};
-  for (const part of String(header).split(';')) {
-    const piece = part.trim();
-    if (!piece) continue;
-    const at = piece.indexOf('=');
-    if (at < 0) continue;
-    try {
-      jar[piece.slice(0, at)] = decodeURIComponent(piece.slice(at + 1));
-    } catch {
-      jar[piece.slice(0, at)] = piece.slice(at + 1);
-    }
-  }
-  return jar;
-}
+export { readCookies };
 
 /** Puts the signed cookie in the response. */
 export function setSessionCookie(res, token) {
-  res.cookie(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: MAX_AGE_MS,
-    path: '/',
-  });
+  setCookie(res, COOKIE_NAME, token, { maxAge: MAX_AGE_MS });
 }
 
 /** Removes the cookie. */
 export function clearSessionCookie(res) {
-  res.clearCookie(COOKIE_NAME, { path: '/' });
+  clearCookie(res, COOKIE_NAME);
 }
 
 /** True when this request comes from a signed in admin. */

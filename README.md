@@ -24,6 +24,10 @@ npm run dev     # starts both
 
 Then open **http://localhost:5173**.
 
+> The project is in the `BAYANSAFE` folder. The folder above it has a small
+> `package.json` that passes the commands on, so `npm run dev` works from
+> either place.
+
 | What            | Where                        |
 | --------------- | ---------------------------- |
 | The React site  | http://localhost:5173        |
@@ -62,21 +66,22 @@ Read the [database section](#the-database-postgresql) for the details.
 BAYANSAFE/
 +-- shared/
 �   +-- site.config.js     the text of the site: footer, cookie notice, navigation
+�   +-- rfid.js            the rules of a card number, used by the client and the server
 +-- client/                the React app (Vite)
 �   +-- public/images/     the pictures
 �   +-- src/
 �       +-- components/    the pieces of the page
 �       +-- content/       the text of the legal pages
-�       +-- hooks/         the loader, the active section, the site configuration
+�       +-- hooks/         the loader, the active section, the site configuration, the reader, the account
 �       +-- lib/           the code that draws the skeleton loader
-�       +-- pages/         Home, Privacy, Terms
-�       +-- styles/        style.css
+�       +-- pages/         Home, Privacy, Terms, Account, Admin
+�       +-- styles/        style.css, account.css, admin.css
 +-- server/                the Node.js app (Express)
 �   +-- .env.example       the database and Gmail settings, copy it to .env
 �   +-- src/
 �       +-- db/            the connection to PostgreSQL and the migrations
-�       +-- routes/        /api/register, /api/contact
-�       +-- services/      accounts, the Gmail connection, the email templates
+�       +-- routes/        /api/register, /api/contact, /api/account
+�       +-- services/      accounts, the sign ins, the Gmail connection, the email templates
 �       +-- index.js       the server itself
 +-- docker-compose.yml     a PostgreSQL server in a container
 ```
@@ -151,7 +156,9 @@ It registers the service `postgresql-x64-17` and starts it right away.
 
 | Table              | What is in it                                              |
 | ------------------ | ---------------------------------------------------------- |
-| `users`            | id, username, email, the hashed password, when it was made |
+| `users`            | id, username, email, the hashed password, the card, when it was made |
+| `user_sessions`    | the sign ins of the players                                |
+| `email_log`        | every email the site sent                                  |
 | `schema_migrations`| which migrations were already applied                      |
 
 Names are not case sensitive: `Juan` and `juan` are the same player. The
@@ -179,6 +186,7 @@ Put a new file in `server/src/db/migrations/`, named `002_...sql`, and run
 | `/`            | the one page with Home, About and Register                          |
 | `/about`       | jumps to the About part of that page                                |
 | `/registration`| jumps to the Register part of that page                             |
+| `/account`     | the account of the player: sign in, name, card, password, removal  |
 | `/privacy`     | the Privacy Policy                                                  |
 | `/terms`       | the Terms of Service                                                |
 
@@ -192,15 +200,27 @@ the right part of the page.
 | `GET /api/health`    | checks that the server and the database are alive                    |
 | `GET /api/config`    | the site configuration (footer, cookie notice, navigation)           |
 | `POST /api/register` | creates an account and emails a welcome message                      |
+| `GET /api/register/rfid/:uid` | says whether a card is already in use                    |
 | `GET /api/mail/status` | tells you whether Gmail is set up and reachable                   |
 | `POST /api/mail/test` | sends a test email to the site's own inbox                         |
 | `POST /api/contact`  | sends a message from the contact form to your Gmail                  |
+| `GET /api/account/session` | says whether a player is signed in                          |
+| `POST /api/account/login`   | signs a player in                                            |
+| `POST /api/account/logout`  | signs a player out                                           |
+| `GET /api/account`          | the account of the player                                    |
+| `PATCH /api/account`        | changes the name and the email                                |
+| `POST /api/account/password` | sets a new password                                         |
+| `POST /api/account/card`     | links a card, or takes the card away                          |
+| `DELETE /api/account`        | removes the account (the password is asked for)                |
 
 The registration form sends this to `POST /api/register`:
 
 ```json
-{ "username": "player1", "email": "player1@example.com", "password": "a-good-password", "acceptedTerms": true }
+{ "username": "player1", "email": "player1@example.com", "password": "a-good-password", "acceptedTerms": true, "rfidUid": "5A2B3C4D" }
 ```
+
+`rfidUid` is the card of the player. It may be left out &mdash; somebody can
+register without a card.
 
 The server checks everything and answers with `{ "ok": true, "message": "..." }`
 or with `{ "ok": false, "error": "..." }` and a status code (400 for a bad
@@ -217,6 +237,113 @@ The player sees *"We sent a welcome email to your address."* when it worked.
 
 Passwords are never stored as plain text. They are hashed with **scrypt** and a
 random salt before they go into the `users` table.
+
+## The RFID card reader
+
+The registration form has a field for the **card of the player**. The number
+can be read with a reader or typed by hand. Either way the number is saved
+with the account, in the `rfid_uid` column of the `users` table.
+
+A card can only belong to **one** account. The database says so (there is a
+unique index on the column), and the form warns about it as well: when a card
+is read, the server is asked whether it is still free, and a card that is
+already in use turns the field red.
+
+### Which readers work
+
+| Reader                                      | How it is used                                   |
+| ------------------------------------------- | ------------------------------------------------ |
+| A USB reader that works like a keyboard     | nothing to set up: plug it in and scan          |
+| A USB reader that shows up as a serial port | press **Connect a reader** (Chrome or Edge)     |
+| No reader at all                            | type the number by hand                          |
+
+The keyboard reader is the easiest one. The computer sees a keyboard, so the
+reader types the card number and presses Enter by itself. The form catches
+those keys, puts the number in the field and stops the Enter key from sending
+the form.
+
+The serial reader is the little one that says "USB Serial" on the sticker.
+The browser has to be allowed to open that port, so press **Connect a reader**
+and pick it in the list. The button only shows up in browsers that can do it
+(Chrome and Edge).
+
+> The keys of the other fields are never taken away from you: a name that is
+> typed by hand is not mistaken for a card.
+
+### The card number
+
+The number is cleaned up before it is saved: upper case, no spaces and no
+`0x` in front. Some readers print the leading zeros of the card and some do
+not, so the leading zeros are dropped &mdash; that way the same card gets the
+same number on every reader.
+
+The rules live in **`shared/rfid.js`**, which the client and the server both
+use, so they always agree.
+
+### The card in the admin dashboard
+
+The dashboard shows the card of every account, and the search box looks for
+it as well. The **Card** button links a card to an account that was made
+without one, or takes the card away again.
+
+### The files
+
+| File                                    | What it holds                                   |
+| --------------------------------------- | ----------------------------------------------- |
+| `shared/rfid.js`                        | the rules of a card number                      |
+| `client/src/hooks/useRfidReader.js`     | watches for a card being read                   |
+| `client/src/components/RfidField.jsx`   | the card field of the form                      |
+| `server/src/services/users.js`          | reads and writes the cards                      |
+| `server/src/db/migrations/003_add_rfid_to_users.sql` | the card column        |
+
+## The account page
+
+Every player has an account page at **`/account`**. The tab **ACCOUNT** in the
+pill at the top of the site goes there. When nobody is signed in, the page
+shows a sign in card that looks exactly like the registration form.
+
+When the player is signed in, the page shows:
+
+| Part                | What is in it                                              |
+| ------------------- | ---------------------------------------------------------- |
+| the head            | a pixel face, the account number, when the account was made and when the player signed in last |
+| **account details** | the account name and the email, both can be changed         |
+| **RFID card / ID**  | the card of the player, read with the reader                |
+| **password**        | a new password, the old one is asked for first              |
+| **danger zone**     | removing the account, the password is asked for first       |
+
+The **account number** (`BS-1A2B3C`) is given to every account and never
+changes, so it can be written on a paper and still mean the same thing
+tomorrow. The card of the RFID reader is a different thing: it can be linked,
+changed and taken away again.
+
+### The sign in
+
+A player signs in with their email and their password. The server then hands
+out a cookie with a random token, and only the hash of that token is kept in
+the database. That way a stolen database cannot be used to sign in as
+somebody else, and the sign in of a player can be ended at any time.
+
+After five wrong tries the sign in is blocked for ten minutes. When the
+password is changed, every other sign in of that player is ended.
+
+The cookie is `httpOnly`, so the page cannot read it, and it is sent with
+`SameSite=Lax`.
+
+### The files
+
+| File                                    | What it holds                                   |
+| --------------------------------------- | ----------------------------------------------- |
+| `client/src/pages/AccountPage.jsx`      | the account page                                |
+| `client/src/components/AccountSignIn.jsx`| the sign in card                              |
+| `client/src/components/AccountDetails.jsx`| the parts of the account                      |
+| `client/src/components/PixelAvatar.jsx` | the little pixel face of a player               |
+| `client/src/hooks/useAccount.js`        | the account of the player in the browser        |
+| `client/src/styles/account.css`         | how the account page looks                      |
+| `server/src/routes/account.js`          | the account API                                 |
+| `server/src/services/userAuth.js`       | the sign ins of the players                     |
+| `server/src/services/cookies.js`        | the cookies of the site                         |
+| `server/src/db/migrations/004_create_user_sessions.sql` | the sign ins table   |
 
 ## Sending email
 
@@ -345,11 +472,13 @@ project.
 The dashboard shows:
 
 - **the numbers** &mdash; how many accounts there are, how many joined today and
-  this week, and how many emails went out (and how many failed)
+  this week, how many cards are linked, and how many emails went out (and how
+  many failed)
 - **a chart** of the new accounts over the last 14 days
 - **the system** &mdash; whether the database and the email are working, with
   the PostgreSQL version
-- **the accounts** &mdash; with a search box, and a button to remove one
+- **the accounts** &mdash; with a search box, the card of every player, and a
+  button to remove one
 - **the email log** &mdash; every email the site sent, and whether it worked
 
 ### How the sign in works
@@ -375,6 +504,7 @@ Anyone can still reach `/admin` &mdash; but they cannot get past the password.
 | `GET /api/admin/users`     | the accounts, `?q=` searches          |
 | `GET /api/admin/emails`    | the email log                         |
 | `GET /api/admin/status`    | how the database and the email do     |
+| `PATCH /api/admin/users/:id/card` | link a card to an account     |
 | `DELETE /api/admin/users/:id` | remove one account                 |
 
 ### The files
@@ -392,6 +522,22 @@ Anyone can still reach `/admin` &mdash; but they cannot get past the password.
 Everything people read is in **`shared/site.config.js`**: the brand name, the
 navigation, the footer, the contact address and the cookie notice. Edit that
 one file and both the client and the server use the new text.
+
+## The layout on a phone
+
+The site is made for a phone first, because most of the players will use one.
+Everything is measured in `rem`, so the whole layout shrinks together like a
+picture instead of breaking apart.
+
+| Width      | What changes                                                  |
+| ---------- | ------------------------------------------------------------- |
+| under 700px | the navigation becomes a bar across the top of the screen, the tagline moves under the picture, and the fields get a text of 16 pixels so iOS does not zoom in when you tap them |
+| under 820px | the logo becomes a little smaller, so it never runs into the navigation |
+| under 600px | the dashboard stacks its tiles in two columns and leaves out the long columns of the tables |
+
+The parts you have to touch with a finger (the tabs, the eye of the password,
+the checkbox of the terms, the button of the reader) are all at least 34
+pixels high on a phone.
 
 ## The loader
 

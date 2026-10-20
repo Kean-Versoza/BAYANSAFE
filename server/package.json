@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "dev": "node --env-file-if-exists=.env --watch --watch-path=src src/index.js",
+    "dev": "node --env-file-if-exists=.env --watch --watch-path=src --watch-path=../shared src/index.js",
     "start": "node --env-file-if-exists=.env src/index.js",
     "mail:check": "node --env-file-if-exists=.env src/scripts/checkMail.js",
     "db:setup": "node --env-file-if-exists=.env src/scripts/setupDb.js",

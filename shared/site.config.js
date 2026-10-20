@@ -13,11 +13,14 @@ export const siteConfig = {
     tagline: 'A Philippine Smart Community Disaster Intelligence and Preparedness Response Game',
   },
 
-  // The three tabs of the pill in the top-right corner
+  // The tabs of the pill in the top-right corner.
+  // A tab with a "path" opens that page, a tab without one jumps to that
+  // part of the home page.
   nav: [
     { id: 'home', label: 'HOME' },
     { id: 'about', label: 'ABOUT' },
     { id: 'registration', label: 'REGISTER' },
+    { id: 'account', label: 'ACCOUNT', path: '/account' },
   ],
 
   footer: {

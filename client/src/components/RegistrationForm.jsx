@@ -1,5 +1,8 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import { paintFormContents } from '../lib/skeleton.js';
+import RfidField from './RfidField.jsx';
 
 /**
  * The registration card.
@@ -7,6 +10,10 @@ import { paintFormContents } from '../lib/skeleton.js';
  * The big yellow button opens the form, and the form briefly shows a
  * skeleton while it appears. The account is then created on the Node.js
  * server, which stores the password as a salted hash.
+ *
+ * The RFID card of the player can be read with a reader while the form is
+ * open. The number is checked against the accounts that already exist, so
+ * the same card cannot be used twice.
  */
 export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
   const [open, setOpen] = useState(false);
@@ -14,6 +21,8 @@ export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState(null);
+  const [rfid, setRfid] = useState('');
+  const [cardTaken, setCardTaken] = useState(false);
 
   const formRef = useRef(null);
   const overlayRef = useRef(null);
@@ -55,7 +64,19 @@ export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
     wasLoading.current = loading;
   }, [loading]);
 
-  // 3. Create the account on the server
+  // 3. A card was read: the server is asked whether it is still free
+  const onCardScan = useCallback(async (card) => {
+    setCardTaken(false);
+    try {
+      const res = await fetch(`/api/register/rfid/${encodeURIComponent(card)}`);
+      const body = await res.json().catch(() => ({}));
+      if (body.ok) setCardTaken(Boolean(body.taken));
+    } catch {
+      // The server is not reachable. The card is checked again on submit.
+    }
+  }, []);
+
+  // 4. Create the account on the server
   const onSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -66,6 +87,7 @@ export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
       email: String(data.get('email') ?? '').trim(),
       password: String(data.get('password') ?? ''),
       acceptedTerms: data.get('terms') === 'on',
+      rfidUid: rfid.trim(),
     };
 
     setStatus(null);
@@ -91,9 +113,13 @@ export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
           ? ` ${body.emailNote}`
           : '';
 
-      setStatus({ type: 'ok', text: (body.message ?? 'Your account is ready.') + note });
+      const card = body.user?.rfidUid ? ` Card ${body.user.rfidUid} is linked to the account.` : '';
+
+      setStatus({ type: 'ok', text: (body.message ?? 'Your account is ready.') + note + card });
       form.reset();
       setShowPassword(false);
+      setRfid('');
+      setCardTaken(false);
     } catch {
       setStatus({ type: 'error', text: 'We could not reach the server. Please try again.' });
     } finally {
@@ -116,6 +142,15 @@ export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
         onSubmit={onSubmit}
       >
         <p className="form-title">CREATE ACCOUNT</p>
+
+        {/* The card of the player, read with the RFID reader */}
+        <RfidField
+          value={rfid}
+          onChange={setRfid}
+          onScan={onCardScan}
+          taken={cardTaken}
+          enabled={open}
+        />
 
         <input type="text" name="username" placeholder="Username" required autoComplete="username" />
         <input type="email" name="email" placeholder="Email Address" required autoComplete="email" />
@@ -155,6 +190,12 @@ export default function RegistrationForm({ tagline, formLoaderMs = 700 }) {
         </button>
 
         {status && <p className={`form-status form-status--${status.type}`}>{status.text}</p>}
+
+        {status?.type === 'ok' && (
+          <p className="account-foot">
+            You can <Link to="/account">sign in to your account</Link> now.
+          </p>
+        )}
 
         {loading && <div ref={overlayRef} className="form-skeleton" aria-hidden="true" />}
       </form>

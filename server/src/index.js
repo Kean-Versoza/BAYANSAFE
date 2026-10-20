@@ -8,6 +8,7 @@ import registerRoutes from './routes/register.js';
 import contactRoutes from './routes/contact.js';
 import mailRoutes from './routes/mail.js';
 import adminRoutes from './routes/admin.js';
+import accountRoutes from './routes/account.js';
 import { checkDatabase, closeDatabase } from './db/pool.js';
 import { migrate } from './db/migrate.js';
 
@@ -45,6 +46,7 @@ app.use('/api/register', registerRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/mail', mailRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/account', accountRoutes);
 
 /* ------------------------------------------------------------------
    The React app
