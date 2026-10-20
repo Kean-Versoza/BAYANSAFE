@@ -46,10 +46,23 @@
    `align-items: center` would shrink it to the width of its contents,
    and the heading would sit left-aligned. In the footer both came from
    `.site-footer` (text-align: center), so they are stated here to keep
-   the form looking the same. */
+   the form looking the same.
+
+   The white panel is the colour of the footer (.site-footer is
+   rgba(255, 255, 255, 0.94)). In the footer the form sat on that
+   panel, which is what made it readable; on this page it would sit
+   straight on the background picture, so the same panel is drawn
+   behind it. */
 .help-page .contact-form {
     margin-top: 0;
     width: 100%;
+    /* The padding sits inside the form's designed max-width, not on top
+       of it, so the fields keep the same width they had in the footer. */
+    box-sizing: border-box;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 0.9rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 .help-page .contact-form-title {
@@ -78,6 +91,9 @@
     .help-top { padding: var(--bar-pad) 1.25rem; }
 
     .help-page { padding: 0 1rem 2rem; }
+
+    /* a little less padding, so the form keeps room on a small screen */
+    .help-page .contact-form { padding: 1.4rem; }
 
     /* the two fields go under each other */
     .help-page .contact-form-row {
