@@ -20,7 +20,7 @@
 }
 
 .account-logo img {
-    height: calc(var(--logo-h) * 0.75);
+    height: var(--logo-h);
     width: auto;
     max-width: 60vw;
     display: block;
