@@ -69,7 +69,7 @@ export default function ContactForm() {
   };
 
   return (
-    <form className="contact-form" id="help" onSubmit={onSubmit}>
+    <form className="contact-form" onSubmit={onSubmit}>
       <p className="contact-form-title">Send us a message</p>
 
       <div className="contact-form-row">

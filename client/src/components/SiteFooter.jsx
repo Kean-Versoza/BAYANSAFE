@@ -1,5 +1,4 @@
 import FooterLinks from './FooterLinks';
-import ContactForm from './ContactForm';
 
 /**
  * Site footer. Content comes from the Node.js server (`GET /api/config`),
@@ -7,8 +6,8 @@ import ContactForm from './ContactForm';
  * `onJump` is optional - when given, the logo scrolls to a section instead
  * of reloading the page.
  *
- * The "Send us a message" form is part of the footer, so the Help Center link
- * lands on it.
+ * The "Send us a message" form lives on its own page at /help, which the
+ * "Help Center" link opens.
  */
 export default function SiteFooter({ config, onJump }) {
   const footer = config.footer;
@@ -51,8 +50,6 @@ export default function SiteFooter({ config, onJump }) {
         {footer.notes.map((note) => (
           <p key={note}>{note}</p>
         ))}
-
-        <ContactForm />
       </div>
     </footer>
   );

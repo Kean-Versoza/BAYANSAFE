@@ -42,7 +42,7 @@ export const siteConfig = {
       { label: 'Privacy Policy', url: '/privacy' },
       { label: 'Terms of Service', url: '/terms' },
       { label: 'About us', url: '#about' },
-      { label: 'Help Center', url: '#help' },
+      { label: 'Help Center', url: '/help' },
     ],
 
     // Small print: one paragraph per line

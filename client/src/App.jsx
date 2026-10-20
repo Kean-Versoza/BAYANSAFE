@@ -5,6 +5,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import AccountPage from './pages/AccountPage';
 import AdminPage from './pages/AdminPage';
+import HelpPage from './pages/HelpPage';
 
 /** SPA route changes behave like real page loads: start at the top. */
 function ScrollToTop() {
@@ -37,6 +38,9 @@ export default function App() {
 
         {/* The dashboard for the team */}
         <Route path="/admin" element={<AdminPage />} />
+
+        {/* The "Send us a message" form on its own page */}
+        <Route path="/help" element={<HelpPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

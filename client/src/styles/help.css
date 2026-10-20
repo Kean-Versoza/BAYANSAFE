@@ -1,0 +1,155 @@
+/* ------------------------------------------------------------------
+   The Help Center page
+   ------------------------------------------------------------------
+   Only the "Send us a message" form, centered on the screen. It reuses
+   the same card look as the registration and account pages: a white
+   card with a thick wooden border, the pixel font for the heading and
+   the yellow button.
+   ------------------------------------------------------------------ */
+
+.help-frame {
+    padding-bottom: 2rem;
+}
+
+/* The logo of the page. It sits in the flow, so it never runs into the
+   navigation pill above it. */
+.help-top {
+    display: flex;
+    align-items: flex-start;
+    flex-shrink: 0;
+    height: calc(var(--bar-pad) * 2 + var(--logo-h));
+    padding: var(--bar-pad) 2.5rem;
+}
+
+.help-logo img {
+    height: var(--logo-h);
+    width: auto;
+    max-width: 60vw;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* The form is the only thing on the page, so it is centered both ways. */
+.help-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.25rem 3rem;
+}
+
+/* ---------- the card ---------- */
+.help-page .contact-form {
+    width: min(34rem, 94vw);
+    margin: 0 auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(4px);
+    border: 3px solid #3b2410;
+    border-radius: 0.9rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    z-index: 15;
+}
+
+/* The heading of the card, matching the other cards on the site */
+.help-page .contact-form-title {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.05rem;
+    color: #1a0500;
+    text-align: center;
+    margin-bottom: 0.35rem;
+}
+
+.help-page .contact-form-row {
+    display: flex;
+    gap: 0.7rem;
+}
+
+.help-page .contact-form input,
+.help-page .contact-form textarea {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    border: 2px solid #3b2410;
+    border-radius: 0.4rem;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a0500;
+    background: #ffffff;
+}
+
+.help-page .contact-form input::placeholder,
+.help-page .contact-form textarea::placeholder {
+    color: #666666;
+    font-weight: 400;
+}
+
+.help-page .contact-form textarea {
+    resize: vertical;
+    min-height: 8rem;
+}
+
+.help-page .contact-form-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.35rem;
+}
+
+.help-page .contact-form-actions .btn-yellow {
+    width: 100%;
+}
+
+.help-page .contact-status {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.help-page .contact-status--ok { color: #1d6b2f; }
+.help-page .contact-status--error { color: #8a1c1c; }
+
+/* The way back to the site, under the card */
+.help-back {
+    margin-top: 1.5rem;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.05rem;
+    color: #3b2410;
+    text-decoration: underline;
+}
+
+.help-back:hover { color: #1a0500; }
+
+/* ---------- on a phone ---------- */
+@media (max-width: 700px) {
+    .help-top { padding: var(--bar-pad) 1.25rem; }
+
+    .help-page { padding: 0 1rem 2rem; }
+
+    .help-page .contact-form { padding: 1.4rem; }
+
+    /* the two fields go under each other */
+    .help-page .contact-form-row {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    /* 16px keeps iOS from zooming in when a field is focused */
+    .help-page .contact-form input,
+    .help-page .contact-form textarea {
+        font-size: 16px;
+    }
+
+    .help-page .contact-form-title { font-size: 1.15rem; }
+}

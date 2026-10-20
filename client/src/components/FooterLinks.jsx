@@ -9,8 +9,8 @@ import { Link } from 'react-router-dom';
  * Internal urls ("/privacy") go through the router; anything else is a normal
  * link, which is how `mailto:` and external addresses work.
  *
- * A url that is an in-page anchor ("#about", "#help") is handed to `onJump`
- * instead of letting the browser jump: the main page is driven by its own
+ * A url that is an in-page anchor ("#about") is handed to `onJump` instead of
+ * letting the browser jump: the main page is driven by its own
  * one-screen-at-a-time scroll controller (see `usePageSnap`), so a native hash
  * jump would fight it. `onJump` is the same path the nav pill uses.
  */
