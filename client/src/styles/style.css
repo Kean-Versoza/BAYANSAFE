@@ -1,0 +1,951 @@
+    /* ---------- Core Reset & Base Variables ---------- */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --blue: #2b9cf2;
+        --yellow: #ffd21f;
+        --wood: #8b5a2b;
+        --wood-dark: #5a3513;
+        --text: #1a1a2e;
+        --parchment: rgba(255, 255, 255, 0.92);
+        --topbar-h: 6.875rem;
+        --bar-pad: 1.75rem;     /* space above the logo / nav */
+        --logo-h: 9.5rem;       /* logo height (the nav centers itself on this) */
+        --nav-right: 6rem;      /* distance of the nav from the right edge */
+        --about-lift: 2rem;     /* how much higher the About panel sits (bigger = higher) */
+    }
+
+    /* One base size that follows the window's width AND height.
+    Everything below uses rem, so the whole layout scales together like a picture. */
+    html {
+        font-size: clamp(12px, min(0.9vw, 1.9vh), 16px);
+        -webkit-text-size-adjust: 100%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Open Sans', sans-serif;
+        color: var(--text);
+        background-color: #4fb3ff;
+        min-height: 100vh;
+        min-height: 100dvh;
+    }
+
+    /* ---------- Background fills the whole screen ---------- */
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background:
+            url('/images/bg.png') center 75% / cover no-repeat,
+            linear-gradient(#4fb3ff 0%, #8fd0ff 45%, #6fbf3f 100%);
+    }
+
+    /* ---------- Page Frame ---------- */
+    .frame {
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .frame-inner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.35);
+        pointer-events: none;
+    }
+    .frame > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ---------- Top area at the start of every section ---------- */
+    .section-top {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: var(--bar-pad) 2.5rem;
+        min-height: 7.7rem;
+        width: 100%;
+        flex-shrink: 0;
+    }
+
+    /* ---------- Brand Logo (fixed; visible from About onwards) ---------- */
+    .logo img {
+        height: var(--logo-h);
+        width: auto;
+        max-width: 60vw;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+    }
+
+    .logo {
+        align-self: center;
+        position: fixed;
+        top: calc(var(--bar-pad) + var(--logo-h) / 2);
+        transform: translateY(-50%);
+        margin: 0;
+        z-index: 125;               /* above the page content, below the loader (150) */
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    /* Hidden while Home is on screen */
+    body[data-section="home"] .logo {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* The logo is fixed, so About's copy already follows you into Registration.
+    This hides the second copy so two logos never stack on top of each other. */
+    #registration .logo {
+        display: none;
+    }
+
+    .section-top--logo {
+        height: calc(var(--bar-pad) * 2 + var(--logo-h));
+        min-height: 0;
+        padding: var(--bar-pad) 2.5rem;
+        align-items: flex-start;
+    }
+
+    /* About panel sits a little higher */
+    #about .section-top--logo {
+        height: calc(var(--bar-pad) * 2 + var(--logo-h) - var(--about-lift));
+    }
+
+    /* ---------- Nav pill: fixed, always visible while scrolling ---------- */
+    .nav-pill {
+        position: fixed;
+        top: calc(var(--bar-pad) + var(--logo-h) / 2);
+        right: var(--nav-right);
+        transform: translateY(-50%);
+        margin: 0;
+        z-index: 120;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.6rem 0.9rem;
+        border-radius: 3rem;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .nav-pill a {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: var(--text);
+        text-decoration: none;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 9.4rem;
+        padding: 0 0.9rem;
+        height: 2.9rem;
+        border-radius: 1.5rem;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+    }
+
+    .nav-pill a:hover {
+        background: rgba(255, 210, 31, 0.8);
+    }
+    .nav-pill a:focus-visible {
+        outline: 3px solid #3b2410;
+        outline-offset: 2px;
+    }
+    .nav-pill a.active {
+        background: var(--yellow);
+        border: 2px solid #3b2410;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ---------- Home Page Banner ---------- */
+    .hero {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 1.5rem 1rem 7.5rem;     /* bottom space is reserved for the tagline */
+        position: relative;
+        width: 100%;
+    }
+
+    .main-banner {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        z-index: 10;
+    }
+
+    .main-banner img {
+        height: 23.5rem;
+        max-width: 94vw;
+        width: auto;
+        display: block;
+        object-fit: contain;
+        image-rendering: pixelated;
+    }
+
+    /* ---------- Tagline (bottom of Home + Registration) ---------- */
+    .tagline,
+    .hero .tagline,
+    .register-page .tagline,
+    .panel .tagline {
+        position: absolute;
+        bottom: 1.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 53rem;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+        z-index: 100;
+
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.85rem;
+        line-height: 1.4;
+        text-align: center;
+        color: #ffd21f;
+        letter-spacing: 0.1rem;
+
+        text-shadow:
+            0.125rem  0.125rem 0 #1a0500,
+        -0.125rem  0.125rem 0 #1a0500,
+            0.125rem -0.125rem 0 #1a0500,
+        -0.125rem -0.125rem 0 #1a0500,
+            0.125rem  0       0 #1a0500,
+        -0.125rem  0       0 #1a0500,
+            0         0.125rem 0 #1a0500,
+            0        -0.125rem 0 #1a0500,
+            0         0.25rem  0.5rem rgba(0, 0, 0, 0.75);
+    }
+
+    .register-page .tagline {
+        z-index: 1;
+    }
+
+    /* ---------- About Page Panel ---------- */
+    .panel {
+        display: block;
+        position: relative;
+        width: 88%;
+        max-width: 50rem;
+        height: auto;
+        margin: 1.5rem auto 1.5rem;
+        padding: 1.25rem 2.2rem 1.5rem;
+
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(4px);
+        border: 3px solid #3b2410;
+        border-radius: 0.75rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+        font-size: 1.0625rem;
+        line-height: 1.4;
+        color: #1a0500;
+        z-index: 0;
+    }
+
+    .panel p,
+    .panel li {
+        font-weight: 600;
+        text-shadow: none;
+    }
+
+    .panel p {
+        margin-bottom: 0.5rem;
+    }
+
+    .content-columns {
+        display: flex;
+        gap: 2.5rem;
+        margin-top: 0.625rem;
+    }
+
+    .column {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .panel .heading {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-bottom: 0.375rem;
+        color: #3b2410;
+        border-bottom: 2px dashed rgba(59, 36, 16, 0.2);
+        padding-bottom: 0.125rem;
+    }
+
+    .features-list {
+        margin: 0 0 0 1.125rem;
+        list-style-type: disc;
+    }
+
+    .features-list li {
+        margin-bottom: 0.25rem;
+    }
+
+    .disaster-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+
+    .disaster p {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-weight: 700;
+        margin-bottom: 0.125rem;
+        color: #d7b400;
+    }
+
+    .disaster-icon {
+        width: 1rem;
+        height: 1rem;
+        flex-shrink: 0;
+    }
+
+    .disaster ul.stacked-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem 0;
+        align-items: flex-start;
+    }
+
+    .disaster ul.stacked-list li {
+        white-space: normal;
+    }
+
+    /* ---------- Registration Page ---------- */
+    .register-page {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        position: relative;
+        padding: 1rem 1rem 7.5rem;       /* bottom space is reserved for the tagline */
+    }
+
+    .register-page .btn-yellow.main-trigger {
+        display: block;
+        margin: 0 auto;
+        background: var(--yellow);
+        color: var(--text);
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.75rem;
+        border: 3px solid #3b2410;
+        border-radius: 0.5rem;
+        padding: 1rem 4rem;
+        cursor: pointer;
+        box-shadow: 0 0.375rem 0 #3b2410, 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.05s, box-shadow 0.05s;
+        z-index: 10;
+
+    }
+
+    .register-page .btn-yellow.main-trigger:hover {
+        background: #ffe14d;
+    }
+
+    .register-page .btn-yellow.main-trigger:active {
+        transform: translateY(4px);
+        box-shadow: 0 2px 0 #3b2410;
+    }
+
+    /* ---------- Registration Form Card ---------- */
+    .reg-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        width: min(30rem, 92vw);
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(4px);
+        border: 3px solid #3b2410;
+        border-radius: 0.9rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        margin: 0 auto;
+        z-index: 15;
+    }
+
+    .reg-form.hidden-form {
+        display: none !important;
+    }
+
+    .reg-form .form-title {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: bold;
+        font-size: 1.75rem;
+        color: #3b2410;
+        text-align: center;
+        margin-bottom: 0.6rem;
+        text-shadow: 0 1px 0 white;
+    }
+
+    .reg-form input[type="email"],
+    .reg-form input[type="text"],
+    .reg-form input[type="password"] {
+        width: 100%;
+        padding: 0.95rem;
+        border: 2px solid #3b2410;
+        border-radius: 0.45rem;
+        font-size: 1.1rem;
+        background: #ffffff;
+        color: #000000;
+        font-weight: 600;
+    }
+
+    .reg-form input::placeholder {
+        color: #666666;
+    }
+
+    .reg-form .terms {
+        font-size: 1rem;
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        color: #1a0500;
+        font-weight: 700;
+    }
+
+    .reg-form .terms input[type="checkbox"] {
+        width: 1.15rem;
+        height: 1.15rem;
+        flex-shrink: 0;
+    }
+
+    .reg-form .btn-submit {
+        margin-top: 0.6rem;
+        padding: 0.95rem;
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.4rem;
+        background: #ffe14d;
+        color: black;
+        border: 2px solid #1a0500;
+        border-radius: 0.45rem;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #1a0500;
+        text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4);
+    }
+
+    .reg-form .btn-submit:hover {
+        background: #fff266;
+    }
+
+    .reg-form .btn-submit:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 #1a0500;
+    }
+
+    .reg-form .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: wait;
+    }
+
+    /* ---------- Message under the registration form ---------- */
+    .form-status {
+        margin: 0;
+        padding: 0.7rem 0.9rem;
+        border-radius: 0.4rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-align: center;
+        border: 2px solid;
+    }
+    .form-status--ok {
+        color: #1c5b26;
+        background: #e4f7e6;
+        border-color: #1c5b26;
+    }
+    .form-status--error {
+        color: #8a1c1c;
+        background: #fde8e8;
+        border-color: #8a1c1c;
+    }
+
+    /* ---------- Password Field with Eye Toggle ---------- */
+    .password-wrapper {
+        position: relative;               /* the icon positions itself against this box */
+        width: 100%;
+    }
+
+    .password-wrapper input {
+        width: 100%;
+        padding-right: 3.2rem !important; /* keeps typed text from running under the icon */
+    }
+
+    .toggle-password-eye {
+        position: absolute;
+        top: 50%;
+        right: 0.9rem;
+        transform: translateY(-50%);
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 0;
+        color: #3b2410;                   /* icon colour */
+        cursor: pointer;
+        transition: transform 0.1s ease, color 0.1s ease;
+    }
+
+    .toggle-password-eye:hover {
+        transform: translateY(-50%) scale(1.15);
+        color: #1a0500;
+    }
+
+    .toggle-password-eye svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        fill: currentColor;
+        display: block;
+    }
+
+    /* Default (password hidden): crossed-out eye
+    After clicking (password visible): open eye */
+    .toggle-password-eye .icon-eye { display: none; }
+    .toggle-password-eye .icon-eye-off { display: block; }
+
+    .toggle-password-eye.is-visible .icon-eye { display: block; }
+    .toggle-password-eye.is-visible .icon-eye-off { display: none; }
+
+    /* =====================================================
+    RESPONSIVE ADJUSTMENTS
+    (the rem scaling above handles most sizes; these only
+        fix things that can't simply shrink)
+    ===================================================== */
+
+    /* Short windows (landscape phones, small laptop windows) */
+    @media (max-height: 560px) {
+        .main-banner img { height: 15rem; }
+        :root { --logo-h: 5rem; }
+        .hero { padding-bottom: 6.5rem; }
+        .tagline,
+        .hero .tagline,
+        .register-page .tagline { font-size: 1.4rem; bottom: 1rem; }
+    }
+
+    /* Tablets and narrow windows */
+    @media (max-width: 900px) {
+        .content-columns { gap: 1.25rem; }
+        .nav-pill a { min-width: 6rem; }
+    }
+
+    /* Phones / very narrow windows: only here do things stack */
+    @media (max-width: 700px) {
+        html { font-size: 14px; }
+        :root { --logo-h: 4.5rem; }
+
+        .section-top {
+            justify-content: center;
+            padding: 4.8rem 1rem 0.9rem;
+        }
+        .nav-pill {
+            top: 0.6rem;
+            right: auto;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .main-banner img {
+            height: auto;
+            width: min(94vw, 34rem);
+        }
+
+        .content-columns {
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .panel {
+            width: 94%;
+            padding: 1rem 1.1rem 1.25rem;
+            font-size: 1rem;
+        }
+
+        .hero,
+        .register-page { padding-bottom: 9rem; }
+
+        .tagline,
+        .hero .tagline,
+        .register-page .tagline {
+            font-size: 1.2rem;
+            bottom: 1rem;
+            letter-spacing: 0.05rem;
+            text-shadow:
+                1px  1px 0 #1a0500,
+            -1px  1px 0 #1a0500,
+                1px -1px 0 #1a0500,
+            -1px -1px 0 #1a0500,
+                0    2px 4px rgba(0, 0, 0, 0.75);
+        }
+
+        .register-page .btn-yellow.main-trigger {
+            font-size: 1.4rem;
+            padding: 0.9rem 2.5rem;
+        }
+    }
+
+    /* Very small phones */
+    @media (max-width: 400px) {
+        .nav-pill { gap: 0.25rem; padding: 0.4rem 0.5rem; }
+        .nav-pill a {
+            min-width: 0;
+            padding: 0 0.6rem;
+            font-size: 0.8rem;
+            height: 2.1rem;
+        }
+        .tagline,
+        .hero .tagline,
+        .register-page .tagline { font-size: 1.05rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+    }
+
+/* ---------- Skeleton loader (drawn by the script in base.html from the real layout) ---------- */
+.page-skeleton {
+    position: fixed;
+    inset: 0;
+    z-index: 150;                         /* above the real nav, logo and cookie bar */
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(143, 208, 255, 0.95) 0%, rgba(190, 226, 150, 0.95) 100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.page-skeleton.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+.page-skeleton > *,
+.form-skeleton > * { position: absolute; }
+
+/* Shimmer */
+.sk {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.35) 25%,
+        rgba(255, 255, 255, 0.8) 50%,
+        rgba(255, 255, 255, 0.35) 75%);
+    background-size: 200% 100%;
+    animation: sk-shimmer 1.3s ease-in-out infinite;
+    border-radius: 0.6rem;
+}
+@keyframes sk-shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+.sk-card   { background: rgba(255, 255, 255, 0.4);  box-shadow: inset 0 0 0 3px rgba(59, 36, 16, 0.3); }
+.sk-pill   { background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.5); }
+.sk-cookie { background: rgba(255, 255, 255, 0.6);  box-shadow: inset 0 3px 0 rgba(59, 36, 16, 0.3); }
+
+/* ---------- Registration form loader ---------- */
+.reg-form { position: relative; }
+.reg-form.is-loading { visibility: hidden; }          /* real form hidden, its space kept */
+.form-skeleton {
+    position: absolute;
+    visibility: visible;                              /* shows even though the form is hidden */
+    z-index: 20;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 0 0 3px rgba(59, 36, 16, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sk { animation: none; }
+}
+
+    /* ---------- Site footer ---------- */
+    .site-footer {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.94);
+        border-top: 3px solid #3b2410;
+        padding: 2rem 2.5rem 6rem;          /* extra bottom space so the cookie bar never hides the last line */
+        color: #6b5a4a;
+        font-size: 0.85rem;
+        line-height: 1.7;
+    }
+    .footer-inner {
+        max-width: 62rem;
+        margin: 0 auto;
+    }
+    .footer-top {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.25rem 3rem;
+        margin-bottom: 1rem;
+    }
+    .footer-logo img {
+        height: 4.5rem;
+        width: auto;
+        display: block;
+    }
+    .footer-badges {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+    }
+    .footer-badges img {
+        height: 3.4rem;
+        width: auto;
+        display: block;
+    }
+    .site-footer p { margin-bottom: 0.35rem; }
+    .site-footer a {
+        color: inherit;
+        text-decoration: underline;
+    }
+    .site-footer a:hover { color: #3b2410; }
+    .footer-contact .sep { margin: 0 0.6rem; }
+
+    /* ---------- Contact form in the footer ---------- */
+    .contact-form {
+        margin-top: 1.5rem;
+        max-width: 34rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .contact-form-title {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #3b2410;
+        margin-bottom: 0.1rem;
+    }
+    .contact-form-row {
+        display: flex;
+        gap: 0.6rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 2px solid #3b2410;
+        border-radius: 0.4rem;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1a0500;
+        background: #ffffff;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder {
+        color: #666666;
+        font-weight: 400;
+    }
+    .contact-form textarea {
+        resize: vertical;
+        min-height: 5rem;
+    }
+    .contact-form-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .contact-form .btn-yellow {
+        background: var(--yellow);
+        color: var(--text);
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #3b2410;
+        border-radius: 0.4rem;
+        padding: 0.55rem 1.4rem;
+        cursor: pointer;
+        box-shadow: 0 0.25rem 0 #3b2410;
+        transition: transform 0.05s, box-shadow 0.05s, background 0.15s;
+    }
+    .contact-form .btn-yellow:hover { background: #ffe14d; }
+    .contact-form .btn-yellow:active {
+        transform: translateY(2px);
+        box-shadow: 0 0.1rem 0 #3b2410;
+    }
+    .contact-form .btn-yellow:disabled {
+        opacity: 0.7;
+        cursor: wait;
+    }
+    .contact-status {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+    .contact-status--ok { color: #1c5b26; }
+    .contact-status--error { color: #8a1c1c; }
+
+    /* ---------- Cookie bar ---------- */
+    .cookie-banner {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 130;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3rem;
+        padding: 1rem 2rem;
+        background: #ffffff;
+        border-top: 3px solid #3b2410;
+        color: var(--text);
+        font-size: 0.95rem;
+    }
+    .cookie-banner[hidden] { display: none; }
+    .cookie-banner a { color: var(--blue); }
+    .cookie-banner button {
+        background: #3b2410;
+        color: #ffffff;
+        border: none;
+        border-radius: 0.4rem;
+        padding: 0.5rem 2.5rem;
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+    .cookie-banner button:hover { background: #5a3513; }
+
+    /* While the cookie bar is showing, lift the bottom taglines above it 
+    .cookie-open .hero .tagline,
+    .cookie-open .register-page .tagline {
+        bottom: calc(1.75rem + var(--cookie-h, 4.5rem));
+    }
+    */
+
+    @media (max-width: 700px) {
+        .site-footer { padding: 1.5rem 1.25rem 9rem; }
+        .contact-form-row { flex-direction: column; }
+        .cookie-banner {
+            flex-direction: column;
+            gap: 0.7rem;
+            padding: 0.9rem 1rem;
+            text-align: center;
+        }
+    }
+
+        /* ---------- Privacy Policy + Terms of Service pages ---------- */
+    .nav-pill--single a {
+        min-width: 0;
+        padding: 0 1.6rem;
+    }
+
+    .legal-top {
+        display: flex;
+        align-items: flex-start;
+        flex-shrink: 0;
+        height: calc(var(--bar-pad) * 2 + var(--logo-h) - var(--about-lift));   /* same height as the About section's top */
+        padding: var(--bar-pad) 2.5rem;
+    }
+    .legal-logo img {
+        height: var(--logo-h);
+        width: auto;
+        max-width: 60vw;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+    }
+
+    .legal-panel {
+        max-width: 52rem;
+        margin-bottom: 2rem;
+        padding: 1.75rem 2.4rem 2rem;
+    }
+    .legal-panel h1 {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 2.1rem;
+        line-height: 1.2;
+        color: #3b2410;
+        text-shadow: 0 1px 0 #ffffff;
+        margin-bottom: 0.2rem;
+    }
+    .legal-updated {
+        font-weight: 400;
+        font-size: 0.9rem;
+        color: #6b5a4a;
+        margin-bottom: 1rem;
+    }
+    .legal-panel h2 {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #3b2410;
+        margin: 1.4rem 0 0.45rem;
+        padding-bottom: 0.15rem;
+        border-bottom: 2px dashed rgba(59, 36, 16, 0.2);
+    }
+    .legal-panel p,
+    .legal-panel li {
+        font-weight: 400;
+        line-height: 1.65;
+    }
+    .legal-panel p  { margin-bottom: 0.7rem; }
+    .legal-panel ul { margin: 0 0 0.8rem 1.25rem; list-style: disc; }
+    .legal-panel li { margin-bottom: 0.3rem; }
+    .legal-panel a  { color: var(--blue); }
+
+    .legal-back {
+        display: inline-block;
+        margin-top: 1.5rem;
+        background: var(--yellow);
+        color: var(--text) !important;
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.3rem;
+        text-decoration: none;
+        border: 3px solid #3b2410;
+        border-radius: 0.5rem;
+        padding: 0.7rem 2rem;
+        box-shadow: 0 0.375rem 0 #3b2410, 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.05s, box-shadow 0.05s;
+    }
+    .legal-back:hover  { background: #ffe14d; }
+    .legal-back:active { transform: translateY(4px); box-shadow: 0 2px 0 #3b2410; }
+
+    .legal-footer {
+        margin-top: auto;
+        padding-bottom: 2rem;       /* no cookie bar on these pages, so no extra space needed */
+    }
+
+    @media (max-width: 700px) {
+        .legal-top {
+            height: auto;
+            justify-content: center;
+            padding: 4.8rem 1rem 0.9rem;
+        }
+        .legal-panel { padding: 1.25rem 1.2rem 1.5rem; }
+        .legal-panel h1 { font-size: 1.7rem; }
+    }
