@@ -13,6 +13,11 @@ client/node_modules/.vite/
 .env.local
 server/.env
 
+# A copy of the database (it has the password hashes of the players in it)
+*.dump
+server/backup*.sql
+server/data*.sql
+
 # Logs
 *.log
 npm-debug.log*
