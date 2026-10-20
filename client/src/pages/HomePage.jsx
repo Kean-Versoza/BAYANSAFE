@@ -46,6 +46,17 @@ export default function HomePage() {
       const target = document.getElementById(id);
       if (!target) return;
 
+      // Only the top-level sections take part in the one-screen-at-a-time
+      // paging and the loader flash. The footer's "Help Center" (#help) is a
+      // plain anchor below the last section, so it just scrolls there.
+      const isSection = target.classList.contains('section');
+
+      if (!isSection) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.history.replaceState(null, '', `#${id}`);
+        return;
+      }
+
       if (SHOW_LOADER_ON_NAV && skeletonRef.current && section !== id) {
         showSkeleton(id);
         window.setTimeout(() => {
@@ -120,9 +131,11 @@ export default function HomePage() {
     };
     window.addEventListener('pageshow', onPageShow);
 
-    /* Landing on /#about or /#registration: jump to that section */
+    /* Landing on /#about or /#registration: jump to that section.
+       #help is handled by its own effect below, which smooth-scrolls to the
+       contact form in the footer. */
     const hash = window.location.hash.replace('#', '');
-    if (hash) {
+    if (hash && hash !== 'help') {
       const target = document.getElementById(hash);
       if (target) window.scrollTo({ top: target.offsetTop, behavior: 'instant' });
     }
@@ -140,11 +153,11 @@ export default function HomePage() {
     if (window.location.hash !== '#help') return undefined;
 
     const timer = window.setTimeout(() => {
-      document.getElementById('help')?.scrollIntoView({ behavior: 'smooth' });
+      jumpTo('help');
     }, MIN_SHOW);
 
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [jumpTo]);
 
   return (
     <>

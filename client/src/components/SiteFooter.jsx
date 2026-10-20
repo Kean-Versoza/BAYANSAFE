@@ -45,7 +45,7 @@ export default function SiteFooter({ config, onJump }) {
         <p className="footer-contact">
           Contact: <a href={`mailto:${footer.email}`}>{footer.email}</a>
           <span className="sep">|</span>
-          <FooterLinks links={footer.links} />
+          <FooterLinks links={footer.links} onJump={onJump} />
         </p>
 
         {footer.notes.map((note) => (
