@@ -1,37 +1,34 @@
-import { Fragment } from 'react';
-import { Link } from 'react-router-dom';
-
+import FooterLinks from './FooterLinks';
 import ContactForm from './ContactForm';
 
 /**
- * The footer of the site.
+ * Site footer. Content comes from the Node.js server (`GET /api/config`),
+ * falling back to `config/site.js` when the API cannot be reached.
+ * `onJump` is optional - when given, the logo scrolls to a section instead
+ * of reloading the page.
  *
- * All the text comes from the site configuration (`config/site.js`, served by
- * `GET /api/config`), so it lives in one place. The logo scrolls to a section
- * when `onJump` is given.
+ * The "Send us a message" form is part of the footer, so the Help Center link
+ * lands on it.
  */
 export default function SiteFooter({ config, onJump }) {
   const footer = config.footer;
   const year = new Date().getFullYear();
 
+  const logoClick = (event) => {
+    if (!onJump) return;
+    event.preventDefault();
+    onJump('home');
+  };
+
   return (
     <footer className="site-footer" id="site-footer">
       <div className="footer-inner">
         <div className="footer-top">
-          <a
-            className="footer-logo"
-            href="#home"
-            data-target="home"
-            onClick={(event) => {
-              if (!onJump) return;
-              event.preventDefault();
-              onJump('home');
-            }}
-          >
-            <img src={footer.logo} alt={footer.brandName} />
+          <a className="footer-logo" href="#home" data-target="home" onClick={logoClick}>
+            <img src={footer.logo} alt={footer.brand_name} />
           </a>
 
-          {/* Optional rating badges. Add more in the site configuration. */}
+          {/* Optional rating badges. Add one entry per image in the config. */}
           {footer.badges.length > 0 && (
             <div className="footer-badges">
               {footer.badges.map((badge) => (
@@ -47,16 +44,8 @@ export default function SiteFooter({ config, onJump }) {
 
         <p className="footer-contact">
           Contact: <a href={`mailto:${footer.email}`}>{footer.email}</a>
-          {footer.links.map((link) => (
-            <Fragment key={`${link.label}-${link.url}`}>
-              <span className="sep">|</span>
-              {link.url.startsWith('/') ? (
-                <Link to={link.url}>{link.label}</Link>
-              ) : (
-                <a href={link.url}>{link.label}</a>
-              )}
-            </Fragment>
-          ))}
+          <span className="sep">|</span>
+          <FooterLinks links={footer.links} />
         </p>
 
         {footer.notes.map((note) => (

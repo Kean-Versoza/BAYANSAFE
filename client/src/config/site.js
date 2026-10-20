@@ -29,7 +29,7 @@ export const siteConfig = {
 
   footer: {
     logo: '/images/logo.png',
-    brandName: 'BAYANSAFE',
+    brand_name: 'BAYANSAFE',
     badges: [{ image: '/images/badges/all-ages.png', alt: 'Suitable for all ages' }],
 
     // The year is added automatically before this text
@@ -58,8 +58,8 @@ export const siteConfig = {
   cookie: {
     show: true,
     text: 'This site uses cookies to improve your experience. By continuing to browse, you agree to their use as described in our',
-    linkLabel: 'Privacy Policy',
-    linkUrl: '/privacy',
+    link_label: 'Privacy Policy',
+    link_url: '/privacy',
     button: 'OK',
   },
 };
