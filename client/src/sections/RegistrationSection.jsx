@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import RfidField from '../components/RfidField';
 import { FORM_LOADER_MS, paintFormContents } from '../lib/skeleton';
 
 const EMPTY_MESSAGE = { type: '', text: '' };
@@ -10,6 +11,8 @@ export default function RegistrationSection() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
+  const [card, setCard] = useState('');
+  const [cardTaken, setCardTaken] = useState(false);
 
   const formRef = useRef(null);
   const overlayRef = useRef(null);
@@ -53,6 +56,19 @@ export default function RegistrationSection() {
     if (FORM_LOADER_MS > 0) setLoading(true);
   };
 
+  /** A scanned card is checked so the visitor knows before submitting. */
+  const checkCard = async (wanted) => {
+    const number = String(wanted ?? '').trim();
+    if (!number) return;
+    try {
+      const res = await fetch(`/api/register/rfid/${encodeURIComponent(number)}`);
+      const body = await res.json().catch(() => ({}));
+      setCardTaken(Boolean(body.taken));
+    } catch {
+      setCardTaken(false);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (submitting) return;
@@ -63,6 +79,8 @@ export default function RegistrationSection() {
       username: data.get('username') ?? '',
       email: data.get('email') ?? '',
       password: data.get('password') ?? '',
+      rfidUid: card,
+      acceptedTerms: data.get('terms') === 'on',
       terms: data.get('terms') === 'on',
     };
 
@@ -80,9 +98,13 @@ export default function RegistrationSection() {
       if (response.ok && result.ok) {
         setMessage({ type: 'success', text: result.message });
         form.reset();
+        setCard('');
+        setCardTaken(false);
         setShowPassword(false);
       } else {
-        const errors = Array.isArray(result.errors) ? result.errors : ['Registration failed. Please try again.'];
+        const errors = Array.isArray(result.errors)
+          ? result.errors
+          : [result.error ?? 'Registration failed. Please try again.'];
         setMessage({ type: 'error', text: errors.join(' ') });
       }
     } catch {
@@ -145,6 +167,14 @@ export default function RegistrationSection() {
           <label className="terms">
             <input type="checkbox" name="terms" required /> I agree to the safety terms
           </label>
+
+          {/* The RFID card. Optional: the account works without one. */}
+          <RfidField
+            value={card}
+            onChange={setCard}
+            onScan={checkCard}
+            taken={cardTaken}
+          />
 
           {message.text && (
             <p className={`form-message is-${message.type}`} role="status" aria-live="polite">

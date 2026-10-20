@@ -1,26 +1,31 @@
-const TABS = [
-  { target: 'home', label: 'HOME' },
-  { target: 'about', label: 'ABOUT' },
-  { target: 'registration', label: 'REGISTER' },
-];
+import { Link } from 'react-router-dom';
 
-/** Fixed pill navigation that follows the section currently on screen. */
-export default function NavPill({ active, onJump }) {
+/**
+ * The pill in the top-right corner with the tabs.
+ *
+ * The tabs come from the site configuration, so adding one is a change in
+ * `config/site.js` and nothing else.
+ *
+ * A tab with a `path` goes to that page (that is how the account page is
+ * reached); a tab without one jumps to that part of the home page, and
+ * `onJump` tells the page to play the loader before the jump.
+ */
+export default function NavPill({ items = [], active, onJump }) {
   return (
-    <nav className="nav-pill">
-      {TABS.map((tab) => (
-        <a
-          key={tab.target}
-          href={`#${tab.target}`}
-          data-target={tab.target}
-          className={active === tab.target ? 'active' : undefined}
-          onClick={(event) => {
-            event.preventDefault();
-            onJump(tab.target);
+    <nav className="nav-pill" aria-label="Main navigation">
+      {items.map((item) => (
+        <Link
+          key={item.id}
+          to={item.path ?? `/#${item.id}`}
+          data-target={item.id}
+          className={active === item.id ? 'active' : undefined}
+          aria-current={active === item.id ? 'page' : undefined}
+          onClick={() => {
+            if (!item.path) onJump?.(item.id);
           }}
         >
-          {tab.label}
-        </a>
+          {item.label}
+        </Link>
       ))}
     </nav>
   );

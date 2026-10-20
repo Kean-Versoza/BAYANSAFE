@@ -3,6 +3,8 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import AccountPage from './pages/AccountPage';
+import AdminPage from './pages/AdminPage';
 
 /** SPA route changes behave like real page loads: start at the top. */
 function ScrollToTop() {
@@ -29,6 +31,12 @@ export default function App() {
 
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+
+        {/* The account of the player, reached from the ACCOUNT tab */}
+        <Route path="/account" element={<AccountPage />} />
+
+        {/* The dashboard for the team */}
+        <Route path="/admin" element={<AdminPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

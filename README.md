@@ -24,28 +24,62 @@ BAYANSAFE/
 │   ├── public/images/           # Logo, banner, disaster icons, backgrounds
 │   └── src/
 │       ├── main.jsx             # React entry point
-│       ├── App.jsx              # Routes (/ /privacy /terms + old redirects)
-│       ├── pages/               # HomePage, Privacy, Terms
+│       ├── App.jsx              # Routes (/ /privacy /terms /account /admin)
+│       ├── pages/               # HomePage, Privacy, Terms, AccountPage, AdminPage
 │       ├── sections/            # Home / About / Registration sections
-│       ├── components/          # NavPill, SiteFooter, CookieBanner
+│       ├── components/          # NavPill, SiteFooter, ContactForm, RfidField, ...
 │       ├── layouts/             # LegalLayout (privacy + terms shell)
-│       ├── hooks/useFooter.js   # Loads footer text from the API
-│       ├── config/footer.js     # Fallback footer text
+│       ├── hooks/               # useSiteConfig, usePageSnap, useAccount, useRfidReader
+│       ├── config/site.js       # Fallback nav / footer / cookie text
 │       ├── lib/skeleton.js      # The page skeleton loader
-│       └── styles/style.css     # All site styling
+│       └── styles/              # style.css, account.css, admin.css
 ├── server/                      # Node.js backend (Express, used by dev + `npm start`)
 │   ├── index.js                 # API + static hosting + SPA fallback
-│   ├── footerConfig.js          # Footer / cookie text (edit here)
-│   ├── register.js              # Registration rules (shared with api/register.js)
-│   └── store.js                 # In-memory account store (scrypt hashes)
+│   ├── siteConfig.js            # Nav / footer / cookie text (edit here)
+│   ├── footerConfig.js          # Footer text for the older /api/footer endpoint
+│   ├── db/                      # PostgreSQL pool + SQL migrations
+│   ├── routes/                  # register, account, admin, contact, mail
+│   ├── services/                # users, sessions, admin auth, mailer, cookies
+│   └── scripts/                 # setupDb, checkDb, checkMail
+├── shared/rfid.js               # Card-number rules (used by client and server)
+├── docker-compose.yml           # A PostgreSQL server for local development
 ├── vercel.json                  # Vercel build + routing configuration
 └── package.json                 # Root scripts and backend dependencies
 ```
+
+## Features
+
+- **Home page** — Home / About / Registration in one scrolling page, with the
+  skeleton loader and the section-following nav pill.
+- **Account page** (`/account`) — sign in, change the name, the email and the
+  password, link an RFID card, download your data, or remove the account.
+- **RFID** — the registration form and the account page both accept a card,
+  from a USB reader that types, a serial reader, or by hand.
+- **Admin dashboard** (`/admin`) — the account list, the growth chart, the
+  email log and the health of the database and the mail provider.
+- **Email** — a welcome message after someone registers, sent through Gmail,
+  Brevo, Resend or any SMTP server.
+- **Contact form** — the footer's "Help Center" jumps to a form that mails the
+  team. Messages are answered by replying to them.
+
+The site still renders, and the home page still works, when PostgreSQL is not
+running. Only the features above need it.
 
 ## Requirements
 
 - Node.js 18 or newer (tested on Node 24)
 - npm
+- PostgreSQL 16 (only for accounts, the admin page and the contact form) —
+  `docker compose up -d` starts one
+
+## Configuration
+
+```bash
+cp .env.example .env       # then fill in the database and the email settings
+npm run db:setup           # creates the tables (needs PostgreSQL running)
+npm run db:check           # is the database reachable?
+npm run mail:check         # do the email settings work?
+```
 
 ## Development
 

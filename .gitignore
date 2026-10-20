@@ -2,7 +2,9 @@ node_modules/
 client/dist/
 client/node_modules/
 
-# Vercel CLI local state
+# The Vite cache (rebuilt automatically, never worth committing)
+client/.vite/
+client/node_modules/.vite/
 .vercel/
 
 # Python leftovers (the old Flask version)

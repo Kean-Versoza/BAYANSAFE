@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useFooter from '../hooks/useFooter';
+import { useSiteConfig } from '../hooks/useSiteConfig';
 
 const COOKIE_KEY = 'bayansafe_cookie_ok';
 
@@ -10,7 +10,7 @@ const COOKIE_KEY = 'bayansafe_cookie_ok';
  * taglines by publishing its height as the `--cookie-h` custom property.
  */
 export default function CookieBanner() {
-  const { cookie } = useFooter();
+  const { cookie } = useSiteConfig();
   const bannerRef = useRef(null);
   const [visible, setVisible] = useState(() => {
     try {
