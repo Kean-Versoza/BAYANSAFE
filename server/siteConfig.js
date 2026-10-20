@@ -41,8 +41,9 @@ export const siteConfig = {
     links: [
       { label: 'Privacy Policy', url: '/privacy' },
       { label: 'Terms of Service', url: '/terms' },
-      { label: 'About us', url: '#about' },
-      { label: 'Help Center', url: '/help' },
+      { label: 'About us', url: '#' },
+      { label: 'Contact us', url: `mailto:${CONTACT_EMAIL}` },
+      { label: 'Help Center', url: '#' },
     ],
 
     // Small print: one paragraph per line
