@@ -43,7 +43,7 @@ export const siteConfig = {
       { label: 'Terms of Service', url: '/terms' },
       { label: 'About us', url: '#' },
       { label: 'Contact us', url: `mailto:${CONTACT_EMAIL}` },
-      { label: 'Help Center', url: '#' },
+      { label: 'Help Center', url: '/help' },
     ],
 
     // Small print: one paragraph per line
