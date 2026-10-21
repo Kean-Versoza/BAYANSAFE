@@ -818,9 +818,9 @@
             transform: none;
             flex-direction: column;
             align-items: stretch;
-            gap: 0.25rem;
-            padding: 5rem 1rem 1.2rem;
-            border-radius: 0 0 1rem 0;
+            gap: 0.1rem;
+            padding: 4rem 0.8rem 0.8rem;
+            border-radius: 0 0 0.8rem 0;
             height: 100vh;
             height: 100dvh;
             width: min(78vw, 16rem);
@@ -836,10 +836,10 @@
         .nav-pill a {
             min-width: 100%;
             justify-content: flex-start;
-            padding: 0 1rem;
-            height: 2.4rem;
-            font-size: 1rem;
-            border-radius: 0.5rem;
+            padding: 0 0.8rem;
+            height: 2.2rem;
+            font-size: 0.95rem;
+            border-radius: 0.4rem;
         }
         .logo {
             top: 1rem;
