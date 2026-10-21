@@ -132,7 +132,7 @@
         right: var(--nav-right);
         transform: translateY(-50%);
         margin: 0;
-        z-index: 120;
+        z-index: 140;
 
         display: flex;
         justify-content: space-between;
@@ -174,6 +174,51 @@
         border: 2px solid #3b2410;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
+
+    /* Mobile nav toggle + backdrop */
+    .nav-toggle {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 160;
+        width: 2.8rem;
+        height: 2.8rem;
+        border-radius: 0.6rem;
+        border: 2px solid #3b2410;
+        background: rgba(255, 255, 255, 0.9);
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 0.35rem;
+        padding: 0;
+        cursor: pointer;
+    }
+    .nav-toggle span {
+        width: 1.6rem;
+        height: 0.2rem;
+        background: #3b2410;
+        border-radius: 2px;
+        transition: transform 0.2s, opacity 0.2s;
+    }
+    .nav-toggle.is-open span:nth-child(1) {
+        transform: translateY(0.55rem) rotate(45deg);
+    }
+    .nav-toggle.is-open span:nth-child(2) {
+        opacity: 0;
+    }
+    .nav-toggle.is-open span:nth-child(3) {
+        transform: translateY(-0.55rem) rotate(-45deg);
+    }
+
+    .nav-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(26, 5, 0, 0.4);
+        z-index: 130;
+    }
+    .nav-backdrop.is-open { display: block; }
 
     /* ---------- Home Page Banner ---------- */
     .hero {
@@ -765,23 +810,41 @@
             --nav-right: 0.75rem;
             --logo-h: 6rem;
         }
+        .nav-toggle { display: flex; }
         .nav-pill {
-            top: 1rem;
+            top: 0;
+            right: auto;
+            left: 0;
             transform: none;
-            right: 0.75rem;
+            flex-direction: column;
+            align-items: stretch;
             gap: 0.4rem;
-            padding: 0.4rem 0.6rem;
+            padding: 5rem 1rem 1.2rem;
+            border-radius: 0 0 1rem 0;
+            height: 100vh;
+            height: 100dvh;
+            width: min(78vw, 16rem);
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid #3b2410;
+            border-left: none;
+            border-top: none;
+            backdrop-filter: none;
+            transition: transform 0.25s ease;
+            transform: translateX(-100%);
         }
+        .nav-pill.is-open { transform: translateX(0); }
         .nav-pill a {
-            min-width: auto;
-            padding: 0 0.8rem;
-            height: 2.4rem;
-            font-size: 0.95rem;
+            min-width: 100%;
+            justify-content: flex-start;
+            padding: 0 1rem;
+            height: 2.8rem;
+            font-size: 1rem;
+            border-radius: 0.6rem;
         }
         .logo {
             top: 1rem;
             transform: none;
-            left: 0.75rem;
+            left: 4rem;
             margin: 0;
         }
         .logo img { height: var(--logo-h); max-width: 40vw; }
@@ -811,8 +874,11 @@
 
     @media (max-width: 480px) {
         :root { --logo-h: 4.5rem; }
-        .nav-pill a { font-size: 0.85rem; padding: 0 0.6rem; height: 2.2rem; }
-        .logo img { max-width: 45vw; }
+        .logo { left: 3.8rem; }
+        .nav-toggle { left: 0.75rem; width: 2.6rem; height: 2.6rem; }
+        .nav-toggle span { width: 1.4rem; }
+        .nav-pill a { font-size: 0.95rem; height: 2.6rem; }
+        .logo img { max-width: 48vw; }
         .section-top,
         .section-top--logo,
         .legal-top,

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 /**
@@ -11,22 +12,47 @@ import { Link } from 'react-router-dom';
  * `onJump` tells the page to play the loader before the jump.
  */
 export default function NavPill({ items = [], active, onJump }) {
+  const [open, setOpen] = useState(false);
+
+  const close = () => setOpen(false);
+
   return (
-    <nav className="nav-pill" aria-label="Main navigation">
-      {items.map((item) => (
-        <Link
-          key={item.id}
-          to={item.path ?? `/#${item.id}`}
-          data-target={item.id}
-          className={active === item.id ? 'active' : undefined}
-          aria-current={active === item.id ? 'page' : undefined}
-          onClick={() => {
-            if (!item.path) onJump?.(item.id);
-          }}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
+    <>
+      <button
+        type="button"
+        className={`nav-toggle${open ? ' is-open' : ''}`}
+        aria-label={open ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
+      <div
+        className={`nav-backdrop${open ? ' is-open' : ''}`}
+        onClick={close}
+        aria-hidden="true"
+      />
+
+      <nav className={`nav-pill${open ? ' is-open' : ''}`} aria-label="Main navigation">
+        {items.map((item) => (
+          <Link
+            key={item.id}
+            to={item.path ?? `/#${item.id}`}
+            data-target={item.id}
+            className={active === item.id ? 'active' : undefined}
+            aria-current={active === item.id ? 'page' : undefined}
+            onClick={() => {
+              if (!item.path) onJump?.(item.id);
+              close();
+            }}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </>
   );
 }
