@@ -67,6 +67,24 @@ const server = app.listen(PORT, () => {
 });
 
 /**
+ * Another copy of the server is already using the port. Say that in words,
+ * because otherwise all the user sees is a stack trace about EADDRINUSE.
+ */
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(
+      `\n! Port ${PORT} is already in use, so this server cannot start.\n` +
+        `  Another copy of BAYANSAFE is probably still running.\n` +
+        `  Stop it (Ctrl+C in the other terminal) and start this one again, or use a free port:\n` +
+        `      $env:PORT=3002; npm run dev:server\n`,
+    );
+    process.exit(1);
+  }
+  console.error('The server could not start:', err.message);
+  process.exit(1);
+});
+
+/**
  * Close the database pool on the way out, so `npm run dev` restarts cleanly.
  * Nothing here waits for PostgreSQL, so the server still stops right away
  * when the database was never reachable.
