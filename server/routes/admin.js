@@ -5,6 +5,7 @@ import { describeError } from '../db/pool.js';
 import { findByRfid } from '../services/users.js';
 import { normalizeCardNumber } from '../../shared/rfid.js';
 import {
+  checkCredentials,
   checkPassword,
   clearSessionCookie,
   isAdminConfigured,
@@ -70,7 +71,7 @@ router.post('/login', (req, res) => {
   if (!isAdminConfigured()) {
     return res.status(503).json({
       ok: false,
-      error: 'No admin password is set. Add ADMIN_PASSWORD to server/.env.',
+      error: 'No admin email or password is set. Add ADMIN_EMAIL and ADMIN_PASSWORD to .env.',
     });
   }
 
@@ -82,11 +83,12 @@ router.post('/login', (req, res) => {
     });
   }
 
+  const email = typeof req.body?.email === 'string' ? req.body.email : '';
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
 
-  if (!checkPassword(password)) {
+  if (!checkCredentials(email, password)) {
     noteFailedTry(key);
-    return res.status(401).json({ ok: false, error: 'That password is not right.' });
+    return res.status(401).json({ ok: false, error: 'That email and password do not go together.' });
   }
 
   attempts.delete(key);

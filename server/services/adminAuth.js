@@ -5,20 +5,26 @@ import { clearCookie, readCookies, setCookie } from './cookies.js';
 /**
  * The admin sign in.
  *
- * The admin gives a password in server/.env (ADMIN_PASSWORD). When it is
- * right, the server hands out a signed cookie that is good for a few hours.
- * The cookie is signed with a key, so it cannot be made up.
+ * The admin gives an email and a password in .env (ADMIN_EMAIL, ADMIN_PASSWORD).
+ * When they are right, the server hands out a signed cookie that is good for
+ * a few hours. The cookie is signed with a key, so it cannot be made up.
  */
 
+const EMAIL = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
 const PASSWORD = process.env.ADMIN_PASSWORD || '';
-const SECRET = process.env.SESSION_SECRET || PASSWORD || randomBytes(32).toString('hex');
+const SECRET = process.env.SESSION_SECRET || PASSWORD || EMAIL || randomBytes(32).toString('hex');
 
 export const COOKIE_NAME = 'bayansafe_admin';
 const MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8 hours
 
-/** True when an admin password has been set. */
+/** True when an admin email and password have been set. */
 export function isAdminConfigured() {
-  return PASSWORD.length > 0;
+  return EMAIL.length > 0 && PASSWORD.length > 0;
+}
+
+/** The email the admin signs in with (for showing a hint). */
+export function adminEmail() {
+  return EMAIL;
 }
 
 /** Compares two strings without leaking how much matched. */
@@ -27,6 +33,13 @@ function safeEqual(a, b) {
   const bufB = Buffer.from(String(b));
   if (bufA.length !== bufB.length) return false;
   return timingSafeEqual(bufA, bufB);
+}
+
+/** True when the given email and password match the admin. */
+export function checkCredentials(email, password) {
+  if (!isAdminConfigured()) return false;
+  const given = String(email || '').trim().toLowerCase();
+  return safeEqual(given, EMAIL) && safeEqual(password, PASSWORD);
 }
 
 /** True when the given password is the admin password. */

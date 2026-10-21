@@ -49,6 +49,22 @@ export function useAccount() {
   const signIn = useCallback(async (email, password) => {
     setBusy(true);
     try {
+      // If using admin credentials on the account page, sign in to the admin panel instead
+      try {
+        const adminRes = await fetch('/api/admin/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: String(email || '').trim(), password }),
+        });
+        if (adminRes.ok) {
+          window.location.href = '/admin';
+          return {};
+        }
+      } catch {
+        // Fall through to normal account login
+      }
+
       const data = await api('/api/account/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),

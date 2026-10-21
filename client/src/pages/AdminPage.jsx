@@ -34,6 +34,7 @@ function formatDate(value) {
 
 export default function AdminPage() {
   const [session, setSession] = useState({ known: false, signedIn: false, configured: false });
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -61,9 +62,10 @@ export default function AdminPage() {
     try {
       await api('/api/admin/login', {
         method: 'POST',
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
       setSession((s) => ({ ...s, signedIn: true }));
+      setEmail('');
       setPassword('');
     } catch (err) {
       setLoginError(err.message);
@@ -147,9 +149,21 @@ export default function AdminPage() {
 
           {!session.configured && (
             <p className="admin-login-error">
-              No admin password is set. Add <code>ADMIN_PASSWORD</code> to <code>server/.env</code>.
+              No admin email or password is set. Add <code>ADMIN_EMAIL</code> and{' '}
+              <code>ADMIN_PASSWORD</code> to <code>.env</code>.
             </p>
           )}
+
+          <label className="admin-field">
+            <span>Email</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
+              autoFocus
+            />
+          </label>
 
           <label className="admin-field">
             <span>Password</span>
@@ -158,7 +172,6 @@ export default function AdminPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
-              autoFocus
             />
           </label>
 
