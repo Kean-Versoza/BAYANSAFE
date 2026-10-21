@@ -1,16 +1,7 @@
 ﻿import { useEffect, useState } from 'react';
 
-import PixelAvatar from './PixelAvatar';
+import AccountBanner from './AccountBanner';
 import RfidField from './RfidField';
-
-function formatDate(value) {
-  if (!value) return '-';
-  return new Date(value).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 
 /**
  * The account of the player.
@@ -158,22 +149,7 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
   return (
     <div className="account-card">
       {/* ---------- the head of the card ---------- */}
-      <header className="account-head">
-        <PixelAvatar name={user.username} />
-
-        <div className="account-head-text">
-          <p className="form-title">MY ACCOUNT</p>
-          <p className="account-number">{user.number}</p>
-          <p className="account-meta">
-            Playing since {formatDate(user.createdAt)}
-            {user.lastLoginAt ? ` \u00b7 Last sign in ${formatDate(user.lastLoginAt)}` : ''}
-          </p>
-        </div>
-
-        <button type="button" className="account-signout" onClick={onSignOut}>
-          SIGN OUT
-        </button>
-      </header>
+      <AccountBanner user={user} onSignOut={onSignOut} />
 
       {/* ---------- the name and the email ---------- */}
       <section className="account-section account-section--details">
@@ -220,7 +196,7 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
       </section>
 
       {/* ---------- the card of the reader ---------- */}
-      <section className="account-section account-section--card">
+      <section className="account-section account-section--card" id="account-card">
         <h2>RFID CARD / ID</h2>
         <p className="account-hint">
           The card you scan in the game. Scan it here to link it to your account. You can play without

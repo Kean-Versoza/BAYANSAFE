@@ -68,40 +68,7 @@
 
 .account-foot a:hover { color: #8b5a2b; }
 
-/* ---------- the head of the card ---------- */
-.account-head {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    flex-wrap: wrap;
-}
-
-.account-head-text {
-    flex: 1;
-    min-width: 12rem;
-}
-
-.account-head .form-title {
-    margin: 0;
-    text-align: left;
-}
-
-.account-number {
-    margin: 0.15rem 0 0;
-    font-family: 'Courier New', monospace;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #8b5a2b;
-}
-
-.account-meta {
-    margin: 0.2rem 0 0;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #6b5a4a;
-}
-
+/* ---------- the sign out button ---------- */
 .account-signout {
     padding: 0.55rem 0.9rem;
     font-family: 'Pixelify Sans', sans-serif;
@@ -134,6 +101,153 @@
 .pixel-avatar span {
     display: block;
 }
+
+/* ---------- the banner of a signed in player ---------- */
+.account-banner {
+    padding: 1.4rem 1.5rem 1.3rem;
+    background-color: #3b2410;
+    background-image:
+        linear-gradient(rgba(255, 225, 77, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 225, 77, 0.07) 1px, transparent 1px);
+    background-size: 9px 9px;
+    border: 3px solid #1a0500;
+    border-radius: 0.7rem;
+    box-shadow: 0 5px 0 rgba(26, 5, 0, 0.4);
+    color: #ffe14d;
+}
+
+.account-banner-top {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.account-banner-text {
+    flex: 1;
+    min-width: 12rem;
+}
+
+.account-kicker {
+    margin: 0;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: rgba(255, 225, 77, 0.8);
+}
+
+.account-name {
+    margin: 0.1rem 0 0;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+    color: #ffffff;
+    text-shadow: 2px 2px 0 #1a0500;
+    overflow-wrap: anywhere;
+}
+
+.account-banner-meta {
+    margin: 0.3rem 0 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.account-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.account-play {
+    padding: 0.6rem 0.95rem;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: #1a0500;
+    background: #ffe14d;
+    border: 2px solid #1a0500;
+    border-radius: 0.4rem;
+    box-shadow: 0 4px 0 #1a0500;
+    transition: background 0.1s ease;
+}
+
+.account-play:hover { background: #fff266; }
+
+.account-play:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1a0500;
+}
+
+/* the sign out button sits on the dark banner, so it is an outline */
+.account-banner .account-signout {
+    background: transparent;
+    color: #ffe14d;
+    border-color: #ffe14d;
+}
+
+.account-banner .account-signout:hover {
+    background: #ffe14d;
+    color: #1a0500;
+}
+
+/* ---------- the little numbers of the banner ---------- */
+.account-stats {
+    list-style: none;
+    margin: 1.2rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+}
+
+.account-stat {
+    padding: 0.6rem 0.7rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 2px solid rgba(255, 225, 77, 0.4);
+    border-radius: 0.45rem;
+}
+
+.account-stat-label {
+    display: block;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: rgba(255, 225, 77, 0.75);
+}
+
+.account-stat-value {
+    display: block;
+    margin-top: 0.3rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #ffffff;
+    overflow-wrap: anywhere;
+}
+
+.account-stat--number .account-stat-value { color: #ffe14d; }
+.account-stat--good .account-stat-value { color: #8ef58e; }
+.account-stat--warn .account-stat-value { color: #ffd21f; font-size: 0.8rem; }
+
+.account-stat-action {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #ffe14d;
+    text-decoration: underline;
+}
+
+.account-stat-action:hover { color: #ffffff; }
 
 /* ---------- the parts of the card ---------- */
 .account-section {
@@ -290,7 +404,6 @@
 /* ---------- small screens ---------- */
 @media (max-width: 700px) {
     .account-card { padding: 1.1rem; }
-    .account-head { gap: 0.8rem; }
     .account-signout { padding: 0.45rem 0.7rem; font-size: 0.85rem; }
 
     /* the navigation pill sits at the top of a phone, so the logo goes below it */
@@ -306,18 +419,31 @@
     /* the face is a little smaller, so the text next to it fits */
     .pixel-avatar { --avatar-size: 4.5rem; }
 
-    .account-head-text { min-width: 0; }
-    .account-head .form-title { font-size: 1.4rem; }
-    .account-number { font-size: 0.95rem; }
-    .account-meta { font-size: 0.75rem; }
-    /* account-logo img no longer needed */
+    /* the banner of the signed in player */
+    .account-banner { padding: 1.1rem 1rem 1rem; }
+    .account-banner-top { gap: 0.85rem; }
+    .account-banner-text { min-width: 0; }
+    .account-name { font-size: 1.45rem; }
+    .account-banner-meta { font-size: 0.75rem; }
+    .account-kicker { font-size: 0.68rem; }
 
-    /* the sign out button gets a line of its own */
-    .account-signout {
+    /* the two buttons get a line of their own */
+    .account-banner-actions {
         order: 3;
         width: 100%;
         margin-top: 0.2rem;
     }
+
+    .account-banner-actions .account-play,
+    .account-banner-actions .account-signout {
+        flex: 1;
+        text-align: center;
+    }
+
+    /* the numbers go two by two on a phone */
+    .account-stats { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    .account-stat-value { font-size: 0.85rem; }
+    .account-stat--warn .account-stat-value { font-size: 0.75rem; }
 
     .account-section { padding-top: 0.9rem; }
     .account-section h2 { font-size: 1.05rem; }
