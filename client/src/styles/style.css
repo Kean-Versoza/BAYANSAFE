@@ -907,30 +907,24 @@
     @media (max-width: 700px) {
         .site-footer { padding: 1.5rem 1.25rem 9rem; }
         .footer-contact {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 0.3rem 0.3rem;
-            line-height: 1.6;
+            display: inline;
+            text-align: center;
+            line-height: 1.8;
             max-width: 90vw;
             margin: 0 auto;
-            text-align: center;
         }
-        .footer-contact .sep { margin: 0 0.1rem; }
+        .footer-contact .sep { margin: 0 0.25rem; }
         .footer-contact a,
         .footer-contact span {
             white-space: nowrap;
         }
-        /* Force "Contact us | Help Center" to wrap to next line under About us */
-        .footer-contact > span:nth-of-type(3) { display: none; }
-        .footer-contact > a:nth-of-type(4) {
-            flex-basis: 100%;
-            order: 5;
-            margin-top: -0.1rem;
+        .footer-contact .sep:nth-of-type(4) {
+            display: block;
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            overflow: hidden;
         }
-        .footer-contact > span:nth-of-type(4) { order: 6; }
-        .footer-contact > a:nth-of-type(5) { order: 7; }
         .cookie-banner {
             flex-direction: column;
             gap: 0.7rem;
