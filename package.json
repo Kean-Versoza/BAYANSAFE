@@ -16,7 +16,9 @@
     "start": "cross-env NODE_ENV=production node server/index.js",
     "db:setup": "node server/scripts/setupDb.js",
     "db:check": "node server/scripts/checkDb.js",
-    "mail:check": "node server/scripts/checkMail.js"
+    "mail:check": "node server/scripts/checkMail.js",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
   },
   "dependencies": {
     "express": "^4.21.2",

@@ -71,7 +71,8 @@ router.post('/login', (req, res) => {
   if (!isAdminConfigured()) {
     return res.status(503).json({
       ok: false,
-      error: 'No admin email or password is set. Add ADMIN_EMAIL and ADMIN_PASSWORD to .env.',
+      error:
+        'No admin email or password is set. Add ADMIN_EMAIL and ADMIN_PASSWORD to the environment (.env locally, the project settings on a deployed site).',
     });
   }
 

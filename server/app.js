@@ -27,6 +27,12 @@ import mailRoutes from './routes/mail.js';
 export function createApiApp() {
   const app = express();
 
+  // On a deployed site the requests come through a proxy (Vercel), so the
+  // address of the proxy would be the address of every visitor. One hop of
+  // trust is what it takes to read the real address of the visitor from the
+  // X-Forwarded-For header, which is what the rate limiters use.
+  app.set('trust proxy', 1);
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -64,7 +70,20 @@ export function createApiApp() {
 
   // Unknown API routes must never fall through to the SPA shell
   app.use('/api', (req, res) => {
-    res.status(404).json({ ok: false, errors: ['Endpoint not found.'] });
+    res.status(404).json({ ok: false, error: 'Endpoint not found.' });
+  });
+
+  /**
+   * Something went wrong. The answer is JSON, not the HTML page Express would
+   * send on its own, because the front end always reads JSON. On Vercel a
+   * handled error also keeps the function healthy instead of leaving it in a
+   * broken state.
+   */
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, req, res, next) => {
+    console.error('The request could not be answered:', err);
+    if (res.headersSent) return;
+    res.status(500).json({ ok: false, error: 'Something went wrong on the server.' });
   });
 
   return app;

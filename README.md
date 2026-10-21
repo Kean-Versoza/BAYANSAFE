@@ -13,11 +13,9 @@ Built with **React** (Vite) on the frontend and **Node.js** on the backend
 
 ```
 BAYANSAFE/
-├── api/                         # Vercel functions (one per endpoint, used when deployed)
-│   ├── footer.js                #   GET  /api/footer
-│   ├── health.js                #   GET  /api/health
-│   ├── register.js              #   POST /api/register
-│   └── not-found.js             #   JSON 404 for unknown /api/* paths
+├── api/                         # Vercel functions
+│   ├── index.js                 #   /api
+│   └── [...path].js             #   every other /api/* path
 ├── client/                      # React frontend (Vite)
 │   ├── index.html
 │   ├── vite.config.js
@@ -35,6 +33,8 @@ BAYANSAFE/
 │       └── styles/              # style.css, account.css, admin.css
 ├── server/                      # Node.js backend (Express, used by dev + `npm start`)
 │   ├── index.js                 # API + static hosting + SPA fallback
+│   ├── app.js                   # The Express app, shared by the server and Vercel
+│   ├── vercelHandler.js         # The Vercel function entry point
 │   ├── siteConfig.js            # Nav / footer / cookie text (edit here)
 │   ├── footerConfig.js          # Footer text for the older /api/footer endpoint
 │   ├── db/                      # PostgreSQL pool + SQL migrations
@@ -70,7 +70,8 @@ running. Only the features above need it.
 - Node.js 18 or newer (tested on Node 24)
 - npm
 - PostgreSQL 16 (only for accounts, the admin page and the contact form) —
-  `docker compose up -d` starts one
+  `docker compose up -d` starts one, or install it on Windows with
+  `winget install PostgreSQL.PostgreSQL.16`
 
 ## Configuration
 
@@ -80,6 +81,9 @@ npm run db:setup           # creates the tables (needs PostgreSQL running)
 npm run db:check           # is the database reachable?
 npm run mail:check         # do the email settings work?
 ```
+
+The database connection, the admin sign-in and the email settings all come from
+the environment, so the same `.env` works locally and on a deployed site.
 
 ## Development
 
@@ -117,41 +121,88 @@ are no build settings to fill in.
 - **Build command:** `npm run build` (the root script installs the client and builds it into `client/dist`).
 - **Output directory:** `client/dist`.
 - **Frontend:** every non-API path is rewritten to `index.html`, so client-side routes such as `/privacy` work on a hard refresh or a shared link.
-- **API:** each file in `api/` becomes a function — `/api/health`, `/api/footer`, `/api/register`. Unknown `/api/*` paths get a JSON 404 rather than the SPA shell.
+- **API:** `api/[...path].js` catches every `/api/*` path and runs the same Express routes the local server runs. Unknown `/api/*` paths get a JSON 404 rather than the SPA shell.
 
 Vercel gives the filesystem precedence over rewrites, so the `api/` functions
 always win over the catch-all rewrite to `index.html`.
 
+### The environment variables of a deployed site
+
+There is no `.env` file on Vercel — the same variables are filled in under
+**Project → Settings → Environment Variables**, and they have to be added for
+**Production**, **Preview** and **Development**:
+
+| Variable        | What it is                                             | Needed |
+| --------------- | ------------------------------------------------------ | ------ |
+| `DATABASE_URL`  | The PostgreSQL connection string                       | yes    |
+| `DATABASE_SSL`  | `true` for most hosted databases                        | yes    |
+| `PGPOOL_MAX`    | `1` or `2`, so a function does not open too many connections | yes |
+| `ADMIN_EMAIL`   | The email the admin signs in with                       | yes    |
+| `ADMIN_PASSWORD`| The password for `/admin`                               | yes    |
+| `SESSION_SECRET`| A long random text that signs the admin cookie          | yes    |
+| `MAIL_*`        | The email settings, if the site should send mail        | no     |
+
+A long `SESSION_SECRET` can be made with `openssl rand -hex 32`.
+
+### The database of a deployed site
+
+The tables are created by the migrations in `server/db/migrations`, which run
+on your own machine against the same database the site uses:
+
+```bash
+# .env holds the DATABASE_URL of the deployed database
+npm run db:setup     # creates the tables
+npm run db:check     # is the database reachable?
+```
+
+Without the tables, registration and the admin dashboard answer "The database
+could not be reached."
+
 ### What is shared with the local server
 
 Express (`server/`, used by `npm run dev` and `npm start`) and the Vercel
-functions share their logic, so there is nothing to keep in sync by hand:
+function run the same routes, so there is nothing to keep in sync by hand:
 
-| Endpoint            | Express                     | Vercel function    | Shared module                                   |
-| ------------------- | --------------------------- | ------------------ | ----------------------------------------------- |
-| `GET /api/health`   | `server/index.js`           | `api/health.js`    | –                                               |
-| `GET /api/footer`   | `server/index.js`           | `api/footer.js`    | `server/footerConfig.js`                        |
-| `POST /api/register`| `server/index.js`           | `api/register.js`  | `server/register.js` + `server/store.js`        |
+| Endpoint             | Express                | Vercel function  | Shared module            |
+| -------------------- | ---------------------- | ---------------- | ------------------------ |
+| `/api/health`        | `server/app.js`        | `api/[...path].js` | `server/app.js`        |
+| `/api/footer`        | `server/app.js`        | `api/[...path].js` | `server/footerConfig.js` |
+| `/api/register`      | `server/routes/register.js` | `api/[...path].js` | `server/services/users.js` |
+| `/api/account/*`     | `server/routes/account.js` | `api/[...path].js` | `server/services/users.js` |
+| `/api/admin/*`       | `server/routes/admin.js`   | `api/[...path].js` | `server/services/adminAuth.js` |
 
-Editing `server/footerConfig.js` or `server/register.js` updates both backends.
-
-### Before relying on registration in production
-
-Accounts live in memory (`server/store.js`). That is fine locally, but on Vercel
-each function instance has its own memory and is recycled at any time, so a
-registration can silently disappear and the duplicate-email check becomes
-unreliable. The form still submits and shows its success message; nothing is
-kept. To persist accounts, replace `server/store.js` with a database (Vercel
-Postgres, Neon, Supabase, ...) — the rest of the code only calls `createUser`,
-`findAccount` and `verifyUser`.
+A new endpoint is added in `server/app.js` (or in a file in `server/routes/`)
+and it works on both, at the same time.
 
 ## API
 
-| Method | Endpoint       | Description                                      |
-| ------ | -------------- | ------------------------------------------------ |
-| GET    | `/api/health`  | Health/uptime check                              |
-| GET    | `/api/footer`  | Footer, badge, link and cookie-bar content       |
-| POST   | `/api/register`| Create an account (username, email, password, terms) |
+| Method | Endpoint                 | Description                                       |
+| ------ | ------------------------ | ------------------------------------------------- |
+| GET    | `/api/health`            | Health/uptime check                               |
+| GET    | `/api/footer`            | Footer, badge, link and cookie-bar content        |
+| GET    | `/api/config`            | Navigation, footer and cookie text                |
+| POST   | `/api/register`          | Create an account (username, email, password, terms) |
+| GET    | `/api/register/rfid/:uid`| Look up an account by its card                    |
+| GET    | `/api/account/session`   | Is somebody signed in?                            |
+| POST   | `/api/account/login`     | Sign in with email and password                   |
+| POST   | `/api/account/logout`    | Sign out                                          |
+| GET    | `/api/account`           | The account of the signed in player               |
+| PATCH  | `/api/account`           | Change the name or the email                      |
+| POST   | `/api/account/password`  | Change the password                               |
+| POST   | `/api/account/card`      | Link an RFID card                                 |
+| DELETE | `/api/account`           | Remove the account                                |
+| POST   | `/api/contact`           | The message form in the footer                    |
+| GET    | `/api/mail/status`       | Is email set up?                                  |
+| POST   | `/api/mail/test`         | Send a test email                                 |
+| POST   | `/api/admin/login`       | Sign in to the dashboard                          |
+| POST   | `/api/admin/logout`      | Sign out of the dashboard                         |
+| GET    | `/api/admin/session`     | Is the admin signed in?                           |
+| GET    | `/api/admin/stats`       | The numbers and the chart                         |
+| GET    | `/api/admin/users`       | The account list (`?q=`, `?limit=`, `?offset=`)    |
+| GET    | `/api/admin/emails`      | The emails the site sent                          |
+| GET    | `/api/admin/status`      | The health of the database and the mail provider  |
+| PATCH  | `/api/admin/users/:id/card` | Link or unlink a card                          |
+| DELETE | `/api/admin/users/:id`   | Remove an account                                 |
 
 `POST /api/register` expects JSON:
 
@@ -159,19 +210,22 @@ Postgres, Neon, Supabase, ...) — the rest of the code only calls `createUser`,
 { "username": "juan", "email": "juan@example.com", "password": "secret123", "terms": true }
 ```
 
-Accounts are kept **in memory** for now (they disappear when the server
-restarts) and passwords are salted and hashed with scrypt — never stored as
-plain text.
+Accounts live in PostgreSQL, and passwords are salted and hashed with scrypt —
+never stored as plain text.
 
 ## Routes
 
-| URL             | Page                                             |
-| --------------- | ------------------------------------------------ |
-| `/`             | Home, About and Registration (one scrolling page)|
-| `/privacy`      | Privacy Policy                                   |
-| `/terms`        | Terms of Service                                 |
-| `/about`        | Redirects to `/#about`                           |
-| `/registration` | Redirects to `/#registration`                    |
+| URL               | Page                                             |
+| ----------------- | ------------------------------------------------ |
+| `/`               | Home, About and Registration (one scrolling page)|
+| `/privacy`        | Privacy Policy                                   |
+| `/terms`          | Terms of Service                                 |
+| `/about`          | Redirects to `/#about`                           |
+| `/registration`   | Redirects to `/#registration`                    |
+| `/account`        | The player's account page                        |
+| `/admin`          | Admin sign in                                    |
+| `/admin/dashboard`| The admin dashboard                              |
+| `/help`           | The help center                                  |
 
 ## Editing content
 

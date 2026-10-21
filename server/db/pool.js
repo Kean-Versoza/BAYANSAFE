@@ -42,6 +42,16 @@ function databaseUrl() {
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 
 /**
+ * True when the server has been told where the database is.
+ *
+ * Without this the pool would quietly try localhost, which on a deployed site
+ * is never the database, and the error would say nothing useful.
+ */
+export function isDatabaseConfigured() {
+  return Boolean(process.env.DATABASE_URL || process.env.PGHOST);
+}
+
+/**
  * Whether the connection is encrypted, and how much of the certificate to
  * check.
  *
@@ -83,7 +93,11 @@ function getPool() {
       database: process.env.PGDATABASE || 'bayansafe',
       user: process.env.PGUSER || 'bayansafe',
       password: process.env.PGPASSWORD || 'bayansafe',
-      max: Number(process.env.PGPOOL_MAX) || 10,
+      // A deployed site (Vercel) starts a new pool in every function instance,
+      // and a small hosted database only allows a handful of connections in
+      // total. The default is kept low for that reason; PGPOOL_MAX can raise
+      // it when the database has room to spare.
+      max: Number(process.env.PGPOOL_MAX) || 5,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: Number(process.env.PGCONNECT_TIMEOUT) || 5000,
       ssl: sslSetting(target),
@@ -112,6 +126,14 @@ export function getClient() {
 
 /** Checks that the database answers. */
 export async function checkDatabase() {
+  if (!isDatabaseConfigured()) {
+    return {
+      ok: false,
+      message:
+        'DATABASE_URL is not set on the server, so there is no database to talk to.',
+    };
+  }
+
   try {
     const { rows } = await getPool().query('SELECT NOW() AS now, current_database() AS name');
     return {
