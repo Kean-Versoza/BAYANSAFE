@@ -38,6 +38,7 @@ export default function App() {
 
         {/* The dashboard for the team */}
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/dashboard" element={<AdminPage />} />
 
         {/* The "Send us a message" form on its own page */}
         <Route path="/help" element={<HelpPage />} />

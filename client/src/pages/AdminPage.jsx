@@ -1,9 +1,14 @@
 ﻿import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import '../styles/admin.css';
 
 const PAGE_SIZE = 25;
+
+/* The sign in page and the panel have their own addresses, so a signed in
+   admin can be linked straight to the panel, and signing in takes you there. */
+const SIGN_IN_PATH = '/admin';
+const PANEL_PATH = '/admin/dashboard';
 
 /** A small helper for the API calls. */
 async function api(path, options = {}) {
@@ -33,6 +38,10 @@ function formatDate(value) {
 }
 
 export default function AdminPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const onPanel = location.pathname.startsWith(PANEL_PATH);
+
   const [session, setSession] = useState({ known: false, signedIn: false, configured: false });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,6 +76,8 @@ export default function AdminPage() {
       setSession((s) => ({ ...s, signedIn: true }));
       setEmail('');
       setPassword('');
+      // Straight to the panel.
+      navigate(PANEL_PATH, { replace: true });
     } catch (err) {
       setLoginError(err.message);
     } finally {
@@ -80,7 +91,21 @@ export default function AdminPage() {
     setStats(null);
     setUsers([]);
     setEmails([]);
+    // Back to the sign in page.
+    navigate(SIGN_IN_PATH, { replace: true });
   };
+
+  /* ---- the right page for the session ---- */
+  // A signed in admin belongs on the panel, a signed out one on the sign in
+  // page. When the two do not match, the other page is on its way.
+  useEffect(() => {
+    if (!session.known) return;
+    if (session.signedIn && !onPanel) {
+      navigate(PANEL_PATH, { replace: true });
+    } else if (!session.signedIn && onPanel) {
+      navigate(SIGN_IN_PATH, { replace: true });
+    }
+  }, [session.known, session.signedIn, onPanel, navigate]);
 
   /* ---- loading the dashboard ---- */
   const load = useCallback(async () => {
@@ -139,7 +164,20 @@ export default function AdminPage() {
   };
 
   /* ---- the sign in screen ---- */
-  if (session.known && !session.signedIn) {
+  // While the session is being checked, or while the other page is on its
+  // way, a short message is shown instead of the wrong screen.
+  if (!session.known || onPanel !== session.signedIn) {
+    return (
+      <div className="admin-login">
+        <div className="admin-login-card">
+          <p className="admin-login-brand">BAYANSAFE</p>
+          <p className="admin-login-hint">One moment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session.signedIn) {
     return (
       <div className="admin-login">
         <form className="admin-login-card" onSubmit={signIn}>
