@@ -1096,6 +1096,30 @@ html.snap-scroll {
         letter-spacing: 0.05rem;
     }
 
+    /* The little tag that says the card is not needed */
+    .rfid-optional {
+        display: inline-block;
+        margin-left: 0.4rem;
+        padding: 0.1rem 0.4rem;
+        border: 2px solid #7a6248;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #7a6248;
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08rem;
+        vertical-align: middle;
+    }
+
+    /* The line that explains what to do without a card */
+    .rfid-hint {
+        margin: 0;
+        font-size: 0.72rem;
+        line-height: 1.35;
+        color: #5a4632;
+    }
+
     .rfid-status {
         font-size: 0.7rem;
         font-weight: 700;
@@ -1209,6 +1233,8 @@ html.snap-scroll {
 
         .rfid-label { font-size: 0.85rem; }
         .rfid-status { font-size: 0.65rem; padding: 0.1rem 0.4rem; }
+        .rfid-optional { font-size: 0.55rem; padding: 0.05rem 0.3rem; }
+        .rfid-hint { font-size: 0.68rem; }
 
         .rfid-field input[type="text"] {
             font-size: 16px;

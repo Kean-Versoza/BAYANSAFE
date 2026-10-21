@@ -16,8 +16,19 @@ const STATUS_TEXT = {
  * The number can be read with a reader (a USB one that works like a keyboard,
  * or a serial one that the browser is allowed to open) or typed by hand.
  * The number that was read is handed to the caller with onChange.
+ *
+ * The card is never something somebody has to have: optional says so out
+ * loud, and hint explains what to do when there is no card at hand.
  */
-export default function RfidField({ value, onChange, onScan, taken = false, enabled = true }) {
+export default function RfidField({
+  value,
+  onChange,
+  onScan,
+  taken = false,
+  enabled = true,
+  optional = false,
+  hint = '',
+}) {
   const { uid, scans, status, message, canSerial, connected, connectSerial, disconnect, clear } =
     useRfidReader({ enabled, onScan });
 
@@ -44,7 +55,10 @@ export default function RfidField({ value, onChange, onScan, taken = false, enab
   return (
     <div className={`rfid-field${taken ? ' is-taken' : ''}`}>
       <div className="rfid-head">
-        <span className="rfid-label">RFID CARD / ID</span>
+        <span className="rfid-label">
+          RFID CARD / ID
+          {optional && <span className="rfid-optional">OPTIONAL</span>}
+        </span>
         <span className={`rfid-status rfid-status--${status}`}>{STATUS_TEXT[status] ?? ''}</span>
       </div>
 
@@ -69,6 +83,8 @@ export default function RfidField({ value, onChange, onScan, taken = false, enab
           </button>
         )}
       </div>
+
+      {optional && !value && !taken && hint && <p className="rfid-hint">{hint}</p>}
 
       <div className="rfid-foot">
         <p className="rfid-message">{taken ? 'This card is already registered.' : message}</p>

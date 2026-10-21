@@ -96,7 +96,14 @@ export default function RegistrationSection() {
       const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.ok) {
-        setMessage({ type: 'success', text: result.message });
+        // An account without a card is a full account, so it says so here.
+        const withoutCard = !result.user?.rfidUid;
+        setMessage({
+          type: 'success',
+          text: withoutCard
+            ? `${result.message} You can add an RFID card later on your account page.`
+            : result.message,
+        });
         form.reset();
         setCard('');
         setCardTaken(false);
@@ -174,6 +181,8 @@ export default function RegistrationSection() {
             onChange={setCard}
             onScan={checkCard}
             taken={cardTaken}
+            optional
+            hint="No card with you? Leave this empty and keep registering. You can add a card later on your account page."
           />
 
           {message.text && (

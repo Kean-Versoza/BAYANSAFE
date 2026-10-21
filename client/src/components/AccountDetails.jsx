@@ -223,7 +223,8 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
       <section className="account-section account-section--card">
         <h2>RFID CARD / ID</h2>
         <p className="account-hint">
-          The card you scan in the game. Scan it here to link it to your account.
+          The card you scan in the game. Scan it here to link it to your account. You can play without
+          one.
         </p>
 
         <RfidField
@@ -232,6 +233,8 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
           onScan={saveCard}
           taken={cardTaken}
           enabled
+          optional
+          hint="No card at hand? Leave this empty and press SAVE CARD only when you have scanned one."
         />
 
         <div className="account-actions">
