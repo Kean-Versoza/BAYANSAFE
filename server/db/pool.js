@@ -10,6 +10,10 @@
  *
  *   postgresql://user:password@localhost:5432/bayansafe
  *
+ * A hosted database works the same way - Neon, Supabase and Railway all hand
+ * you a URL like that, you paste it in, and the encryption it asks for is
+ * taken care of (see sslSetting below).
+ *
  * The PGHOST / PGPORT / ... variables are used when there is no DATABASE_URL.
  */
 import pg from 'pg';
@@ -18,10 +22,62 @@ const { Pool } = pg;
 
 let pool = null;
 
+/** Where the database is. Returns null when there is no DATABASE_URL. */
+function databaseUrl() {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) return null;
+
+  try {
+    const url = new URL(raw);
+    // The sslmode is read here and then taken out of the URL, for the reason
+    // written under sslSetting() below.
+    const sslmode = url.searchParams.get('sslmode');
+    url.searchParams.delete('sslmode');
+    return { url, sslmode };
+  } catch {
+    return null; // a broken URL is handled as "no URL", the PG* settings apply
+  }
+}
+
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+
+/**
+ * Whether the connection is encrypted, and how much of the certificate to
+ * check.
+ *
+ * Hosted databases - Neon, Supabase, Railway, Render - need it. Their URL
+ * ends with "?sslmode=require", which in PostgreSQL means "encrypt the
+ * connection, but do not check the certificate", so that is what is asked
+ * for here.
+ *
+ * The setting has to be given to node-postgres on its own. It reads the URL
+ * too, and would put its own reading of sslmode over this one, which is why
+ * the parameter is removed from the URL in databaseUrl().
+ *
+ * DATABASE_SSL=true or =false is there for a database that needs the other
+ * answer, and always wins.
+ */
+function sslSetting(target) {
+  if (process.env.DATABASE_SSL === 'true') return { rejectUnauthorized: false };
+  if (process.env.DATABASE_SSL === 'false') return false;
+
+  const mode = target?.sslmode;
+  if (mode === 'disable') return false;
+  if (mode === 'verify-full') return true; // check the certificate properly
+  if (mode) return { rejectUnauthorized: false }; // "require" and friends
+
+  // No sslmode in the URL: a database on this machine needs no encryption,
+  // and one anywhere else almost always does.
+  const host = target?.url.hostname ?? process.env.PGHOST ?? 'localhost';
+  return LOCAL_HOSTS.has(host) ? false : { rejectUnauthorized: false };
+}
+
 function getPool() {
   if (!pool) {
+    const target = databaseUrl();
+
     const config = {
-      connectionString: process.env.DATABASE_URL || undefined,
+      connectionString: target ? target.url.toString() : undefined,
       host: process.env.PGHOST || 'localhost',
       port: Number(process.env.PGPORT) || 5432,
       database: process.env.PGDATABASE || 'bayansafe',
@@ -30,12 +86,8 @@ function getPool() {
       max: Number(process.env.PGPOOL_MAX) || 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: Number(process.env.PGCONNECT_TIMEOUT) || 5000,
+      ssl: sslSetting(target),
     };
-
-    // Hosted databases (Neon, Supabase, Railway) need SSL
-    if (process.env.DATABASE_SSL === 'true') {
-      config.ssl = { rejectUnauthorized: false };
-    }
 
     pool = new Pool(config);
 

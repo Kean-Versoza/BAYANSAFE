@@ -1,11 +1,13 @@
 ﻿/**
  * Checks that the email settings work.
  *
- *   npm run mail:check --workspace server
+ *   npm run mail:check
  *
- * Use it after you fill in server/.env, to see if the provider accepts
+ * Use it after you fill in .env, to see if the provider accepts
  * the details.
  */
+import '../env.js';
+
 import { checkConnection, isMailConfigured, mailRecipient, provider, providerName } from '../services/mailer.js';
 
 console.log(`Provider: ${provider.label} (MAIL_PROVIDER=${providerName})`);

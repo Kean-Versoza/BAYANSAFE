@@ -1,16 +1,11 @@
+import './env.js'; // must come first, so the settings are there for the rest
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 
-import footerConfig from './footerConfig.js';
-import siteConfig from './siteConfig.js';
-import { registerAccount } from './register.js';
-import registerRoutes from './routes/register.js';
-import accountRoutes from './routes/account.js';
-import adminRoutes from './routes/admin.js';
-import contactRoutes from './routes/contact.js';
-import mailRoutes from './routes/mail.js';
+import { createApiApp } from './app.js';
 import { closeDatabase } from './db/pool.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -18,9 +13,6 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3001;
 
 const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Simple request log so `npm run dev` shows what the client is asking for
 app.use((req, res, next) => {
@@ -33,52 +25,8 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ============================== API ROUTES ============================== */
-
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, service: 'bayansafe', uptime: process.uptime() });
-});
-
-// The whole footer/cookie configuration, so text lives in one place
-app.get('/api/footer', (req, res) => {
-  res.json(footerConfig);
-});
-
-// Navigation, footer and cookie text, shared with the client. The client
-// falls back to its bundled copy when this cannot be reached.
-app.get('/api/config', (req, res) => {
-  res.json(siteConfig);
-});
-
-/* ---------------------------------------------------------------
-   The features that came from the backend branch.
-
-   Every one of these talks to PostgreSQL. When the database is not
-   running they answer 503 and the rest of the site keeps working.
-   --------------------------------------------------------------- */
-
-// Accounts: sign in, the account page, the RFID card, the password
-app.use('/api/account', accountRoutes);
-
-// The dashboard behind /admin
-app.use('/api/admin', adminRoutes);
-
-// The "Send us a message" form in the footer
-app.use('/api/contact', contactRoutes);
-
-// Email status, used to tell the visitor when email is not set up
-app.use('/api/mail', mailRoutes);
-
-// Registration with an account, a card and the welcome email.
-// This replaces the old in-memory handler for the same path.
-app.use('/api/register', registerRoutes);
-
-/* --------------------------------------------------------------- */
-
-// Unknown API routes must never fall through to the SPA shell
-app.use('/api', (req, res) => {
-  res.status(404).json({ ok: false, errors: ['Endpoint not found.'] });
-});
+// Every endpoint of the site. On Vercel the same app runs from api/index.js.
+app.use(createApiApp());
 
 /* =========================== STATIC FRONTEND ============================ */
 

@@ -4,8 +4,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "client/dist",
   "rewrites": [
-    { "source": "/api", "destination": "/api/not-found" },
-    { "source": "/api/(.*)", "destination": "/api/not-found" },
+    { "source": "/api", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api/index" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -1,10 +1,12 @@
 ﻿/**
  * Sets the database up.
  *
- *   npm run db:setup --workspace server
+ *   npm run db:setup
  *
  * It creates the database when it is missing and then applies the migrations.
  */
+import '../env.js';
+
 import pg from 'pg';
 
 import { checkDatabase, closeDatabase } from '../db/pool.js';
@@ -12,7 +14,21 @@ import { migrate } from '../db/migrate.js';
 
 const { Pool } = pg;
 
-const targetDatabase = process.env.PGDATABASE || 'bayansafe';
+/**
+ * The name of the database the site uses. It comes from the URL when there
+ * is one, so a hosted database is never mistaken for a local one.
+ */
+function targetDatabase() {
+  if (process.env.DATABASE_URL) {
+    try {
+      const name = decodeURIComponent(new URL(process.env.DATABASE_URL).pathname.slice(1));
+      if (name) return name;
+    } catch {
+      /* a broken URL is handled as "no URL" below */
+    }
+  }
+  return process.env.PGDATABASE || 'bayansafe';
+}
 
 /** A connection to the "postgres" database, which every server has. */
 function adminConnection() {
@@ -34,8 +50,9 @@ function adminConnection() {
 async function ensureDatabaseExists() {
   const admin = new Pool(adminConnection());
   try {
-    await admin.query(`CREATE DATABASE "${targetDatabase}"`);
-    console.log(`Created the database "${targetDatabase}".`);
+    const name = targetDatabase();
+    await admin.query(`CREATE DATABASE "${name}"`);
+    console.log(`Created the database "${name}".`);
   } catch (err) {
     // 42P04 = duplicate_database, it was already there, that is fine
     if (err.code !== '42P04') throw err;
@@ -58,9 +75,9 @@ if (!db.ok) {
   console.log(db.message);
   console.log('');
   console.log('Things to try:');
-  console.log('  - start PostgreSQL:   docker compose up -d');
-  console.log('  - check DATABASE_URL in server/.env');
-  console.log(`  - check that PostgreSQL runs on ${process.env.PGHOST || 'localhost'}:${process.env.PGPORT || 5432}`);
+  console.log('  - put DATABASE_URL in .env (that is where Neon, Supabase and Railway tell you to put it)');
+  console.log('  - for a database on this machine: start PostgreSQL with "docker compose up -d"');
+  console.log(`  - or check that PostgreSQL runs on ${process.env.PGHOST || 'localhost'}:${process.env.PGPORT || 5432}`);
   await closeDatabase().catch(() => {});
   process.exit(1);
 }
