@@ -103,7 +103,7 @@ export default function Privacy() {
       <h2>10. Contact us</h2>
       <p>
         Questions about this policy? Email us at{' '}
-        <a href="mailto:versozakean@gmail.com">versozakean@gmail.com</a>.
+        <a href="mailto:bayansafe.admin@gmail.com">bayansafe.admin@gmail.com</a>.
       </p>
     </LegalLayout>
   );

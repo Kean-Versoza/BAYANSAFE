@@ -82,7 +82,7 @@ export default function Terms() {
       <h2>11. Contact us</h2>
       <p>
         Questions about these terms? Email us at{' '}
-        <a href="mailto:versozakean@gmail.com">versozakean@gmail.com</a>.
+        <a href="mailto:bayansafe.admin@gmail.com">bayansafe.admin@gmail.com</a>.
       </p>
     </LegalLayout>
   );
