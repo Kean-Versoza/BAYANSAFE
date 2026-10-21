@@ -45,9 +45,7 @@ export default function AccountBanner({ user, onSignOut }) {
         <div className="account-banner-text">
           <p className="account-kicker">WELCOME BACK</p>
           <h1 className="account-name">{user.username}</h1>
-          <p className="account-banner-meta">
-            Player {user.number} · Playing since {formatDate(user.createdAt)}
-          </p>
+          <p className="account-banner-meta">Signed in as {user.email}</p>
         </div>
 
         <div className="account-banner-actions">
