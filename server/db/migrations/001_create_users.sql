@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 -- The accounts of the players.
+=======
+﻿-- The accounts of the players.
+>>>>>>> 0c2b239ee6494135d1db09295d6a81cc8bc39d9d
 --
 -- The password column holds the salted hash, never the password itself.
 

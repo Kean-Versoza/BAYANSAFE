@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 -- A note of every email the site tried to send.
+=======
+﻿-- A note of every email the site tried to send.
+>>>>>>> 0c2b239ee6494135d1db09295d6a81cc8bc39d9d
 -- The dashboard uses this to show whether the welcome emails are going out.
 
 CREATE TABLE IF NOT EXISTS email_log (
