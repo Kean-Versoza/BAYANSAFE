@@ -109,8 +109,11 @@ Set `PORT` to change the server port.
 
 ## Deploying to Vercel
 
-The repository is already configured for Vercel — import it and deploy, there
-are no build settings to fill in.
+The repository is already connected to the Vercel project **bayansafe**
+(team **BAYANSAFE**), so a push to `main` builds and deploys on its own. The
+live site is **https://bayansafe.vercel.app**.
+
+If the project ever has to be created again:
 
 1. Push the repository to GitHub.
 2. On vercel.com choose **Add New → Project** and import the repository.
