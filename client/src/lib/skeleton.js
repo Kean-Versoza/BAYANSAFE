@@ -185,7 +185,10 @@ export function buildSkeleton(sk, id) {
   if (nav) nav.querySelectorAll('a').forEach((a) => paintBox(sk, fixed, a, 'sk'));
 
   // brand logo (not on Home)
-  if (id !== 'home') paintInk(sk, fixed, document.querySelector('#about .logo img'), '0.6rem');
+  if (id !== 'home') {
+    const logoImg = document.querySelector('#about .logo img') || document.querySelector('.account-frame .logo img');
+    paintInk(sk, fixed, logoImg, '0.6rem');
+  }
 
   if (id === 'home') {
     paintInk(sk, flow, sec.querySelector('.main-banner img'), '1rem');
@@ -194,6 +197,12 @@ export function buildSkeleton(sk, id) {
     paintBox(sk, flow, sec.querySelector('.panel'), 'sk-card');
     sec.querySelectorAll('.disaster-icon').forEach((ic) => paintBox(sk, flow, ic, 'sk'));
     sec.querySelectorAll('.panel p, .panel li').forEach((el) => paintLines(sk, flow, el));
+  } else if (id === 'account') {
+    const form = sec.querySelector('.account-card, .reg-form');
+    if (form) {
+      paintBox(sk, flow, form, 'sk-card');
+      paintFormContents(sk, flow, form);
+    }
   } else {
     const form = sec.querySelector('.reg-form');
     if (form && !form.classList.contains('hidden-form')) {

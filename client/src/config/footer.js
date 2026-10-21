@@ -6,7 +6,7 @@
  */
 
 /** Contact address - the footer's "Contact us" link opens it. */
-const CONTACT_EMAIL = 'versozakean@gmail.com';
+const CONTACT_EMAIL = ' bayansafe.admin@gmail.com';
 
 const defaultFooter = {
   logo: '/images/logo.png',

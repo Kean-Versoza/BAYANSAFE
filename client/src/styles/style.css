@@ -747,6 +747,83 @@
     }
     */
 
+    @media (max-width: 1024px) {
+        :root {
+            --nav-right: 1.5rem;
+            --bar-pad: 1rem;
+            --logo-h: 7.5rem;
+        }
+        .nav-pill { right: 1rem; }
+        .section-top,
+        .section-top--logo,
+        .legal-top,
+        .account-top { padding: var(--bar-pad) 1.5rem; }
+    }
+
+    @media (max-width: 768px) {
+        :root {
+            --nav-right: 0.75rem;
+            --logo-h: 6rem;
+        }
+        .nav-pill {
+            top: 1rem;
+            transform: none;
+            right: 0.75rem;
+            gap: 0.4rem;
+            padding: 0.4rem 0.6rem;
+        }
+        .nav-pill a {
+            min-width: auto;
+            padding: 0 0.8rem;
+            height: 2.4rem;
+            font-size: 0.95rem;
+        }
+        .logo {
+            top: 1rem;
+            transform: none;
+            left: 0.75rem;
+            margin: 0;
+        }
+        .logo img { height: var(--logo-h); max-width: 40vw; }
+        .section-top,
+        .section-top--logo,
+        .legal-top,
+        .account-top {
+            min-height: auto;
+            height: auto;
+            padding: calc(1rem + var(--logo-h) + 1rem) 1rem 1rem;
+            justify-content: center;
+        }
+        #about .section-top--logo { height: auto; }
+        .panel,
+        .legal-panel {
+            margin: 0 auto 1rem;
+            padding: 1rem 1rem 1.25rem;
+            width: min(95vw, 48rem);
+        }
+        .content-columns { flex-direction: column; gap: 1.5rem; }
+        .hero { padding: 1rem 0.5rem 8rem; }
+        .main-banner img { max-width: 96vw; }
+        .tagline { font-size: clamp(1rem, 4vw, 1.5rem); bottom: 2rem; }
+        .reg-form,
+        .account-card { width: min(95vw, 30rem); padding: 1.25rem 1rem; }
+    }
+
+    @media (max-width: 480px) {
+        :root { --logo-h: 4.5rem; }
+        .nav-pill a { font-size: 0.85rem; padding: 0 0.6rem; height: 2.2rem; }
+        .logo img { max-width: 45vw; }
+        .section-top,
+        .section-top--logo,
+        .legal-top,
+        .account-top { padding: calc(0.75rem + var(--logo-h) + 0.75rem) 0.75rem 0.75rem; }
+        .panel h1,
+        .legal-panel h1 { font-size: clamp(1.5rem, 6vw, 2rem); }
+        .btn-submit,
+        .legal-back,
+        .cookie-banner button { font-size: clamp(1rem, 4vw, 1.2rem); }
+    }
+
     @media (max-width: 700px) {
         .site-footer { padding: 1.5rem 1.25rem 9rem; }
         .cookie-banner {
