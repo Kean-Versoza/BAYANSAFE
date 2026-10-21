@@ -1,0 +1,109 @@
+/* ------------------------------------------------------------------
+   The Help Center page
+   ------------------------------------------------------------------
+   Holds nothing but the "Send us a message" form, centered on the
+   screen. The design of the form itself (its fields, the wooden border
+   and the yellow button) is the shared one in styles/style.css, so it
+   looks exactly the same here as it did in the footer. This file only
+   places it on the page.
+   ------------------------------------------------------------------ */
+
+.help-frame {
+    padding-bottom: 2rem;
+}
+
+/* The logo of the page. It sits in the flow, so it never runs into the
+   navigation pill above it. */
+.help-top {
+    display: flex;
+    align-items: flex-start;
+    flex-shrink: 0;
+    height: calc(var(--bar-pad) * 2 + var(--logo-h));
+    padding: var(--bar-pad) 2.5rem;
+}
+
+.help-logo img {
+    height: var(--logo-h);
+    width: auto;
+    max-width: 60vw;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+/* The form is the only thing on the page, so it is centered both ways.
+   The form keeps its own design - no card is drawn around it. */
+.help-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.25rem 3rem;
+}
+
+/* The form keeps its own width and centering. Without these,
+   `align-items: center` would shrink it to the width of its contents,
+   and the heading would sit left-aligned. In the footer both came from
+   `.site-footer` (text-align: center), so they are stated here to keep
+   the form looking the same.
+
+   The white panel is the colour of the footer (.site-footer is
+   rgba(255, 255, 255, 0.94)). In the footer the form sat on that
+   panel, which is what made it readable; on this page it would sit
+   straight on the background picture, so the same panel is drawn
+   behind it. */
+.help-page .contact-form {
+    margin-top: 0;
+    width: 100%;
+    /* The padding sits inside the form's designed max-width, not on top
+       of it, so the fields keep the same width they had in the footer. */
+    box-sizing: border-box;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 0.9rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.help-page .contact-form-title {
+    text-align: center;
+    /* In the footer this gap came out a little bigger: `.site-footer`
+       sets `font-size: 1rem`, which resets the em basis the title
+       inherits. Stated here so the gap is the same as it was. */
+    margin-bottom: 0.35rem;
+}
+
+/* The way back to the site, under the form */
+.help-back {
+    margin-top: 1.5rem;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.05rem;
+    color: #3b2410;
+    text-decoration: underline;
+}
+
+.help-back:hover { color: #1a0500; }
+
+/* ---------- on a phone ---------- */
+@media (max-width: 700px) {
+    .help-top { padding: var(--bar-pad) 1.25rem; }
+
+    .help-page { padding: 0 1rem 2rem; }
+
+    /* a little less padding, so the form keeps room on a small screen */
+    .help-page .contact-form { padding: 1.4rem; }
+
+    /* the two fields go under each other */
+    .help-page .contact-form-row {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    /* 16px keeps iOS from zooming in when a field is focused */
+    .help-page .contact-form input,
+    .help-page .contact-form textarea {
+        font-size: 16px;
+    }
+}
