@@ -22,5 +22,18 @@ export default function handler(req, res) {
     req.url = `/api${url.startsWith('/') ? url : `/${url}`}`;
   }
 
+  // TEMPORARY DIAGNOSTIC - removed after the routing has been checked
+  if (req.url.startsWith('/api/__diag-7f3a91')) {
+    res.json({
+      url: req.url,
+      originalUrl: req.originalUrl,
+      baseUrl: req.baseUrl,
+      path: req.path,
+      headers: req.headers,
+    });
+    return;
+  }
+
+  res.setHeader('x-bayansafe-path', req.url);
   return app(req, res);
 }
