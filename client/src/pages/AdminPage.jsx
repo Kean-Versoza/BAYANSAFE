@@ -57,6 +57,14 @@ export default function AdminPage() {
   const [message, setMessage] = useState(null);
   const [tab, setTab] = useState('users');
 
+  /* The name of the tab, so the window says which page is open */
+  useEffect(() => {
+    document.title = 'BayanSafe | Admin';
+    return () => {
+      document.title = 'BayanSafe';
+    };
+  }, []);
+
   /* ---- signing in ---- */
   useEffect(() => {
     api('/api/admin/session')

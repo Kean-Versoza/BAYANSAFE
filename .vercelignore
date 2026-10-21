@@ -1,0 +1,15 @@
+# Files that must not be uploaded to Vercel.
+#
+# The .env file holds the local database password and the admin password.
+# A deployed site gets its settings from the project environment variables
+# instead, so the file never has to leave this computer.
+
+.env
+.env.local
+.env*
+!.env.example
+
+node_modules
+client/node_modules
+client/dist
+.vercel
