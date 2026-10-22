@@ -185,6 +185,32 @@ npm run db:setup
 Without the tables, registration and the admin dashboard answer "The database
 could not be reached."
 
+### Copying the players from this computer to the live site
+
+`db:setup` creates empty tables. To move the accounts, the sign ins and the
+email log from the database on this computer to the deployed one, use:
+
+```bash
+# The database on this computer comes from .env (DATABASE_URL).
+# The target is the database of the deployed site.
+$env:TARGET_DATABASE_URL = "postgresql://..."   # PowerShell
+npm run db:push
+```
+
+`db:push` empties the target tables and writes the local rows, so running it
+twice is safe and the result is always an exact copy. It does not touch the
+schema — run `db:setup` against the target first.
+
+The copy is done with ordinary SQL rows rather than `pg_dump`, so the two
+databases do not have to be the same PostgreSQL version. A local 16 can fill a
+hosted 18 (which is what the live site runs), and the other way round. Only
+the `users`, `user_sessions` and `email_log` tables are copied;
+`schema_migrations` is left alone, since each side keeps its own record of the
+migrations it has applied.
+
+To copy the other way, point `SOURCE_DATABASE_URL` at the hosted database and
+leave `DATABASE_URL` as the target.
+
 A new environment variable only reaches a deployment that is created after it
 was added, so redeploy (`git commit --allow-empty -m redeploy` or the
 **Redeploy** button) after changing one.
