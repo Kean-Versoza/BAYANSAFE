@@ -69,9 +69,10 @@ running. Only the features above need it.
 
 - Node.js 18 or newer (tested on Node 24)
 - npm
-- PostgreSQL 16 (only for accounts, the admin page and the contact form) —
+- PostgreSQL 18 (only for accounts, the admin page and the contact form) -
   `docker compose up -d` starts one, or install it on Windows with
-  `winget install PostgreSQL.PostgreSQL.16`
+  `winget install PostgreSQL.PostgreSQL.18`. The live site runs 18.6 too, so a
+  table or a backup moves between the two without a version step.
 
 ## Configuration
 
