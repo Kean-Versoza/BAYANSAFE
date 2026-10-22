@@ -8,6 +8,12 @@ import { clearCookie, readCookies, setCookie } from './cookies.js';
  * The admin gives an email and a password in .env (ADMIN_EMAIL, ADMIN_PASSWORD).
  * When they are right, the server hands out a signed cookie that is good for
  * a few hours. The cookie is signed with a key, so it cannot be made up.
+ *
+ * The admin password is deliberately exempt from the player password rules in
+ * shared/password.js. It is not stored in the database and never goes through
+ * registration or the account page, so it is allowed to stay short and easy to
+ * type for quick access. Keep it private all the same: the dashboard shows
+ * every account.
  */
 
 const EMAIL = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
@@ -37,6 +43,8 @@ function safeEqual(a, b) {
 
 /** True when the given email and password match the admin. */
 export function checkCredentials(email, password) {
+  // No strength check here, on purpose: the admin password comes from the
+  // environment and is exempt from the player rules (see the file header).
   if (!isAdminConfigured()) return false;
   const given = String(email || '').trim().toLowerCase();
   return safeEqual(given, EMAIL) && safeEqual(password, PASSWORD);

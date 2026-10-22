@@ -4,6 +4,10 @@
  * The client and the server both use this file, so the checklist the player
  * sees and the check the server runs can never drift apart.
  *
+ * These are the rules for PLAYER passwords (sign up and the account page).
+ * The admin password is set in the environment and is deliberately exempt;
+ * see server/services/adminAuth.js.
+ *
  * A password needs all five things:
  *   - 8 characters or more
  *   - an uppercase letter

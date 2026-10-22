@@ -148,6 +148,13 @@ There is no `.env` file on Vercel — the same variables are filled in under
 
 A long `SESSION_SECRET` can be made with `openssl rand -hex 32`.
 
+`ADMIN_PASSWORD` is exempt from the player password rules. It is read from the
+environment, never stored in the database and never registered, so it can stay
+short and easy to type (the current one is `bayansafe-admin`). The checklist in
+the sign up form and the checks in `/api/register` and `/api/account/password`
+apply to players only. Keep the admin password private all the same, since the
+dashboard shows every account.
+
 ### The database of a deployed site
 
 The live site runs on **Neon Postgres**, attached through the Vercel
