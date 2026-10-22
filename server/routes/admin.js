@@ -9,6 +9,7 @@ import {
   checkPassword,
   clearSessionCookie,
   isAdminConfigured,
+  isAdminEmail,
   isSignedIn,
   setSessionCookie,
   signToken,
@@ -88,7 +89,10 @@ router.post('/login', (req, res) => {
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
 
   if (!checkCredentials(email, password)) {
-    noteFailedTry(key);
+    // Only a wrong password for the admin's own email counts. The account page
+    // tries the admin sign in first, so every player sign in arrives here too,
+    // and those must not use up the admin's tries.
+    if (isAdminEmail(email)) noteFailedTry(key);
     return res.status(401).json({ ok: false, error: 'That email and password do not go together.' });
   }
 

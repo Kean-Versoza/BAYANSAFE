@@ -42,6 +42,18 @@ export function checkCredentials(email, password) {
   return safeEqual(given, EMAIL) && safeEqual(password, PASSWORD);
 }
 
+/**
+ * True when the email is the one the admin signs in with.
+ *
+ * The account page tries the admin sign in first, so a player typing their own
+ * email here is normal traffic. Only a wrong password for the admin's own email
+ * is worth counting, otherwise a few players would lock the admin out.
+ */
+export function isAdminEmail(email) {
+  if (!isAdminConfigured()) return false;
+  return safeEqual(String(email || '').trim().toLowerCase(), EMAIL);
+}
+
 /** True when the given password is the admin password. */
 export function checkPassword(password) {
   if (!isAdminConfigured()) return false;

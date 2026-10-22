@@ -10,7 +10,15 @@ async function api(path, options = {}) {
 
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const error = new Error(body.error ?? 'Something went wrong.');
+    // A reply that is not JSON means the request never reached the API - the
+    // development server was not running, for example - so the status is said
+    // out loud instead of a sentence that explains nothing.
+    const error = new Error(
+      body.error ??
+        (res.status >= 500
+          ? `The server could not answer (HTTP ${res.status}). Check that the API is running.`
+          : `The request failed (HTTP ${res.status}).`),
+    );
     error.status = res.status;
     throw error;
   }
