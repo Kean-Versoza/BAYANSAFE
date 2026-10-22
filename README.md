@@ -137,7 +137,7 @@ There is no `.env` file on Vercel — the same variables are filled in under
 
 | Variable        | What it is                                             | Needed |
 | --------------- | ------------------------------------------------------ | ------ |
-| `DATABASE_URL`  | The PostgreSQL connection string                       | yes    |
+| `DATABASE_URL`  | The PostgreSQL connection string (set by the Neon integration) | yes |
 | `DATABASE_SSL`  | `true` for most hosted databases                        | yes    |
 | `PGPOOL_MAX`    | `1` or `2`, so a function does not open too many connections | yes |
 | `ADMIN_EMAIL`   | The email the admin signs in with                       | yes    |
@@ -149,17 +149,45 @@ A long `SESSION_SECRET` can be made with `openssl rand -hex 32`.
 
 ### The database of a deployed site
 
-The tables are created by the migrations in `server/db/migrations`, which run
-on your own machine against the same database the site uses:
+The live site runs on **Neon Postgres**, attached through the Vercel
+Marketplace, so the database lives next to the project instead of in a
+separate account to look after:
+
+- Project → **Storage** shows the resource `bayansafe-db`.
+- Attaching it wrote `DATABASE_URL` (pooled), `DATABASE_URL_UNPOOLED` and the
+  `PG*` / `POSTGRES_*` aliases into the project environment variables for all
+  three environments. There is nothing to paste in by hand.
+- The database is in **Singapore** (`sin1`), the closest region to the
+  Philippines, and it sits on Neon's free plan.
+
+The tables are created by the migrations in `server/db/migrations`. They are
+not applied automatically on deploy, so run them from your machine against the
+same database the site uses:
 
 ```bash
-# .env holds the DATABASE_URL of the deployed database
+# The Vercel CLI writes the project variables into .env.local
+vercel env pull .env.local
+# ...or copy DATABASE_URL by hand into .env
+
 npm run db:setup     # creates the tables
 npm run db:check     # is the database reachable?
 ```
 
+`db:setup` reads `DATABASE_URL` and leaves it alone when one is already in the
+shell, so it can be pointed at the hosted database without editing a file:
+
+```bash
+$env:DATABASE_URL = "postgresql://..."   # PowerShell
+$env:DATABASE_SSL = "true"
+npm run db:setup
+```
+
 Without the tables, registration and the admin dashboard answer "The database
 could not be reached."
+
+A new environment variable only reaches a deployment that is created after it
+was added, so redeploy (`git commit --allow-empty -m redeploy` or the
+**Redeploy** button) after changing one.
 
 ### What is shared with the local server
 
