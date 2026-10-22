@@ -158,6 +158,8 @@ separate account to look after:
 - Attaching it wrote `DATABASE_URL` (pooled), `DATABASE_URL_UNPOOLED` and the
   `PG*` / `POSTGRES_*` aliases into the project environment variables for all
   three environments. There is nothing to paste in by hand.
+- The database itself is called **bayansafe**, the same name it has on this
+  computer, so the two can be read side by side without translating names.
 - The database is in **Singapore** (`sin1`), the closest region to the
   Philippines, and it sits on Neon's free plan.
 
