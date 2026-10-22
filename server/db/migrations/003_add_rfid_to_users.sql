@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 -- The RFID card of the player.
-=======
-﻿-- The RFID card of the player.
->>>>>>> 0c2b239ee6494135d1db09295d6a81cc8bc39d9d
 --
 -- The column holds the card number the reader gave us, in upper case, so the
 -- same card always looks the same. It is empty when the player has no card.

@@ -37,14 +37,10 @@ export async function migrate({ verbose = true } = {}) {
       continue;
     }
 
-<<<<<<< HEAD
     // A file saved by a Windows editor can start with a BOM (the invisible
     // character U+FEFF). PostgreSQL does not accept it at the start of a
     // statement, so it is taken off here.
     const sql = (await fs.readFile(path.join(migrationsFolder, file), 'utf8')).replace(/^\uFEFF/, '');
-=======
-    const sql = await fs.readFile(path.join(migrationsFolder, file), 'utf8');
->>>>>>> 0c2b239ee6494135d1db09295d6a81cc8bc39d9d
     const client = await getClient();
 
     try {

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 -- The sign in of the players.
-=======
-﻿-- The sign in of the players.
->>>>>>> 0c2b239ee6494135d1db09295d6a81cc8bc39d9d
 --
 -- Every sign in makes a row here. The cookie of the player holds a random
 -- token, and only the hash of that token is kept, so a stolen database cannot
