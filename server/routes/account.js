@@ -22,6 +22,7 @@ import {
   setUserCookie,
 } from '../services/userAuth.js';
 import { normalizeCardNumber } from '../../shared/rfid.js';
+import { describePasswordProblem } from '../../shared/password.js';
 
 const router = Router();
 
@@ -219,11 +220,13 @@ router.post('/password', requireUser, async (req, res) => {
   const current = typeof req.body?.currentPassword === 'string' ? req.body.currentPassword : '';
   const next = typeof req.body?.newPassword === 'string' ? req.body.newPassword : '';
 
-  if (next.length < 8) {
-    return res.status(400).json({ ok: false, error: 'Please use a password of at least 8 characters.' });
+  if (!next) {
+    return res.status(400).json({ ok: false, error: 'Please choose a password.' });
   }
-  if (next.length > 200) {
-    return res.status(400).json({ ok: false, error: 'That password is too long.' });
+
+  const passwordProblem = describePasswordProblem(next);
+  if (passwordProblem) {
+    return res.status(400).json({ ok: false, error: passwordProblem });
   }
 
   try {

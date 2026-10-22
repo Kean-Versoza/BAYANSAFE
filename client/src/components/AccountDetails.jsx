@@ -1,7 +1,9 @@
 ﻿import { useEffect, useState } from 'react';
 
 import AccountBanner from './AccountBanner';
+import PasswordChecklist from './PasswordChecklist';
 import RfidField from './RfidField';
+import { describePasswordProblem } from '@shared/password';
 
 /**
  * The account of the player.
@@ -99,8 +101,11 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
       setPasswordMessage({ type: 'error', text: 'The two new passwords are not the same.' });
       return;
     }
-    if (newPassword.length < 8) {
-      setPasswordMessage({ type: 'error', text: 'Please use a password of at least 8 characters.' });
+
+    // Same rules the server enforces, shown before the request is sent.
+    const passwordProblem = describePasswordProblem(newPassword);
+    if (passwordProblem) {
+      setPasswordMessage({ type: 'error', text: passwordProblem });
       return;
     }
 
@@ -255,8 +260,16 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
               minLength={8}
               required
               autoComplete="new-password"
+              aria-describedby="account-password-rules"
             />
           </label>
+
+          {/* Shown once the player starts typing, so the rules are never hidden */}
+          <PasswordChecklist
+            password={newPassword}
+            id="account-password-rules"
+            visible={newPassword.length > 0}
+          />
 
           <label className="account-field">
             <span>REPEAT THE NEW PASSWORD</span>

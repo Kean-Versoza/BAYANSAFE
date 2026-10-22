@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import RfidField from '../components/RfidField';
+import PasswordChecklist from '../components/PasswordChecklist';
+import { describePasswordProblem } from '@shared/password';
 import { FORM_LOADER_MS, paintFormContents } from '../lib/skeleton';
 
 const EMPTY_MESSAGE = { type: '', text: '' };
@@ -9,6 +11,8 @@ export default function RegistrationSection() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
   const [card, setCard] = useState('');
@@ -75,10 +79,21 @@ export default function RegistrationSection() {
 
     const form = event.currentTarget;
     const data = new FormData(form);
+    const passwordValue = String(data.get('password') ?? '');
+
+    // The server checks this too; saying it here saves a round trip and puts
+    // the answer next to the field the player is looking at. The value comes
+    // from the form itself so an autofilled password is judged correctly.
+    const passwordProblem = describePasswordProblem(passwordValue);
+    if (passwordProblem) {
+      setMessage({ type: 'error', text: passwordProblem });
+      return;
+    }
+
     const payload = {
       username: data.get('username') ?? '',
       email: data.get('email') ?? '',
-      password: data.get('password') ?? '',
+      password: passwordValue,
       rfidUid: card,
       acceptedTerms: data.get('terms') === 'on',
       terms: data.get('terms') === 'on',
@@ -108,6 +123,8 @@ export default function RegistrationSection() {
         setCard('');
         setCardTaken(false);
         setShowPassword(false);
+        setPassword('');
+        setPasswordFocused(false);
       } else {
         const errors = Array.isArray(result.errors)
           ? result.errors
@@ -152,6 +169,11 @@ export default function RegistrationSection() {
               placeholder="Password"
               autoComplete="new-password"
               minLength={8}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              onFocus={() => setPasswordFocused(true)}
+              onBlur={() => setPasswordFocused(false)}
+              aria-describedby="registration-password-rules"
               required
             />
             <button
@@ -170,6 +192,13 @@ export default function RegistrationSection() {
               </svg>
             </button>
           </div>
+
+          {/* What the password still needs, updated as the player types */}
+          <PasswordChecklist
+            password={password}
+            id="registration-password-rules"
+            visible={passwordFocused || password.length > 0}
+          />
 
           <label className="terms">
             <input type="checkbox" name="terms" required /> I agree to the safety terms

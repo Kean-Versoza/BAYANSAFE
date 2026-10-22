@@ -267,8 +267,20 @@ and it works on both, at the same time.
 `POST /api/register` expects JSON:
 
 ```json
-{ "username": "juan", "email": "juan@example.com", "password": "secret123", "terms": true }
+{ "username": "juan", "email": "juan@example.com", "password": "BayanSafe1!", "terms": true }
 ```
+
+A password must have all five of these, and the form ticks them off as you
+type:
+
+- at least 8 characters
+- an uppercase letter
+- a lowercase letter
+- a number
+- a special character
+
+The rules live in `shared/password.js`, which the form and the server both
+import, so the checklist and the server can never disagree.
 
 Accounts live in PostgreSQL, and passwords are salted and hashed with scrypt —
 never stored as plain text.

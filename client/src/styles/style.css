@@ -1343,3 +1343,78 @@ html.snap-scroll {
     }
     .contact-status--ok { color: #1c5b26; }
     .contact-status--error { color: #8a1c1c; }
+
+    /* ------------------------------------------------------------------
+       The password checklist
+       --------------------------------------------------------------
+       Shown under a password box in the registration card and on the
+       account page. Each rule is ticked as soon as the password meets
+       it, so the player can see what is still missing while typing.
+       ------------------------------------------------------------------ */
+    .password-rules {
+        margin: -0.35rem 0 0;
+        padding: 0.55rem 0.7rem;
+        border: 2px dashed #b9a58c;
+        border-radius: 0.45rem;
+        background: #fffdf6;
+        text-align: left;
+    }
+
+    .password-rules ul {
+        display: grid;
+        gap: 0.22rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .password-rules li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.42rem;
+        font-size: 0.74rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: #7a6248;
+    }
+
+    .password-rules li.is-met {
+        color: #1c5b26;
+    }
+
+    .password-rule-mark {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 0.95rem;
+        height: 0.95rem;
+        margin-top: 0.05rem;
+        border-radius: 999px;
+        background: #efe6d6;
+        color: #8a6b4a;
+        font-size: 0.62rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .password-rules li.is-met .password-rule-mark {
+        background: #d9f5e0;
+        color: #1c5b26;
+    }
+
+    .password-rules-summary {
+        margin: 0.4rem 0 0;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #8a6b4a;
+    }
+
+    .password-rules-summary.is-ok {
+        color: #1c5b26;
+    }
+
+    @media (max-width: 600px) {
+        .password-rules li { font-size: 0.7rem; }
+        .password-rules-summary { font-size: 0.68rem; }
+    }

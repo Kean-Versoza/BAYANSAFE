@@ -5,6 +5,7 @@ import { describeError } from '../db/pool.js';
 import { sendMail } from '../services/mailer.js';
 import { welcomeMessage } from '../services/mailTemplates.js';
 import { normalizeCardNumber } from '../../shared/rfid.js';
+import { describePasswordProblem } from '../../shared/password.js';
 
 const router = Router();
 
@@ -20,8 +21,12 @@ function validate({ username, email, password, acceptedTerms }) {
   if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
     return 'Please enter a valid email address.';
   }
-  if (typeof password !== 'string' || password.length < 8) {
-    return 'Please use a password of at least 8 characters.';
+  if (typeof password !== 'string' || password.length === 0) {
+    return 'Please choose a password.';
+  }
+  const passwordProblem = describePasswordProblem(password);
+  if (passwordProblem) {
+    return passwordProblem;
   }
   if (acceptedTerms !== true) {
     return 'Please agree to the safety terms.';
