@@ -56,6 +56,7 @@ export default function AdminPage() {
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState(null);
   const [tab, setTab] = useState('users');
+  const [refreshing, setRefreshing] = useState(false);
 
   /* The name of the tab, so the window says which page is open */
   useEffect(() => {
@@ -135,6 +136,19 @@ export default function AdminPage() {
     if (!session.signedIn) return;
     load().catch((err) => setMessage({ type: 'error', text: err.message }));
   }, [session.signedIn, load]);
+
+  /* The refresh button in the header: asks the server for everything again. */
+  const reload = async () => {
+    setRefreshing(true);
+    try {
+      await load();
+      setMessage(null);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const removeUser = async (user) => {
     const sure = window.confirm(
@@ -238,16 +252,44 @@ export default function AdminPage() {
   /* ---- the dashboard ---- */
   const max = Math.max(1, ...(stats?.chart ?? []).map((d) => d.count));
 
+  /* The numbers at the top of the page. The tone gives each one its colour. */
+  const tiles = [
+    { label: 'Accounts', value: stats?.totals.accounts, tone: 'brand' },
+    { label: 'New today', value: stats?.totals.today, tone: 'ok' },
+    { label: 'New this week', value: stats?.totals.week, tone: 'sky' },
+    { label: 'Cards linked', value: stats?.totals.cards, tone: 'violet' },
+    { label: 'Emails sent', value: stats?.totals.emails, tone: 'teal' },
+    { label: 'Emails failed', value: stats?.totals.emails_failed, tone: 'bad' },
+  ];
+
   return (
     <div className="admin">
       <header className="admin-header">
-        <div>
+        <div className="admin-header-brand">
           <p className="admin-brand">BAYANSAFE</p>
-          <h1>Admin dashboard</h1>
+          <div className="admin-header-text">
+            <h1>Admin dashboard</h1>
+            <p className="admin-subtitle">Accounts, cards and email — all in one place.</p>
+          </div>
         </div>
-        <button type="button" className="admin-button admin-button--ghost" onClick={signOut}>
-          SIGN OUT
-        </button>
+
+        <div className="admin-header-actions">
+          <span className={`admin-live${status && !status.database.ok ? ' is-down' : ''}`}>
+            <span className="admin-live-dot" />
+            {status && !status.database.ok ? 'Database offline' : 'Live'}
+          </span>
+          <button
+            type="button"
+            className="admin-button admin-button--ghost"
+            onClick={reload}
+            disabled={refreshing}
+          >
+            {refreshing ? 'REFRESHING...' : 'REFRESH'}
+          </button>
+          <button type="button" className="admin-button" onClick={signOut}>
+            SIGN OUT
+          </button>
+        </div>
       </header>
 
       {message && (
@@ -260,30 +302,12 @@ export default function AdminPage() {
       )}
 
       <section className="admin-tiles">
-        <div className="admin-tile">
-          <span className="admin-tile-value">{stats?.totals.accounts ?? '-'}</span>
-          <span className="admin-tile-label">Accounts</span>
-        </div>
-        <div className="admin-tile">
-          <span className="admin-tile-value">{stats?.totals.today ?? '-'}</span>
-          <span className="admin-tile-label">New today</span>
-        </div>
-        <div className="admin-tile">
-          <span className="admin-tile-value">{stats?.totals.week ?? '-'}</span>
-          <span className="admin-tile-label">New this week</span>
-        </div>
-        <div className="admin-tile">
-          <span className="admin-tile-value">{stats?.totals.cards ?? '-'}</span>
-          <span className="admin-tile-label">Cards linked</span>
-        </div>
-        <div className="admin-tile">
-          <span className="admin-tile-value">{stats?.totals.emails ?? '-'}</span>
-          <span className="admin-tile-label">Emails sent</span>
-        </div>
-        <div className="admin-tile">
-          <span className="admin-tile-value">{stats?.totals.emails_failed ?? '-'}</span>
-          <span className="admin-tile-label">Emails failed</span>
-        </div>
+        {tiles.map((tile) => (
+          <div className={`admin-tile admin-tile--${tile.tone}`} key={tile.label}>
+            <span className="admin-tile-value">{tile.value ?? '-'}</span>
+            <span className="admin-tile-label">{tile.label}</span>
+          </div>
+        ))}
       </section>
 
       <div className="admin-grid">
@@ -381,7 +405,11 @@ export default function AdminPage() {
                     <button type="button" onClick={() => setCard(user)}>
                       Card
                     </button>
-                    <button type="button" onClick={() => removeUser(user)}>
+                    <button
+                      type="button"
+                      className="admin-action--danger"
+                      onClick={() => removeUser(user)}
+                    >
                       Remove
                     </button>
                   </td>
