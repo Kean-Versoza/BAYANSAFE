@@ -8,9 +8,11 @@ import {
   findByRfid,
   findByUsername,
   noteSignIn,
+  setPin,
   updatePassword,
   updateUser,
   verifyPassword,
+  verifyPin,
 } from '../services/users.js';
 import {
   clearUserCookie,
@@ -63,6 +65,7 @@ function playerNumber(id) {
 function publicUser(user) {
   return {
     id: user.id,
+    playerNumber: user.player_number ?? null,
     number: playerNumber(user.id),
     username: user.username,
     email: user.email,
@@ -110,11 +113,13 @@ router.get('/session', async (req, res) => {
  * Signs a player in with their email and their password.
  */
 router.post('/login', async (req, res) => {
-  const email = typeof req.body?.email === 'string' ? req.body.email.trim() : '';
+  const identifier = typeof req.body?.username === 'string'
+    ? req.body.username.trim()
+    : (typeof req.body?.email === 'string' ? req.body.email.trim() : '');
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
 
-  if (!email || !password) {
-    return res.status(400).json({ ok: false, error: 'Please fill in your email and your password.' });
+  if (!identifier || !password) {
+    return res.status(400).json({ ok: false, error: 'Please fill in your username and your password.' });
   }
 
   const key = req.ip ?? 'unknown';
@@ -123,10 +128,12 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const user = await findByEmail(email);
+    const user = identifier.includes('@')
+      ? await findByEmail(identifier)
+      : await findByUsername(identifier);
     if (!user || !verifyPassword(password, user.password)) {
       noteFailedTry(key);
-      return res.status(401).json({ ok: false, error: 'That email and password do not go together.' });
+      return res.status(401).json({ ok: false, error: 'That username and password do not go together.' });
     }
 
     attempts.delete(key);
@@ -155,6 +162,27 @@ router.post('/logout', async (req, res) => {
   }
   clearUserCookie(res);
   res.json({ ok: true });
+});
+
+/**
+ * POST /api/account/pin
+ * Sets a PIN on the signed-in account for RFID quick sign-in security.
+ * Requires the user to be signed in.
+ */
+router.post('/pin', requireUser, async (req, res) => {
+  const { pin } = req.body ?? {};
+
+  if (!pin || !/^\d{4,6}$/.test(String(pin))) {
+    return res.status(400).json({ ok: false, error: 'PIN must be 4 to 6 digits.' });
+  }
+
+  try {
+    await setPin(req.user.id, pin);
+    res.json({ ok: true, message: 'PIN set successfully.' });
+  } catch (err) {
+    console.error('Could not set PIN:', describeError(err));
+    res.status(503).json({ ok: false, error: 'Could not set PIN.' });
+  }
 });
 
 /* ------------------------------------------------------------------

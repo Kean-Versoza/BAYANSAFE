@@ -45,13 +45,13 @@ export function useAccount() {
     refresh();
   }, [refresh]);
 
-  /** Signs a player in. */
-  const signIn = useCallback(async (email, password) => {
+  /** Signs a player in. Accepts a username or an email address. */
+  const signIn = useCallback(async (username, password) => {
     setBusy(true);
     try {
       const data = await api('/api/account/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       setUser(data.user);
       setKnown(true);

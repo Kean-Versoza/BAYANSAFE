@@ -29,6 +29,8 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
   const [cardMessage, setCardMessage] = useState(null);
   const [cardBusy, setCardBusy] = useState(false);
   const [cardTaken, setCardTaken] = useState(false);
+  const [replacing, setReplacing] = useState(false);
+  const [enrollState, setEnrollState] = useState(user.card ? 'linked' : 'ready');
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -46,6 +48,7 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
     setName(user.username);
     setEmail(user.email);
     setCard(user.card ?? '');
+    setEnrollState(user.card ? 'linked' : 'ready');
   }, [user]);
 
   /* ---- the name and the email ---- */
@@ -65,24 +68,39 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
   };
 
   /* ---- the card ---- */
-  const saveCard = async (number) => {
+  const handleEnrollScan = async (number) => {
     const wanted = number.trim();
     if (!wanted || wanted === (user.card ?? '')) return;
 
-    setCardMessage(null);
+    setCard(wanted);
     setCardTaken(false);
+    setCardMessage(null);
+    setEnrollState('detected');
     setCardBusy(true);
 
     try {
       const data = await onSaveCard(wanted);
-      setCardMessage({ type: 'ok', text: data.message });
+      setReplacing(false);
+      setEnrollState('linked');
+      setCardMessage({ type: 'ok', text: '✅ Card successfully scanned! Linking to your account...' });
     } catch (err) {
-      setCardTaken(err.status === 409);
-      setCardMessage({ type: 'error', text: err.message });
+      if (err.status === 409) {
+        setCardTaken(true);
+        setEnrollState('taken');
+        setCardMessage({
+          type: 'error',
+          text: '⚠️ This card is already registered to another account. If this is a mistake, please contact support.',
+        });
+      } else {
+        setEnrollState('ready');
+        setCardMessage({ type: 'error', text: err.message });
+      }
     } finally {
       setCardBusy(false);
     }
   };
+
+  const saveCard = handleEnrollScan;
 
   const takeCardAway = async () => {
     setCardMessage(null);
@@ -91,6 +109,8 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
     try {
       const data = await onSaveCard('');
       setCard(data.user.card ?? '');
+      setReplacing(false);
+      setEnrollState('ready');
       setCardMessage({ type: 'ok', text: data.message });
     } catch (err) {
       setCardMessage({ type: 'error', text: err.message });
@@ -221,29 +241,79 @@ export default function AccountDetails({ user, onSaveDetails, onSavePassword, on
 
       {/* ---------- the card of the reader ---------- */}
       <section className="account-section account-section--card">
-        <h2>RFID CARD / ID</h2>
+        <h2>RFID CARD / ID (ENROL FOR QUICK SIGN-IN IN THE GAME)</h2>
         <p className="account-hint">
-          The card you scan in the game. Scan it here to link it to your account.
+          Scan your card to link it to this account. The card can then be used for quick sign-in inside the game.
         </p>
 
-        <RfidField
-          value={card}
-          onChange={setCard}
-          onScan={saveCard}
-          taken={cardTaken}
-          enabled
-        />
-
-        <div className="account-actions">
-          <button type="button" className="btn-submit" onClick={() => saveCard(card)} disabled={cardBusy}>
-            {cardBusy ? 'SAVING...' : 'SAVE CARD'}
-          </button>
-          {user.card && (
-            <button type="button" className="account-link" onClick={takeCardAway} disabled={cardBusy}>
-              Take the card away
-            </button>
-          )}
-        </div>
+        {enrollState === 'linked' && user.card && !replacing ? (
+          <>
+            <p className="account-hint">Card linked: {user.card}</p>
+            <div className="account-actions">
+              <button type="button" className="account-link" onClick={() => { setReplacing(true); setEnrollState('ready'); }} disabled={cardBusy}>
+                Replace card
+              </button>
+              <button type="button" className="account-link" onClick={takeCardAway} disabled={cardBusy}>
+                {cardBusy ? 'REMOVING...' : 'Unlink card'}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="account-hint">
+              💡 Instructions: Hold your RFID card flat against the center of the reader module until it beeps or lights up.
+            </p>
+            <RfidField
+              value={card}
+              onChange={setCard}
+              onScan={handleEnrollScan}
+              taken={cardTaken}
+              enabled
+              allowManual={false}
+              badgeLabel={
+                enrollState === 'detected'
+                  ? 'CARD DETECTED'
+                  : enrollState === 'taken'
+                  ? 'ALREADY LINKED'
+                  : 'READY TO SCAN'
+              }
+              badgeTone={
+                enrollState === 'detected'
+                  ? 'success'
+                  : enrollState === 'taken'
+                  ? 'error'
+                  : 'ready'
+              }
+              messageOverride={
+                enrollState === 'detected'
+                  ? '✅ Card successfully scanned! Linking to your account...'
+                  : enrollState === 'taken'
+                  ? '⚠️ This card is already registered to another account. If this is a mistake, please contact support.'
+                  : 'Waiting for card scan...'
+              }
+            />
+            {enrollState === 'taken' && (
+              <button
+                type="button"
+                className="account-link"
+                onClick={() => {
+                  setEnrollState('ready');
+                  setCardTaken(false);
+                  setCard('');
+                  setCardMessage(null);
+                }}
+                disabled={cardBusy}
+              >
+                Try Another Card
+              </button>
+            )}
+            {replacing && (
+              <button type="button" className="account-link" onClick={() => { setReplacing(false); setEnrollState(user.card ? 'linked' : 'ready'); }} disabled={cardBusy}>
+                Cancel
+              </button>
+            )}
+          </>
+        )}
 
         {cardMessage && <p className={`form-status form-status--${cardMessage.type}`}>{cardMessage.text}</p>}
       </section>

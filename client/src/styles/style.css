@@ -659,7 +659,33 @@
 
     .rfid-field.is-taken .rfid-message { color: #8a1c1c; }
 
-    .rfid-field.is-taken .rfid-status {
+    .rfid-toast {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    background: #1a0500;
+    color: #ffe14d;
+    border: 2px solid #3b2410;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 0 #3b2410;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    z-index: 9999;
+    animation: rfid-toast-in 0.2s ease-out;
+}
+.rfid-toast__icon { font-size: 1.1rem; }
+.rfid-toast__text small { opacity: 0.7; margin-left: 0.25rem; }
+
+@keyframes rfid-toast-in {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.rfid-field.is-taken .rfid-status {
         background: #fde8e8;
         color: #8a1c1c;
         border-color: #8a1c1c;
@@ -1175,3 +1201,5 @@
         .legal-panel { padding: 1.25rem 1.2rem 1.5rem; }
         .legal-panel h1 { font-size: 1.7rem; }
     }
+.rfid-status--ready { background: #ffe9a8; color: #8a5a00; border-color: #8a5a00; }
+.rfid-status--success { background: #dcfce7; color: #15803d; border-color: #15803d; }

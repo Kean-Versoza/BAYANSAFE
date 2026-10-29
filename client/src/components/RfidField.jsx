@@ -17,7 +17,17 @@ const STATUS_TEXT = {
  * or a serial one that the browser is allowed to open) or typed by hand.
  * The number that was read is handed to the form with onChange.
  */
-export default function RfidField({ value, onChange, onScan, taken = false, enabled = true }) {
+export default function RfidField({
+  value,
+  onChange,
+  onScan,
+  taken = false,
+  enabled = true,
+  allowManual = true,
+  badgeLabel,
+  badgeTone,
+  messageOverride,
+}) {
   const { uid, scans, status, message, canSerial, connected, connectSerial, disconnect, clear } =
     useRfidReader({ enabled, onScan });
 
@@ -45,7 +55,9 @@ export default function RfidField({ value, onChange, onScan, taken = false, enab
     <div className={`rfid-field${taken ? ' is-taken' : ''}`}>
       <div className="rfid-head">
         <span className="rfid-label">RFID CARD / ID</span>
-        <span className={`rfid-status rfid-status--${status}`}>{STATUS_TEXT[status] ?? ''}</span>
+        <span className={`rfid-status rfid-status--${badgeTone ?? status}`}>
+          {badgeLabel ?? (STATUS_TEXT[status] ?? '')}
+        </span>
       </div>
 
       <div className="rfid-row">
@@ -55,9 +67,10 @@ export default function RfidField({ value, onChange, onScan, taken = false, enab
           value={value}
           onChange={(event) => onChange(event.target.value.toUpperCase())}
           onKeyDown={onKeyDown}
-          onBlur={onBlur}
-          placeholder="Scan or type the card"
+          onBlur={allowManual ? onBlur : undefined}
+          placeholder={allowManual ? 'Scan or type the card' : 'Scan your card on the reader'}
           autoComplete="off"
+          readOnly={!allowManual}
           autoCapitalize="characters"
           spellCheck="false"
           data-rfid-input="true"
@@ -71,7 +84,9 @@ export default function RfidField({ value, onChange, onScan, taken = false, enab
       </div>
 
       <div className="rfid-foot">
-        <p className="rfid-message">{taken ? 'This card is already registered.' : message}</p>
+        <p className="rfid-message">
+          {messageOverride ?? (taken ? 'This card is already registered.' : message)}
+        </p>
 
         {canSerial && enabled && (
           connected ? (

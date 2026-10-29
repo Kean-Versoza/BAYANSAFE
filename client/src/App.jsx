@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import Toast from './components/Toast.jsx';
 import HomePage from './pages/HomePage.jsx';
 import PrivacyPage from './pages/PrivacyPage.jsx';
 import TermsPage from './pages/TermsPage.jsx';
@@ -9,6 +10,7 @@ import AccountPage from './pages/AccountPage.jsx';
 export default function App() {
   return (
     <BrowserRouter>
+      <Toast />
       <Routes>
         <Route path="/" element={<HomePage />} />
 

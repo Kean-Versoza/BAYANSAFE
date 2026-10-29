@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { createUser, findByEmail, findByRfid } from '../services/users.js';
+import { createUser, findByEmail, findByRfid, noteSignIn } from '../services/users.js';
 import { describeError } from '../db/pool.js';
 import { sendMail } from '../services/mailer.js';
 import { welcomeMessage } from '../services/mailTemplates.js';
 import { normalizeCardNumber } from '../../../shared/rfid.js';
+import { createSession, setUserCookie, removeOldSessions } from '../services/userAuth.js';
 
 const router = Router();
 
@@ -58,20 +59,11 @@ router.post('/', async (req, res) => {
   const body = req.body ?? {};
   const username = typeof body.username === 'string' ? body.username.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim() : '';
+  const rfidUid = typeof body.rfidUid === 'string' ? normalizeCardNumber(body.rfidUid) : '';
 
   const problem = validate({ ...body, username, email });
   if (problem) {
     return res.status(400).json({ ok: false, error: problem });
-  }
-
-  // The card of the player. It is optional: somebody can register without one.
-  const typedCard = typeof body.rfidUid === 'string' ? body.rfidUid.trim() : '';
-  const card = typedCard ? normalizeCardNumber(typedCard) : '';
-  if (typedCard && !card) {
-    return res.status(400).json({
-      ok: false,
-      error: 'That card number does not look right. Scan the card again or type the full number.',
-    });
   }
 
   try {
@@ -80,21 +72,11 @@ router.post('/', async (req, res) => {
       return res.status(409).json({ ok: false, error: 'That email is already registered.' });
     }
 
-    if (card) {
-      const usedCard = await findByRfid(card);
-      if (usedCard) {
-        return res.status(409).json({
-          ok: false,
-          error: 'That RFID card is already registered to another account.',
-        });
-      }
-    }
-
     const { user, error, status } = await createUser({
       username,
       email,
       password: body.password,
-      rfidUid: card || null,
+      rfidUid: rfidUid || null,
     });
     if (error) {
       return res.status(status ?? 400).json({ ok: false, error });
@@ -124,6 +106,12 @@ router.post('/', async (req, res) => {
       }
     }
 
+    // Auto sign in after registration so the player can enrol their RFID card
+    await removeOldSessions();
+    const { token } = await createSession(user.id);
+    setUserCookie(res, token);
+    await noteSignIn(user.id);
+
     res.status(201).json({
       ok: true,
       message: `Welcome, ${user.username}! Your account is ready.`,
@@ -131,6 +119,7 @@ router.post('/', async (req, res) => {
       emailNote,
       user: {
         id: user.id,
+        playerNumber: user.player_number ?? null,
         username: user.username,
         email: user.email,
         rfidUid: user.rfid_uid ?? null,

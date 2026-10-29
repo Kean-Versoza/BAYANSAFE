@@ -73,6 +73,32 @@ export function useRfidReader({ enabled = true, onScan } = {}) {
     setScans((count) => count + 1);
     setFailed(false);
     onScanRef.current?.(clean);
+
+    // Optional beep.
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        gain.gain.value = 0.08;
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      }
+    } catch {
+      /* ignore */
+    }
+
+    // Global notification for any listener (e.g. Toast).
+    try {
+      window.dispatchEvent(new CustomEvent('rfid-scan', { detail: { uid: clean, source: from } }));
+    } catch {
+      /* ignore */
+    }
+
     return true;
   }, []);
 
@@ -233,6 +259,38 @@ export function useRfidReader({ enabled = true, onScan } = {}) {
     setUid('');
     setSource(null);
   }, []);
+
+  /* ------------------------------------------------------------------
+     Wi-Fi bridge: an ESP32 (or any bridge) can POST a scanned UID to the
+     server, which forwards it here over Server-Sent Events. This lets a
+     wireless ESP32 fill the RFID field without a cable or Web Serial.
+     ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!enabled) return undefined;
+    if (typeof EventSource === 'undefined') return undefined;
+
+    let es;
+    try {
+      es = new EventSource('/api/rfid/stream');
+    } catch {
+      return undefined;
+    }
+
+    const onScan = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data?.uid) report(data.uid, 'wifi');
+      } catch {
+        /* ignore malformed events */
+      }
+    };
+
+    es.addEventListener('scan', onScan);
+    return () => {
+      es.removeEventListener('scan', onScan);
+      es.close();
+    };
+  }, [enabled, report]);
 
   // Let go of the reader when the form goes away
   useEffect(() => () => releaseRef.current?.(), []);

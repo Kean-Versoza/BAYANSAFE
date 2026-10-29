@@ -9,6 +9,8 @@ import contactRoutes from './routes/contact.js';
 import mailRoutes from './routes/mail.js';
 import adminRoutes from './routes/admin.js';
 import accountRoutes from './routes/account.js';
+import googleAuthRoutes from './routes/googleAuth.js';
+import rfidBridgeRoutes from './routes/rfidBridge.js';
 import { checkDatabase, closeDatabase } from './db/pool.js';
 import { migrate } from './db/migrate.js';
 
@@ -47,6 +49,8 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/mail', mailRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/auth', googleAuthRoutes);
+app.use('/api/rfid', rfidBridgeRoutes);
 
 /* ------------------------------------------------------------------
    The React app

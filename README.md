@@ -267,6 +267,14 @@ The browser has to be allowed to open that port, so press **Connect a reader**
 and pick it in the list. The button only shows up in browsers that can do it
 (Chrome and Edge).
 
+### Using an ESP32 as the reader
+
+An ESP32 with an MFRC522 (RC522) module works as one of these serial
+readers. Flash `hardware/esp32/rfid_bridge.ino`, wire the module as
+documented in `hardware/README.md`, plug the ESP32 in by USB, and pick
+its port with **Connect a reader**. The card UID is then typed into the
+field exactly like any other reader.
+
 > The keys of the other fields are never taken away from you: a name that is
 > typed by hand is not mistaken for a card.
 

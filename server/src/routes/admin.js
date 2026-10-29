@@ -160,9 +160,9 @@ router.get('/users', requireAdmin, async (req, res) => {
     const pattern = `%${search}%`;
 
     const { rows } = await query(
-      `SELECT id, username, email, rfid_uid, created_at
+      `SELECT id, username, email, rfid_uid, player_number, created_at
          FROM users
-        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2)
+        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2 OR player_number ILIKE $2)
         ORDER BY created_at DESC
         LIMIT $3 OFFSET $4`,
       [search, pattern, limit, offset],
@@ -171,7 +171,7 @@ router.get('/users', requireAdmin, async (req, res) => {
     const { rows: counts } = await query(
       `SELECT count(*)::int AS count
          FROM users
-        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2)`,
+        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2 OR player_number ILIKE $2)`,
       [search, pattern],
     );
 
@@ -179,6 +179,7 @@ router.get('/users', requireAdmin, async (req, res) => {
       ok: true,
       users: rows.map((u) => ({
         id: u.id,
+        playerNumber: u.player_number ?? null,
         username: u.username,
         email: u.email,
         rfidUid: u.rfid_uid ?? null,
