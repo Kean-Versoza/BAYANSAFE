@@ -622,6 +622,8 @@
 
     .rfid-status--idle { background: #e6e6e6; }
     .rfid-status--connecting { background: #ffe9a8; }
+    .rfid-status--ready { background: #ffe9a8; color: #8a5a00; border-color: #8a5a00; }
+    .rfid-status--success { background: #dcfce7; color: #15803d; border-color: #15803d; }
     .rfid-status--error {
         background: #fde8e8;
         color: #8a1c1c;
@@ -1259,7 +1261,6 @@
 
     @media (max-width: 700px) {
         .site-footer { padding: 1.5rem 1.25rem 9rem; }
-<<<<<<< HEAD
         .footer-contact {
             display: inline;
             text-align: center;
@@ -1279,9 +1280,7 @@
             margin: 0;
             overflow: hidden;
         }
-=======
         .contact-form-row { flex-direction: column; }
->>>>>>> features-from-other-repo
         .cookie-banner {
             flex-direction: column;
             gap: 0.7rem;
@@ -1383,7 +1382,6 @@
         .legal-panel { padding: 1.25rem 1.2rem 1.5rem; }
         .legal-panel h1 { font-size: 1.7rem; }
     }
-<<<<<<< HEAD
 /* ---------- Registration feedback message ---------- */
 .reg-form .form-message {
     font-size: 0.95rem;
@@ -1493,6 +1491,8 @@ html.snap-scroll {
 
     .rfid-status--idle { background: #e6e6e6; }
     .rfid-status--connecting { background: #ffe9a8; }
+    .rfid-status--ready { background: #ffe9a8; color: #8a5a00; border-color: #8a5a00; }
+    .rfid-status--success { background: #dcfce7; color: #15803d; border-color: #15803d; }
     .rfid-status--error {
         background: #fde8e8;
         color: #8a1c1c;
@@ -1777,7 +1777,3 @@ html.snap-scroll {
         .password-rules li { font-size: 0.7rem; }
         .password-rules-summary { font-size: 0.68rem; }
     }
-=======
-.rfid-status--ready { background: #ffe9a8; color: #8a5a00; border-color: #8a5a00; }
-.rfid-status--success { background: #dcfce7; color: #15803d; border-color: #15803d; }
->>>>>>> features-from-other-repo
