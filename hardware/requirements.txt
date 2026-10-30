@@ -1,0 +1,4 @@
+# Python dependencies for esp32_rfid_handler.py
+pyserial>=3.5
+psycopg2-binary>=2.9
+requests>=2.31

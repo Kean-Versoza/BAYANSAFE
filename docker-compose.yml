@@ -1,4 +1,4 @@
-﻿# A PostgreSQL server for the site.
+# A PostgreSQL server for the site.
 #
 #   docker compose up -d      start it
 #   docker compose stop       stop it
@@ -9,7 +9,7 @@
 
 services:
   db:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     container_name: bayansafe-db
     restart: unless-stopped
     environment:
@@ -17,8 +17,8 @@ services:
       POSTGRES_PASSWORD: bayansafe
       POSTGRES_DB: bayansafe
     ports:
-      # 5433 matches the local Windows install, so .env works with either
-      - "5433:5432"
+      # 5432 is the default port for PostgreSQL
+      - "5432:5432"
     volumes:
       - bayansafe-db:/var/lib/postgresql/data
     healthcheck:

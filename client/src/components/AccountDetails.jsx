@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import AccountBanner from './AccountBanner';
 import PasswordChecklist from './PasswordChecklist';
