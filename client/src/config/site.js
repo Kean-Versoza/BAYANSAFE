@@ -27,6 +27,10 @@ export const siteConfig = {
     { id: 'account', label: 'ACCOUNT', path: '/account' },
   ],
 
+  // Filled in by the server from GOOGLE_CLIENT_ID. While it is empty the
+  // "Continue with Google" button says that Google sign-in is not set up.
+  googleClientId: null,
+
   footer: {
     logo: '/images/logo.png',
     brand_name: 'BAYANSAFE',

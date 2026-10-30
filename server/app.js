@@ -4,6 +4,7 @@ import footerConfig from './footerConfig.js';
 import siteConfig from './siteConfig.js';
 import registerRoutes from './routes/register.js';
 import accountRoutes from './routes/account.js';
+import googleAuthRoutes from './routes/googleAuth.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
 import mailRoutes from './routes/mail.js';
@@ -48,13 +49,17 @@ export function createApiApp() {
   });
 
   // Navigation, footer and cookie text, shared with the client. The client
-  // falls back to its bundled copy when this cannot be reached.
+  // falls back to its bundled copy when this cannot be reached. The Google
+  // Client ID is public by design: the browser needs it to draw the button.
   app.get('/api/config', (req, res) => {
-    res.json(siteConfig);
+    res.json({ ...siteConfig, googleClientId: process.env.GOOGLE_CLIENT_ID || null });
   });
 
   // Accounts: sign in, the account page, the RFID card, the password
   app.use('/api/account', accountRoutes);
+
+  // "Continue with Google" for the registration form and the sign in card
+  app.use('/api/auth', googleAuthRoutes);
 
   // The dashboard behind /admin
   app.use('/api/admin', adminRoutes);

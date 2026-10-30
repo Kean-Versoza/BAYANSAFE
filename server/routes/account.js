@@ -21,6 +21,7 @@ import {
   removeOldSessions,
   setUserCookie,
 } from '../services/userAuth.js';
+import { publicUser } from '../services/publicUser.js';
 import { normalizeCardNumber } from '../../shared/rfid.js';
 import { describePasswordProblem } from '../../shared/password.js';
 
@@ -50,27 +51,6 @@ function noteFailedTry(key) {
     return;
   }
   entry.count += 1;
-}
-
-/**
- * The player number of an account. It never changes, so it can be written
- * on a paper and still mean the same thing tomorrow.
- */
-function playerNumber(id) {
-  return `BS-${String(id).replace(/-/g, '').slice(0, 6).toUpperCase()}`;
-}
-
-/** The account as the player may see it. The password never leaves the server. */
-function publicUser(user) {
-  return {
-    id: user.id,
-    number: playerNumber(user.id),
-    username: user.username,
-    email: user.email,
-    card: user.rfid_uid ?? null,
-    createdAt: user.created_at,
-    lastLoginAt: user.last_login_at ?? null,
-  };
 }
 
 /** Everything under /api/account needs a signed in player. */

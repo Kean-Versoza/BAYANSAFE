@@ -29,6 +29,7 @@ export default function AccountPage() {
     known,
     busy,
     signIn,
+    signInWithGoogle,
     signOut,
     saveDetails,
     savePassword,
@@ -113,7 +114,7 @@ export default function AccountPage() {
               onSignOut={signOut}
             />
           ) : (
-            <AccountSignIn onSignIn={signIn} busy={busy} />
+            <AccountSignIn onSignIn={signIn} onGoogleSignIn={signInWithGoogle} busy={busy} />
           )}
 
           {!known && <p className="account-loading">Loading your account...</p>}

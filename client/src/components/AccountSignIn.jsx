@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import GoogleSignIn from './GoogleSignIn.jsx';
+
 /**
  * The sign in card of the account page.
  *
  * It is the same card as the registration form, so the page looks like the
- * rest of the site.
+ * rest of the site. A player may sign in with their email and password, or
+ * with Google.
  */
-export default function AccountSignIn({ onSignIn, busy }) {
+export default function AccountSignIn({ onSignIn, onGoogleSignIn, busy }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +22,16 @@ export default function AccountSignIn({ onSignIn, busy }) {
 
     try {
       await onSignIn(email.trim(), password);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const onGoogleCredential = async (credential) => {
+    setError('');
+
+    try {
+      await onGoogleSignIn(credential);
     } catch (err) {
       setError(err.message);
     }
@@ -72,6 +85,16 @@ export default function AccountSignIn({ onSignIn, busy }) {
         <button type="submit" className="btn-submit" disabled={busy}>
           {busy ? 'SIGNING IN...' : 'SIGN IN'}
         </button>
+
+        <div className="google-signin__divider" role="separator">
+          <span>or</span>
+        </div>
+
+        <GoogleSignIn
+          onCredential={onGoogleCredential}
+          text="signin_with"
+          disabled={busy}
+        />
 
         <p className="account-foot">
           No account yet? <Link to="/#registration">Register here</Link>.

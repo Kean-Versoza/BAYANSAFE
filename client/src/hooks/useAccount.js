@@ -85,6 +85,22 @@ export function useAccount() {
     }
   }, []);
 
+  /** Signs a player in with a Google ID token. */
+  const signInWithGoogle = useCallback(async (credential) => {
+    setBusy(true);
+    try {
+      const data = await api('/api/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential }),
+      });
+      setUser(data.user);
+      setKnown(true);
+      return data;
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   /** Signs the player out. */
   const signOut = useCallback(async () => {
     await api('/api/account/logout', { method: 'POST' }).catch(() => {});
@@ -137,6 +153,7 @@ export function useAccount() {
     signedIn: Boolean(user),
     refresh,
     signIn,
+    signInWithGoogle,
     signOut,
     saveDetails,
     savePassword,

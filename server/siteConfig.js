@@ -26,6 +26,10 @@ export const siteConfig = {
     { id: 'account', label: 'ACCOUNT', path: '/account' },
   ],
 
+  // Filled in by app.js from GOOGLE_CLIENT_ID, so the browser can draw the
+  // "Continue with Google" button. Null means Google sign-in is off.
+  googleClientId: null,
+
   footer: {
     logo: '/images/logo.png',
     brand_name: 'BAYANSAFE',

@@ -455,3 +455,88 @@
 
     .account-actions { gap: 0.7rem; }
 }
+
+/* ---------- Continue with Google ---------- */
+.google-signin {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.google-signin__slot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+}
+
+.google-signin__slot iframe {
+    max-width: 100%;
+}
+
+.google-signin__slot.is-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Shown while GOOGLE_CLIENT_ID is missing, so the option is explained
+   instead of disappearing without a word. */
+.google-signin__fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    background: #ffffff;
+    color: #3c4043;
+    border: 2px solid #dadce0;
+    border-radius: 0.45rem;
+    font-family: 'Roboto', 'Open Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: not-allowed;
+}
+
+.google-signin__fallback svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+}
+
+.google-signin__note {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #6b5a4a;
+    text-align: center;
+}
+
+.google-signin__note--error {
+    color: #8a1c1c;
+}
+
+.google-signin__divider {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0.15rem 0;
+    color: #8a7a68;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.google-signin__divider::before,
+.google-signin__divider::after {
+    content: '';
+    flex: 1;
+    border-top: 2px solid rgba(59, 36, 16, 0.2);
+}
