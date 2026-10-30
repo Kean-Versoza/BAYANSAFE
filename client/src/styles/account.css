@@ -521,22 +521,12 @@
     color: #8a1c1c;
 }
 
-.google-signin__divider {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
+.google-signin__heading {
     margin: 0.15rem 0;
-    color: #8a7a68;
+    color: #3b2410;
     font-family: 'Pixelify Sans', sans-serif;
-    font-size: 0.75rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.google-signin__divider::before,
-.google-signin__divider::after {
-    content: '';
-    flex: 1;
-    border-top: 2px solid rgba(59, 36, 16, 0.2);
+    text-align: center;
 }

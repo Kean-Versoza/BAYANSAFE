@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import RfidField from '../components/RfidField';
 import PasswordChecklist from '../components/PasswordChecklist';
 import GoogleSignIn from '../components/GoogleSignIn';
 import { describePasswordProblem } from '@shared/password';
@@ -18,8 +17,6 @@ export default function RegistrationSection() {
   const [googleBusy, setGoogleBusy] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
-  const [card, setCard] = useState('');
-  const [cardTaken, setCardTaken] = useState(false);
 
   const formRef = useRef(null);
   const overlayRef = useRef(null);
@@ -63,19 +60,6 @@ export default function RegistrationSection() {
     if (FORM_LOADER_MS > 0) setLoading(true);
   };
 
-  /** A scanned card is checked so the visitor knows before submitting. */
-  const checkCard = async (wanted) => {
-    const number = String(wanted ?? '').trim();
-    if (!number) return;
-    try {
-      const res = await fetch(`/api/register/rfid/${encodeURIComponent(number)}`);
-      const body = await res.json().catch(() => ({}));
-      setCardTaken(Boolean(body.taken));
-    } catch {
-      setCardTaken(false);
-    }
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (submitting) return;
@@ -97,7 +81,6 @@ export default function RegistrationSection() {
       username: data.get('username') ?? '',
       email: data.get('email') ?? '',
       password: passwordValue,
-      rfidUid: card,
       acceptedTerms: data.get('terms') === 'on',
       terms: data.get('terms') === 'on',
     };
@@ -114,18 +97,12 @@ export default function RegistrationSection() {
       const result = await response.json().catch(() => ({}));
 
       if (response.ok && result.ok) {
-        // An account without a card is a full account, so it says so here.
-        const withoutCard = !result.user?.rfidUid;
         setMessage({
           type: 'success',
-          text: withoutCard
-            ? `${result.message} You can add an RFID card later on your account page.`
-            : result.message,
+          text: `${result.message} You can add an RFID card later on your account page.`,
         });
         form.reset();
         setAcceptedTerms(false);
-        setCard('');
-        setCardTaken(false);
         setShowPassword(false);
         setPassword('');
         setPasswordFocused(false);
@@ -182,8 +159,6 @@ export default function RegistrationSection() {
         });
         formRef.current?.reset();
         setAcceptedTerms(false);
-        setCard('');
-        setCardTaken(false);
         setShowPassword(false);
         setPassword('');
         setPasswordFocused(false);
@@ -272,19 +247,7 @@ export default function RegistrationSection() {
             I agree to the safety terms
           </label>
 
-          {/* The RFID card. Optional: the account works without one. */}
-          <RfidField
-            value={card}
-            onChange={setCard}
-            onScan={checkCard}
-            taken={cardTaken}
-            optional
-            hint="No card with you? Leave this empty and keep registering. You can add a card later on your account page."
-          />
-
-          <div className="google-signin__divider" role="separator">
-            <span>or</span>
-          </div>
+          <p className="google-signin__heading">OR CONTINUE WITH GOOGLE</p>
 
           {/* Google sign up: the account is created from the Google profile */}
           <GoogleSignIn
