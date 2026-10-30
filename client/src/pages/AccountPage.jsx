@@ -5,6 +5,7 @@ import NavPill from '../components/NavPill.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
 import AccountSignIn from '../components/AccountSignIn.jsx';
 import AccountDetails from '../components/AccountDetails.jsx';
+import RfidEnrollment from '../components/RfidEnrollment.jsx';
 import { useAccount } from '../hooks/useAccount.js';
 import { useSiteConfig } from '../hooks/useSiteConfig.js';
 

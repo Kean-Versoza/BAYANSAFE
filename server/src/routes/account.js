@@ -1,6 +1,7 @@
 import { Router } from 'express';
+import { randomBytes, randomUUID } from 'node:crypto';
 
-import { query, describeError } from '../db/pool.js';
+import { getClient, query, describeError } from '../db/pool.js';
 import {
   deleteUser,
   findByEmail,
@@ -312,6 +313,260 @@ router.post('/card', requireUser, async (req, res) => {
       return res.status(409).json({ ok: false, error: 'That card is already linked to another account.' });
     }
     console.error('Could not change the card:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/* ------------------------------------------------------------------
+   RFID card enrollment (ESP32 quick sign-in)
+   ------------------------------------------------------------------ */
+
+/** Bridge token shared with the ESP32. Set RFID_BRIDGE_TOKEN in server/.env. */
+const BRIDGE_TOKEN = process.env.RFID_BRIDGE_TOKEN || '';
+
+function checkBridgeToken(req, res) {
+  if (!BRIDGE_TOKEN) return true;
+  const given = req.get('x-bridge-token') || '';
+  if (given !== BRIDGE_TOKEN) {
+    res.status(401).json({ ok: false, error: 'Bad bridge token.' });
+    return false;
+  }
+  return true;
+}
+
+/**
+ * POST /api/account/rfid/enroll/start
+ * Creates an enrollment session for the signed-in player.
+ */
+router.post('/rfid/enroll/start', requireUser, async (req, res) => {
+  const sessionId = randomUUID();
+
+  try {
+    // Cancel any still-active sessions for this user so only one is live.
+    await query(
+      `UPDATE rfid_enrollment_sessions
+        SET status = 'cancelled', expires_at = NOW()
+      WHERE user_id = $1 AND status = 'active'`,
+      [req.user.id],
+    );
+
+    const { rows } = await query(
+      `INSERT INTO rfid_enrollment_sessions (id, user_id, status, expires_at)
+         VALUES ($1, $2, 'active', NOW() + INTERVAL '10 minutes')
+         RETURNING id, status, expires_at`,
+      [sessionId, req.user.id],
+    );
+
+    res.json({
+      ok: true,
+      session: {
+        id: rows[0].id,
+        status: rows[0].status,
+        expiresAt: rows[0].expires_at,
+      },
+    });
+  } catch (err) {
+    console.error('Could not start enrollment:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/**
+ * POST /api/account/rfid/enroll/scan
+ * The ESP32 posts a scanned UID against an active enrollment session.
+ * Protected by the bridge token (device credential, never sent to the browser).
+ */
+router.post('/rfid/enroll/scan', (req, res) => {
+  if (!checkBridgeToken(req, res)) return;
+
+  const { sessionId, uid } = req.body ?? {};
+  const card = typeof uid === 'string' ? normalizeCardNumber(uid) : '';
+  if (!sessionId || !card) {
+    return res.status(400).json({ ok: false, error: 'Missing session or card UID.' });
+  }
+
+  (async () => {
+    try {
+      const { rows } = await query(
+        `SELECT id, user_id, card_uid, status, expires_at
+           FROM rfid_enrollment_sessions
+          WHERE id = $1`,
+        [sessionId],
+      );
+      const session = rows[0];
+      if (!session) {
+        return res.status(404).json({ ok: false, error: 'Enrollment session not found.' });
+      }
+      if (session.status !== 'active') {
+        return res.status(410).json({
+          ok: false,
+          error: 'Enrollment session is no longer active.',
+        });
+      }
+      if (new Date(session.expires_at) < new Date()) {
+        await query(
+          `UPDATE rfid_enrollment_sessions SET status = 'expired' WHERE id = $1`,
+          [sessionId],
+        );
+        return res.status(410).json({ ok: false, error: 'Enrollment session expired.' });
+      }
+
+      // A card already on another account cannot be enrolled.
+      const used = await findByRfid(card);
+      if (used && used.id !== session.user_id) {
+        await query(
+          `UPDATE rfid_enrollment_sessions SET status = 'cancelled' WHERE id = $1`,
+          [sessionId],
+        );
+        return res.status(409).json({
+          ok: false,
+          error: 'That card is already registered to another account.',
+        });
+      }
+
+      await query(
+        `UPDATE rfid_enrollment_sessions
+           SET card_uid = $2, status = 'detected'
+         WHERE id = $1`,
+        [sessionId, card],
+      );
+
+      res.json({ ok: true, card, detected: true });
+    } catch (err) {
+      console.error('Could not record scan:', describeError(err));
+      res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+    }
+  })();
+});
+
+/**
+ * POST /api/account/rfid/enroll/confirm
+ * The player confirms the detected card. Saves it to the account.
+ */
+router.post('/rfid/enroll/confirm', requireUser, async (req, res) => {
+  const { sessionId } = req.body ?? {};
+  if (!sessionId) {
+    return res.status(400).json({ ok: false, error: 'Missing enrollment session.' });
+  }
+
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+
+    const { rows } = await client.query(
+      `SELECT id, user_id, card_uid, status, expires_at
+         FROM rfid_enrollment_sessions
+        WHERE id = $1 FOR UPDATE`,
+      [sessionId],
+    );
+    const session = rows[0];
+    if (!session) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ ok: false, error: 'Enrollment session not found.' });
+    }
+    if (session.user_id !== req.user.id) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ ok: false, error: 'Not your enrollment session.' });
+    }
+    if (session.status !== 'detected') {
+      await client.query('ROLLBACK');
+      return res.status(410).json({
+        ok: false,
+        error: 'No card detected for this session.',
+      });
+    }
+    if (new Date(session.expires_at) < new Date()) {
+      await client.query(
+        `UPDATE rfid_enrollment_sessions SET status = 'expired' WHERE id = $1`,
+        [sessionId],
+      );
+      await client.query('COMMIT');
+      return res.status(410).json({ ok: false, error: 'Enrollment session expired.' });
+    }
+
+    // Double-check the card is still free (another user could have taken it).
+    const used = await findByRfid(session.card_uid);
+    if (used && used.id !== req.user.id) {
+      await client.query(
+        `UPDATE rfid_enrollment_sessions SET status = 'cancelled' WHERE id = $1`,
+        [sessionId],
+      );
+      await client.query('COMMIT');
+      return res.status(409).json({
+        ok: false,
+        error: 'That card is already registered to another account.',
+      });
+    }
+
+    await client.query(
+      `UPDATE users SET rfid_uid = $2 WHERE id = $1`,
+      [req.user.id, session.card_uid],
+    );
+
+    await client.query(
+      `UPDATE rfid_enrollment_sessions
+         SET status = 'completed', confirmed_at = NOW()
+       WHERE id = $1`,
+      [sessionId],
+    );
+
+    await client.query('COMMIT');
+
+    const fresh = await findById(req.user.id);
+    res.json({
+      ok: true,
+      message: 'RFID card registered successfully.',
+      user: publicUser(fresh ?? null),
+    });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '23505') {
+      return res.status(409).json({ ok: false, error: 'That card is already registered.' });
+    }
+    console.error('Could not confirm enrollment:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  } finally {
+    client.release();
+  }
+});
+
+/**
+ * POST /api/account/rfid/enroll/cancel
+ * Cancels the active enrollment session for the signed-in player.
+ */
+router.post('/rfid/enroll/cancel', requireUser, async (req, res) => {
+  try {
+    await query(
+      `UPDATE rfid_enrollment_sessions
+         SET status = 'cancelled', expires_at = NOW()
+       WHERE user_id = $1 AND status = 'active'`,
+      [req.user.id],
+    );
+    res.json({ ok: true, message: 'Enrollment cancelled.' });
+  } catch (err) {
+    console.error('Could not cancel enrollment:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/**
+ * GET /api/account/rfid/enroll/status
+ * Returns the active enrollment session (if any) for the signed-in player.
+ */
+router.get('/rfid/enroll/status', requireUser, async (req, res) => {
+  try {
+    const { rows } = await query(
+      `SELECT id, card_uid, status, expires_at, confirmed_at
+         FROM rfid_enrollment_sessions
+        WHERE user_id = $1
+          AND status IN ('active', 'detected')
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [req.user.id],
+    );
+    res.json({ ok: true, session: rows[0] ?? null });
+  } catch (err) {
+    console.error('Could not read enrollment status:', describeError(err));
     res.status(503).json({ ok: false, error: 'The database could not be reached.' });
   }
 });
