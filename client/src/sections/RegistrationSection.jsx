@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import RfidField from '../components/RfidField';
 import PasswordChecklist from '../components/PasswordChecklist';
+import GoogleSignIn from '../components/GoogleSignIn';
 import { describePasswordProblem } from '@shared/password';
 import { FORM_LOADER_MS, paintFormContents } from '../lib/skeleton';
 
@@ -14,6 +15,8 @@ export default function RegistrationSection() {
   const [password, setPassword] = useState('');
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
   const [card, setCard] = useState('');
   const [cardTaken, setCardTaken] = useState(false);
@@ -120,6 +123,7 @@ export default function RegistrationSection() {
             : result.message,
         });
         form.reset();
+        setAcceptedTerms(false);
         setCard('');
         setCardTaken(false);
         setShowPassword(false);
@@ -137,6 +141,63 @@ export default function RegistrationSection() {
       setSubmitting(false);
     }
   };
+
+  /**
+   * "Continue with Google" creates the account (or signs the player in when
+   * the email is already registered). The terms box is checked here because
+   * the Google button is an iframe and cannot take part in form validation.
+   */
+  const handleGoogleCredential = useCallback(
+    async (credential) => {
+      if (!acceptedTerms) {
+        setMessage({
+          type: 'error',
+          text: 'Please agree to the safety terms before continuing with Google.',
+        });
+        return;
+      }
+
+      setGoogleBusy(true);
+      setMessage(EMPTY_MESSAGE);
+
+      try {
+        const response = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential }),
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result.ok) {
+          setMessage({
+            type: 'error',
+            text: result.error ?? 'Google sign-in failed. Please try again.',
+          });
+          return;
+        }
+
+        setMessage({
+          type: 'success',
+          text: `${result.message} You can now continue with Google, or add an RFID card on your account page.`,
+        });
+        formRef.current?.reset();
+        setAcceptedTerms(false);
+        setCard('');
+        setCardTaken(false);
+        setShowPassword(false);
+        setPassword('');
+        setPasswordFocused(false);
+      } catch {
+        setMessage({
+          type: 'error',
+          text: 'Could not reach the server. Please check your connection and try again.',
+        });
+      } finally {
+        setGoogleBusy(false);
+      }
+    },
+    [acceptedTerms],
+  );
 
   return (
     <section id="registration" className="section frame frame-inner">
@@ -201,7 +262,14 @@ export default function RegistrationSection() {
           />
 
           <label className="terms">
-            <input type="checkbox" name="terms" required /> I agree to the safety terms
+            <input
+              type="checkbox"
+              name="terms"
+              required
+              checked={acceptedTerms}
+              onChange={(event) => setAcceptedTerms(event.target.checked)}
+            />{' '}
+            I agree to the safety terms
           </label>
 
           {/* The RFID card. Optional: the account works without one. */}
@@ -214,14 +282,25 @@ export default function RegistrationSection() {
             hint="No card with you? Leave this empty and keep registering. You can add a card later on your account page."
           />
 
+          <div className="google-signin__divider" role="separator">
+            <span>or</span>
+          </div>
+
+          {/* Google sign up: the account is created from the Google profile */}
+          <GoogleSignIn
+            onCredential={handleGoogleCredential}
+            text="signup_with"
+            disabled={submitting || googleBusy}
+          />
+
           {message.text && (
             <p className={`form-message is-${message.type}`} role="status" aria-live="polite">
               {message.text}
             </p>
           )}
 
-          <button type="submit" className="btn-submit" disabled={submitting}>
-            {submitting ? 'SUBMITTING...' : 'SUBMIT'}
+          <button type="submit" className="btn-submit" disabled={submitting || googleBusy}>
+            {submitting ? 'SUBMITTING...' : googleBusy ? 'CONNECTING...' : 'SUBMIT'}
           </button>
         </form>
 
