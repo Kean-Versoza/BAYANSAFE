@@ -247,7 +247,9 @@ export default function RegistrationSection() {
             I agree to the safety terms
           </label>
 
-          <p className="google-signin__heading">OR CONTINUE WITH GOOGLE</p>
+          <p className="google-signin__heading google-signin__heading--start">
+            OR CONTINUE WITH GOOGLE
+          </p>
 
           {/* Google sign up: the account is created from the Google profile */}
           <GoogleSignIn

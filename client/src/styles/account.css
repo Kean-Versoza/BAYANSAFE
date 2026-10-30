@@ -530,3 +530,10 @@
     letter-spacing: 0.08em;
     text-align: center;
 }
+
+/* Registration card: a rule above the label, aligned with the fields */
+.google-signin__heading--start {
+    padding-top: 0.85rem;
+    border-top: 2px solid rgba(59, 36, 16, 0.2);
+    text-align: left;
+}
