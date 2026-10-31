@@ -341,10 +341,6 @@ export default function RegistrationSection() {
             {submitting ? 'SUBMITTING...' : googleBusy ? 'CONNECTING...' : 'SUBMIT'}
           </button>
         </form>
-
-        <p className="tagline">
-          A Philippine Smart Community Disaster Intelligence and Preparedness Response Game
-        </p>
       </div>
     </section>
   );
