@@ -209,15 +209,37 @@ router.get('/users', requireAdmin, async (req, res) => {
  */
 router.get('/emails', requireAdmin, async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 100);
+
+  const search = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+  const status = ['sent', 'failed'].includes(req.query.status) ? req.query.status : '';
+
+  const where = [];
+  const params = [];
+
+  if (search) {
+    params.push(`%${search}%`);
+    where.push(
+      `(to_address ILIKE $${params.length} OR subject ILIKE $${params.length} ` +
+        `OR kind ILIKE $${params.length})`,
+    );
+  }
+  if (status) {
+    params.push(status === 'sent');
+    where.push(`ok = $${params.length}`);
+  }
+
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
   try {
     const { rows } = await query(
       `SELECT id, to_address, subject, kind, ok, error, created_at
          FROM email_log
+         ${whereSql}
         ORDER BY created_at DESC
-        LIMIT $1`,
-      [limit],
+        LIMIT $${params.length + 1}`,
+      [...params, limit],
     );
-    res.json({ ok: true, emails: rows });
+    res.json({ ok: true, emails: rows, total: rows.length, limit });
   } catch (err) {
     console.error('Could not read the email log:', describeError(err));
     res.status(503).json({ ok: false, error: 'The database could not be reached.' });
@@ -264,16 +286,58 @@ router.get('/messages', requireAdmin, async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
   const offset = Math.max(Number(req.query.offset) || 0, 0);
 
+  // The filters of the Messages tab: a search, a source and a read state.
+  const search = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+  const source = ['contact', 'help', 'gmail'].includes(req.query.source)
+    ? req.query.source
+    : '';
+  const status = ['read', 'unread'].includes(req.query.status) ? req.query.status : '';
+
+  const where = [];
+  const params = [];
+
+  if (search) {
+    params.push(`%${search}%`);
+    where.push(
+      `(name ILIKE $${params.length} OR email ILIKE $${params.length} ` +
+        `OR subject ILIKE $${params.length} OR message ILIKE $${params.length})`,
+    );
+  }
+  if (source) {
+    params.push(source);
+    where.push(`source = $${params.length}`);
+  }
+  if (status) {
+    params.push(status === 'read');
+    where.push(`is_read = $${params.length}`);
+  }
+
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
   try {
+    const limitParam = params.length + 1;
+    const offsetParam = params.length + 2;
+
     const { rows } = await query(
       `SELECT id, name, email, subject, message, source, is_read, created_at
          FROM contact_messages
+         ${whereSql}
         ORDER BY created_at DESC
-        LIMIT $1 OFFSET $2`,
-      [limit, offset],
+        LIMIT $${limitParam} OFFSET $${offsetParam}`,
+      [...params, limit, offset],
     );
 
+    // The counts of the filtered list, for the line above it.
     const { rows: counts } = await query(
+      `SELECT count(*)::int AS total,
+              count(*) FILTER (WHERE is_read = FALSE)::int AS unread
+         FROM contact_messages
+         ${whereSql}`,
+      params,
+    );
+
+    // The counts of every message, for the tab and its badge.
+    const { rows: overall } = await query(
       `SELECT count(*)::int AS total,
               count(*) FILTER (WHERE is_read = FALSE)::int AS unread
          FROM contact_messages`,
@@ -284,6 +348,8 @@ router.get('/messages', requireAdmin, async (req, res) => {
       messages: rows,
       total: counts[0].total,
       unread: counts[0].unread,
+      allTotal: overall[0].total,
+      unreadAll: overall[0].unread,
       limit,
       offset,
     });

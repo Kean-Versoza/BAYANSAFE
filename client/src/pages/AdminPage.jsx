@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import '../styles/admin.css';
@@ -78,8 +78,15 @@ export default function AdminPage() {
   const [messages, setMessages] = useState([]);
   const [messageTotal, setMessageTotal] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [filteredTotal, setFilteredTotal] = useState(0);
+  const [filteredUnread, setFilteredUnread] = useState(0);
+  const [messageSearch, setMessageSearch] = useState('');
+  const [messageSource, setMessageSource] = useState('');
+  const [messageStatus, setMessageStatus] = useState('');
   const [search, setSearch] = useState('');
   const [emails, setEmails] = useState([]);
+  const [emailSearch, setEmailSearch] = useState('');
+  const [emailStatus, setEmailStatus] = useState('');
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState(null);
   const [tab, setTab] = useState('users');
@@ -147,22 +154,47 @@ export default function AdminPage() {
   /* ---- loading the dashboard ---- */
   const load = useCallback(async () => {
     const query = search.trim() ? `?q=${encodeURIComponent(search.trim())}` : '';
-    const [statsData, usersData, emailsData, statusData, messagesData] = await Promise.all([
+    const [statsData, usersData, statusData] = await Promise.all([
       api('/api/admin/stats'),
       api(`/api/admin/users${query}`),
-      api('/api/admin/emails?limit=15'),
       api('/api/admin/status'),
-      api('/api/admin/messages?limit=50'),
     ]);
     setStats(statsData);
     setUsers(usersData.users);
     setTotal(usersData.total);
-    setEmails(emailsData.emails);
     setStatus(statusData);
-    setMessages(messagesData.messages);
-    setMessageTotal(messagesData.total);
-    setUnreadMessages(messagesData.unread);
   }, [search]);
+
+  /* The messages tab, with its search and its two filters. */
+  const loadMessages = useCallback(async () => {
+    const params = new URLSearchParams({ limit: '50' });
+    if (messageSearch.trim()) params.set('q', messageSearch.trim());
+    if (messageSource) params.set('source', messageSource);
+    if (messageStatus) params.set('status', messageStatus);
+
+    const data = await api(`/api/admin/messages?${params.toString()}`);
+    setMessages(data.messages);
+    setMessageTotal(data.allTotal);
+    setUnreadMessages(data.unreadAll);
+    setFilteredTotal(data.total);
+    setFilteredUnread(data.unread);
+  }, [messageSearch, messageSource, messageStatus]);
+
+  /* The email log, with its own search and result filter. */
+  const loadEmails = useCallback(async () => {
+    const params = new URLSearchParams({ limit: '25' });
+    if (emailSearch.trim()) params.set('q', emailSearch.trim());
+    if (emailStatus) params.set('status', emailStatus);
+
+    const data = await api(`/api/admin/emails?${params.toString()}`);
+    setEmails(data.emails);
+  }, [emailSearch, emailStatus]);
+
+  // The Gmail sync reloads the list with the filters that are in use now.
+  const loadMessagesRef = useRef(loadMessages);
+  useEffect(() => {
+    loadMessagesRef.current = loadMessages;
+  }, [loadMessages]);
 
   /* ---- copying the admin Gmail inbox into the dashboard ---- */
   const syncGmail = useCallback(async ({ force = false } = {}) => {
@@ -174,12 +206,7 @@ export default function AdminPage() {
       });
 
       // New messages arrived: read the list again so they show up.
-      if (result.added > 0) {
-        const data = await api('/api/admin/messages?limit=50');
-        setMessages(data.messages);
-        setMessageTotal(data.total);
-        setUnreadMessages(data.unread);
-      }
+      if (result.added > 0) await loadMessagesRef.current();
 
       if (result.error) setMessage({ type: 'error', text: result.error });
       return result;
@@ -197,6 +224,24 @@ export default function AdminPage() {
     load().catch((err) => setMessage({ type: 'error', text: err.message }));
   }, [session.signedIn, load]);
 
+  // A short wait keeps typing in the search box from sending a request on
+  // every key.
+  useEffect(() => {
+    if (!session.signedIn) return;
+    const timer = setTimeout(() => {
+      loadMessages().catch((err) => setMessage({ type: 'error', text: err.message }));
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [session.signedIn, loadMessages]);
+
+  useEffect(() => {
+    if (!session.signedIn) return;
+    const timer = setTimeout(() => {
+      loadEmails().catch((err) => setMessage({ type: 'error', text: err.message }));
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [session.signedIn, loadEmails]);
+
   useEffect(() => {
     if (!session.signedIn) return;
     // Check Gmail quietly once when the dashboard opens; it is usable while
@@ -208,7 +253,7 @@ export default function AdminPage() {
   const reload = async () => {
     setRefreshing(true);
     try {
-      await load();
+      await Promise.all([load(), loadMessages(), loadEmails()]);
       setMessage(null);
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
@@ -241,12 +286,15 @@ export default function AdminPage() {
       list.map((item) => (item.id === message.id ? { ...item, is_read: true } : item)),
     );
     setUnreadMessages((count) => Math.max(0, count - 1));
+    setFilteredUnread((count) => Math.max(0, count - 1));
 
     try {
       await api(`/api/admin/messages/${message.id}/read`, {
         method: 'PATCH',
         body: JSON.stringify({ read: true }),
       });
+      // With the "Unread only" filter on, the message now leaves the list.
+      loadMessages().catch(() => {});
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
     }
@@ -465,10 +513,15 @@ export default function AdminPage() {
           <div className="admin-toolbar">
             <input
               type="search"
-              placeholder="Search by name or email..."
+              placeholder="Search by name, email or card..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            {search && (
+              <button type="button" className="admin-clear" onClick={() => setSearch('')}>
+                Clear
+              </button>
+            )}
             <span className="admin-toolbar-count">{total} account(s)</span>
           </div>
 
@@ -486,7 +539,7 @@ export default function AdminPage() {
               {users.length === 0 && (
                 <tr>
                   <td colSpan={5} className="admin-empty">
-                    No accounts yet.
+                    {search ? 'No accounts match this search.' : 'No accounts yet.'}
                   </td>
                 </tr>
               )}
@@ -517,10 +570,53 @@ export default function AdminPage() {
 
       {tab === 'messages' && (
         <section className="admin-panel">
-          <div className="admin-toolbar">
+          <div className="admin-toolbar admin-toolbar--filters">
+            <input
+              type="search"
+              placeholder="Search name, email, subject or message..."
+              value={messageSearch}
+              onChange={(e) => setMessageSearch(e.target.value)}
+            />
+
+            <select
+              aria-label="Filter by where the message came from"
+              value={messageSource}
+              onChange={(e) => setMessageSource(e.target.value)}
+            >
+              <option value="">All sources</option>
+              <option value="contact">Contact us</option>
+              <option value="help">Help Center</option>
+              <option value="gmail">Gmail</option>
+            </select>
+
+            <select
+              aria-label="Filter by read state"
+              value={messageStatus}
+              onChange={(e) => setMessageStatus(e.target.value)}
+            >
+              <option value="">All messages</option>
+              <option value="unread">Unread only</option>
+              <option value="read">Read only</option>
+            </select>
+
+            {(messageSearch || messageSource || messageStatus) && (
+              <button
+                type="button"
+                className="admin-clear"
+                onClick={() => {
+                  setMessageSearch('');
+                  setMessageSource('');
+                  setMessageStatus('');
+                }}
+              >
+                Clear
+              </button>
+            )}
+
             <span className="admin-toolbar-count">
-              {messageTotal} message(s) &middot; {unreadMessages} unread
+              {filteredTotal} of {messageTotal} message(s) &middot; {filteredUnread} unread
             </span>
+
             <button
               type="button"
               className="admin-sync"
@@ -532,7 +628,13 @@ export default function AdminPage() {
           </div>
 
           <div className="admin-messages">
-            {messages.length === 0 && <p className="admin-empty">No messages yet.</p>}
+            {messages.length === 0 && (
+              <p className="admin-empty">
+                {messageSearch || messageSource || messageStatus
+                  ? 'No messages match these filters.'
+                  : 'No messages yet.'}
+              </p>
+            )}
 
             {messages.map((item) => (
               <details
@@ -579,6 +681,40 @@ export default function AdminPage() {
 
       {tab === 'emails' && (
         <section className="admin-panel">
+          <div className="admin-toolbar admin-toolbar--filters">
+            <input
+              type="search"
+              placeholder="Search address, subject or kind..."
+              value={emailSearch}
+              onChange={(e) => setEmailSearch(e.target.value)}
+            />
+
+            <select
+              aria-label="Filter by send result"
+              value={emailStatus}
+              onChange={(e) => setEmailStatus(e.target.value)}
+            >
+              <option value="">All results</option>
+              <option value="sent">Sent</option>
+              <option value="failed">Failed</option>
+            </select>
+
+            {(emailSearch || emailStatus) && (
+              <button
+                type="button"
+                className="admin-clear"
+                onClick={() => {
+                  setEmailSearch('');
+                  setEmailStatus('');
+                }}
+              >
+                Clear
+              </button>
+            )}
+
+            <span className="admin-toolbar-count">{emails.length} email(s)</span>
+          </div>
+
           <table className="admin-table admin-table--emails">
             <thead>
               <tr>
@@ -592,7 +728,9 @@ export default function AdminPage() {
               {emails.length === 0 && (
                 <tr>
                   <td colSpan={4} className="admin-empty">
-                    No emails yet.
+                    {emailSearch || emailStatus
+                      ? 'No emails match these filters.'
+                      : 'No emails yet.'}
                   </td>
                 </tr>
               )}
