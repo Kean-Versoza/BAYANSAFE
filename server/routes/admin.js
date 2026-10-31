@@ -224,6 +224,70 @@ router.get('/emails', requireAdmin, async (req, res) => {
 });
 
 /**
+ * GET /api/admin/messages
+ * The messages visitors sent with the "Send us a message" form.
+ */
+router.get('/messages', requireAdmin, async (req, res) => {
+  const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
+  const offset = Math.max(Number(req.query.offset) || 0, 0);
+
+  try {
+    const { rows } = await query(
+      `SELECT id, name, email, subject, message, source, is_read, created_at
+         FROM contact_messages
+        ORDER BY created_at DESC
+        LIMIT $1 OFFSET $2`,
+      [limit, offset],
+    );
+
+    const { rows: counts } = await query(
+      `SELECT count(*)::int AS total,
+              count(*) FILTER (WHERE is_read = FALSE)::int AS unread
+         FROM contact_messages`,
+    );
+
+    res.json({
+      ok: true,
+      messages: rows,
+      total: counts[0].total,
+      unread: counts[0].unread,
+      limit,
+      offset,
+    });
+  } catch (err) {
+    console.error('Could not read the messages:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/**
+ * PATCH /api/admin/messages/:id/read
+ * Marks one message as read (or unread again).
+ */
+router.patch('/messages/:id/read', requireAdmin, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({ ok: false, error: 'That is not a valid message id.' });
+  }
+
+  const read = req.body?.read !== false;
+
+  try {
+    const { rows } = await query(
+      `UPDATE contact_messages SET is_read = $2 WHERE id = $1 RETURNING id, is_read`,
+      [id, read],
+    );
+    if (!rows.length) {
+      return res.status(404).json({ ok: false, error: 'That message does not exist.' });
+    }
+    res.json({ ok: true, message: rows[0] });
+  } catch (err) {
+    console.error('Could not change the message:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/**
  * GET /api/admin/status
  * How the system is doing.
  */

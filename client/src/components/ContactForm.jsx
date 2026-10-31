@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
  * say "email is not set up yet" instead of failing after the visitor typed
  * everything.
  */
-export default function ContactForm() {
+export default function ContactForm({ source = 'contact' }) {
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState(null);
   const [mailReady, setMailReady] = useState(null);
@@ -41,6 +41,7 @@ export default function ContactForm() {
       email: String(data.get('email') ?? '').trim(),
       subject: String(data.get('subject') ?? '').trim(),
       message: String(data.get('message') ?? '').trim(),
+      source,
     };
 
     setStatus(null);

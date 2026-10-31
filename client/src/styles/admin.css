@@ -727,6 +727,133 @@
     color: var(--bad-ink);
 }
 
+.admin-tag.is-help {
+    background: #e7f1fd;
+    color: #1f5f9e;
+}
+
+.admin-tag.is-new {
+    background: var(--brand);
+    color: var(--brand-ink);
+}
+
+/* ---------- Messages from the site forms ---------- */
+.admin-tab-badge {
+    display: inline-block;
+    min-width: 1.15rem;
+    margin-left: 0.4rem;
+    padding: 0 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+    text-align: center;
+    color: #ffffff;
+    background: var(--bad);
+    border-radius: 999px;
+}
+
+.admin-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.admin-message-item {
+    background: #ffffff;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.55rem;
+    overflow: hidden;
+}
+
+.admin-message-item.is-unread {
+    border-left: 4px solid var(--brand);
+}
+
+.admin-message-head {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1.1fr) minmax(8rem, 1.4fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.admin-message-head::-webkit-details-marker { display: none; }
+
+.admin-message-head:hover { background: #fdf9f2; }
+
+.admin-message-from {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.admin-message-from strong {
+    font-size: 0.88rem;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-message-from span {
+    font-size: 0.76rem;
+    color: var(--faint);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-message-subject {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
+.admin-message-body {
+    margin: 0;
+    padding: 0.85rem 1rem 0.4rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-top: 1px solid var(--line);
+}
+
+.admin-message-reply {
+    display: inline-block;
+    margin: 0 1rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1f5f9e;
+    text-decoration: none;
+}
+
+.admin-message-reply:hover { text-decoration: underline; }
+
+@media (max-width: 700px) {
+    .admin-message-head {
+        grid-template-columns: 1fr auto;
+    }
+    .admin-message-subject {
+        grid-column: 1 / -1;
+    }
+    .admin-message-meta { justify-content: flex-end; }
+}
+
 /* ---------- Message ---------- */
 .admin-message {
     display: flex;

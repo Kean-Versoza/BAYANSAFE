@@ -1,5 +1,6 @@
 ﻿import { Router } from 'express';
 
+import { query, describeError } from '../db/pool.js';
 import { isMailConfigured, mailRecipient, sendMail } from '../services/mailer.js';
 import { contactMessage } from '../services/mailTemplates.js';
 
@@ -53,6 +54,7 @@ router.post('/', async (req, res) => {
   const email = typeof body.email === 'string' ? body.email.trim() : '';
   const subject = typeof body.subject === 'string' ? body.subject.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
+  const source = body.source === 'help' ? 'help' : 'contact';
 
   if (!name || name.length > MAX_NAME) {
     return res.status(400).json({ ok: false, error: 'Please tell us your name.' });
@@ -76,6 +78,20 @@ router.post('/', async (req, res) => {
 
   const mail = contactMessage({ name, email, subject: subject || 'Message from the site', message });
 
+  // Keep a copy for the dashboard first. The copy is the record the admin
+  // reads, so it must not depend on the email being delivered.
+  let saved = true;
+  try {
+    await query(
+      `INSERT INTO contact_messages (name, email, subject, message, source)
+            VALUES ($1, $2, $3, $4, $5)`,
+      [name, email, subject, message, source],
+    );
+  } catch (err) {
+    saved = false;
+    console.error('Could not save the contact message:', describeError(err));
+  }
+
   try {
     await sendMail({
       to: mailRecipient(),
@@ -86,10 +102,19 @@ router.post('/', async (req, res) => {
       kind: 'contact',
     });
   } catch (err) {
-    if (err.code === 'MAIL_NOT_CONFIGURED') {
+    if (err.code === 'MAIL_NOT_CONFIGURED' && !saved) {
       return res.status(503).json({ ok: false, error: 'Email is not set up on the server yet.' });
     }
     console.error('Could not send the email:', err.message);
+
+    // The message is in the dashboard, so it was still received.
+    if (saved) {
+      return res.json({
+        ok: true,
+        message: 'Thank you! Your message was received. The team will see it in the dashboard.',
+      });
+    }
+
     return res.status(502).json({ ok: false, error: 'We could not send your message. Please try again later.' });
   }
 

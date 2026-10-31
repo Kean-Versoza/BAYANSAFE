@@ -59,6 +59,9 @@ export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
+  const [messages, setMessages] = useState([]);
+  const [messageTotal, setMessageTotal] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [search, setSearch] = useState('');
   const [emails, setEmails] = useState([]);
   const [status, setStatus] = useState(null);
@@ -127,17 +130,21 @@ export default function AdminPage() {
   /* ---- loading the dashboard ---- */
   const load = useCallback(async () => {
     const query = search.trim() ? `?q=${encodeURIComponent(search.trim())}` : '';
-    const [statsData, usersData, emailsData, statusData] = await Promise.all([
+    const [statsData, usersData, emailsData, statusData, messagesData] = await Promise.all([
       api('/api/admin/stats'),
       api(`/api/admin/users${query}`),
       api('/api/admin/emails?limit=15'),
       api('/api/admin/status'),
+      api('/api/admin/messages?limit=50'),
     ]);
     setStats(statsData);
     setUsers(usersData.users);
     setTotal(usersData.total);
     setEmails(emailsData.emails);
     setStatus(statusData);
+    setMessages(messagesData.messages);
+    setMessageTotal(messagesData.total);
+    setUnreadMessages(messagesData.unread);
   }, [search]);
 
   useEffect(() => {
@@ -168,6 +175,26 @@ export default function AdminPage() {
       await api(`/api/admin/users/${user.id}`, { method: 'DELETE' });
       setMessage({ type: 'ok', text: `${user.username} was removed.` });
       load().catch(() => {});
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  /* ---- a message from the contact form / help center ---- */
+  const markMessageRead = async (message) => {
+    if (message.is_read) return;
+
+    // Show it as read straight away; the request only makes it stick.
+    setMessages((list) =>
+      list.map((item) => (item.id === message.id ? { ...item, is_read: true } : item)),
+    );
+    setUnreadMessages((count) => Math.max(0, count - 1));
+
+    try {
+      await api(`/api/admin/messages/${message.id}/read`, {
+        method: 'PATCH',
+        body: JSON.stringify({ read: true }),
+      });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
     }
@@ -277,7 +304,7 @@ export default function AdminPage() {
           <p className="admin-brand">BAYANSAFE</p>
           <div className="admin-header-text">
             <h1>Admin dashboard</h1>
-            <p className="admin-subtitle">Accounts, cards and email — all in one place.</p>
+            <p className="admin-subtitle">Accounts, cards, messages and email — all in one place.</p>
           </div>
         </div>
 
@@ -366,6 +393,14 @@ export default function AdminPage() {
         </button>
         <button
           type="button"
+          className={tab === 'messages' ? 'is-active' : ''}
+          onClick={() => setTab('messages')}
+        >
+          Messages ({messageTotal})
+          {unreadMessages > 0 && <span className="admin-tab-badge">{unreadMessages}</span>}
+        </button>
+        <button
+          type="button"
           className={tab === 'emails' ? 'is-active' : ''}
           onClick={() => setTab('emails')}
         >
@@ -425,6 +460,60 @@ export default function AdminPage() {
               ))}
             </tbody>
           </table>
+        </section>
+      )}
+
+      {tab === 'messages' && (
+        <section className="admin-panel">
+          <div className="admin-toolbar">
+            <span className="admin-toolbar-count">
+              {messageTotal} message(s) &middot; {unreadMessages} unread
+            </span>
+          </div>
+
+          <div className="admin-messages">
+            {messages.length === 0 && <p className="admin-empty">No messages yet.</p>}
+
+            {messages.map((item) => (
+              <details
+                key={item.id}
+                className={`admin-message-item${item.is_read ? '' : ' is-unread'}`}
+                onToggle={(event) => {
+                  if (event.currentTarget.open) markMessageRead(item);
+                }}
+              >
+                <summary className="admin-message-head">
+                  <span className="admin-message-from">
+                    <strong>{item.name}</strong>
+                    <span>{item.email}</span>
+                  </span>
+
+                  <span className="admin-message-subject">
+                    {item.subject || '(no subject)'}
+                  </span>
+
+                  <span className="admin-message-meta">
+                    <span className={`admin-tag ${item.source === 'help' ? 'is-help' : 'is-ok'}`}>
+                      {item.source === 'help' ? 'Help Center' : 'Contact us'}
+                    </span>
+                    {!item.is_read && <span className="admin-tag is-new">New</span>}
+                    <span className="admin-muted">{formatDate(item.created_at)}</span>
+                  </span>
+                </summary>
+
+                <p className="admin-message-body">{item.message}</p>
+
+                <a
+                  className="admin-message-reply"
+                  href={`mailto:${item.email}?subject=${encodeURIComponent(
+                    `Re: ${item.subject || 'Your message to BayanSafe'}`,
+                  )}`}
+                >
+                  Reply by email
+                </a>
+              </details>
+            ))}
+          </div>
         </section>
       )}
 

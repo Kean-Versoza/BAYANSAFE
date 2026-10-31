@@ -46,7 +46,7 @@ export const siteConfig = {
       { label: 'Privacy Policy', url: '/privacy' },
       { label: 'Terms of Service', url: '/terms' },
       { label: 'About us', url: '#' },
-      { label: 'Contact us', url: `mailto:${CONTACT_EMAIL}` },
+      { label: 'Contact us', url: '/help?from=contact' },
       { label: 'Help Center', url: '/help' },
     ],
 

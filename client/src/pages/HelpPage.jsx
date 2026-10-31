@@ -1,16 +1,20 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import ContactForm from '../components/ContactForm';
 
 /**
  * The Help Center page.
  *
- * Reached from the footer's "Help Center" link. It holds nothing but the
- * "Send us a message" form, centered on the page, so the visitor lands
- * straight on it.
+ * Reached from the footer's "Contact us" and "Help Center" links. It holds
+ * nothing but the "Send us a message" form, centered on the page, so the
+ * visitor lands straight on it.
  */
 export default function HelpPage() {
+  const location = useLocation();
+  const source =
+    new URLSearchParams(location.search).get('from') === 'contact' ? 'contact' : 'help';
+
   useEffect(() => {
     document.title = 'Help Center | BayanSafe';
     return () => {
@@ -33,7 +37,7 @@ export default function HelpPage() {
         </header>
 
         <main className="help-page">
-          <ContactForm />
+          <ContactForm source={source} />
 
           <Link className="help-back" to="/">
             &larr; Back to BAYANSAFE
