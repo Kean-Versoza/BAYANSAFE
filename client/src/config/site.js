@@ -47,7 +47,10 @@ export const siteConfig = {
       { label: 'Privacy Policy', url: '/privacy' },
       { label: 'Terms of Service', url: '/terms' },
       { label: 'About us', url: '#' },
-      { label: 'Contact us', url: '/help?from=contact' },
+      {
+        label: 'Contact us',
+        url: `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT_EMAIL}&su=Message%20to%20BayanSafe`,
+      },
       { label: 'Help Center', url: '/help' },
     ],
 
