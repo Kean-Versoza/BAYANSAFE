@@ -537,3 +537,9 @@
     border-top: 2px solid rgba(59, 36, 16, 0.2);
     text-align: left;
 }
+
+/* The sign-in button's 5px shadow eats into the gap above the rule, so the
+   account card gets a little more room to match the registration card. */
+.account-card .google-signin__heading--start {
+    margin-top: 0.55rem;
+}
