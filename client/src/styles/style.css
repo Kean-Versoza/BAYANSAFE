@@ -490,6 +490,44 @@
         flex-shrink: 0;
     }
 
+    /* The Terms of Service / Privacy Policy confirmation shown after the
+       safety terms box is checked. */
+    .reg-form .policy-consent {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        padding: 0.75rem 0.85rem;
+        border: 2px solid rgba(59, 36, 16, 0.2);
+        border-radius: 0.45rem;
+        background: rgba(255, 255, 255, 0.55);
+        color: #3b2410;
+        font-size: 0.9rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .reg-form .policy-consent__note {
+        margin: 0;
+    }
+
+    .reg-form .policy-consent__note a {
+        color: #1a4f8a;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    .reg-form .policy-consent__check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .reg-form .policy-consent__check input[type="checkbox"] {
+        width: 1.1rem;
+        height: 1.1rem;
+        flex-shrink: 0;
+    }
+
     .reg-form .btn-submit {
         margin-top: 0.6rem;
         padding: 0.95rem;
@@ -884,7 +922,8 @@
             right: 0.5rem;
         }
 
-        .reg-form .terms input[type="checkbox"] {
+        .reg-form .terms input[type="checkbox"],
+        .reg-form .policy-consent__check input[type="checkbox"] {
             width: 1.4rem;
             height: 1.4rem;
         }

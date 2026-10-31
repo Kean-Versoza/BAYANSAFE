@@ -11,7 +11,7 @@ const router = Router();
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function validate({ username, email, password, acceptedTerms }) {
+function validate({ username, email, password, acceptedTerms, policiesRead }) {
   if (typeof username !== 'string' || username.trim().length < 3) {
     return 'Please enter a username of at least 3 characters.';
   }
@@ -30,6 +30,9 @@ function validate({ username, email, password, acceptedTerms }) {
   }
   if (acceptedTerms !== true) {
     return 'Please agree to the safety terms.';
+  }
+  if (policiesRead !== true) {
+    return 'Please read and confirm the Terms of Service and Privacy Policy before registering.';
   }
   return null;
 }

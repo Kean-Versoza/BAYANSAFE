@@ -84,6 +84,11 @@ router.post('/google', async (req, res) => {
     return res.status(400).json({ ok: false, error: 'Google did not send a sign-in token.' });
   }
 
+  // Reading the policies is only required when Google creates a new account.
+  // Signing back in to an existing account does not ask again.
+  const acceptedTerms = req.body?.acceptedTerms === true;
+  const policiesRead = req.body?.policiesRead === true;
+
   let payload;
   try {
     const ticket = await googleVerifier(clientId).verifyIdToken({
@@ -117,6 +122,14 @@ router.post('/google', async (req, res) => {
     let created = false;
 
     if (!user) {
+      if (!acceptedTerms || !policiesRead) {
+        return res.status(400).json({
+          ok: false,
+          error:
+            'Please agree to the safety terms and confirm that you have read the Terms of Service and Privacy Policy before creating an account with Google.',
+        });
+      }
+
       const username = await uniqueUsername(usernameFromProfile(payload));
       const result = await createUser({
         username,

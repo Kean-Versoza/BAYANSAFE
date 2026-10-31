@@ -16,6 +16,8 @@ export default function RegistrationSection() {
   const [submitting, setSubmitting] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [readTerms, setReadTerms] = useState(false);
+  const [readPrivacy, setReadPrivacy] = useState(false);
   const [message, setMessage] = useState(EMPTY_MESSAGE);
 
   const formRef = useRef(null);
@@ -64,6 +66,16 @@ export default function RegistrationSection() {
     event.preventDefault();
     if (submitting) return;
 
+    // The browser also disables the button, but a form can still be submitted
+    // with the keyboard, so the rule is checked here as well.
+    if (!acceptedTerms || !readTerms || !readPrivacy) {
+      setMessage({
+        type: 'error',
+        text: 'Please agree to the safety terms and confirm that you have read the Terms of Service and Privacy Policy.',
+      });
+      return;
+    }
+
     const form = event.currentTarget;
     const data = new FormData(form);
     const passwordValue = String(data.get('password') ?? '');
@@ -83,6 +95,7 @@ export default function RegistrationSection() {
       password: passwordValue,
       acceptedTerms: data.get('terms') === 'on',
       terms: data.get('terms') === 'on',
+      policiesRead: readTerms && readPrivacy,
     };
 
     setSubmitting(true);
@@ -103,6 +116,8 @@ export default function RegistrationSection() {
         });
         form.reset();
         setAcceptedTerms(false);
+        setReadTerms(false);
+        setReadPrivacy(false);
         setShowPassword(false);
         setPassword('');
         setPasswordFocused(false);
@@ -134,6 +149,14 @@ export default function RegistrationSection() {
         return;
       }
 
+      if (!readTerms || !readPrivacy) {
+        setMessage({
+          type: 'error',
+          text: 'Please read and confirm the Terms of Service and Privacy Policy before continuing with Google.',
+        });
+        return;
+      }
+
       setGoogleBusy(true);
       setMessage(EMPTY_MESSAGE);
 
@@ -141,7 +164,7 @@ export default function RegistrationSection() {
         const response = await fetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ credential }),
+          body: JSON.stringify({ credential, acceptedTerms: true, policiesRead: true }),
         });
         const result = await response.json().catch(() => ({}));
 
@@ -159,6 +182,8 @@ export default function RegistrationSection() {
         });
         formRef.current?.reset();
         setAcceptedTerms(false);
+        setReadTerms(false);
+        setReadPrivacy(false);
         setShowPassword(false);
         setPassword('');
         setPasswordFocused(false);
@@ -171,7 +196,7 @@ export default function RegistrationSection() {
         setGoogleBusy(false);
       }
     },
-    [acceptedTerms],
+    [acceptedTerms, readTerms, readPrivacy],
   );
 
   return (
@@ -242,10 +267,52 @@ export default function RegistrationSection() {
               name="terms"
               required
               checked={acceptedTerms}
-              onChange={(event) => setAcceptedTerms(event.target.checked)}
+              onChange={(event) => {
+                const checked = event.target.checked;
+                setAcceptedTerms(checked);
+                if (!checked) {
+                  setReadTerms(false);
+                  setReadPrivacy(false);
+                }
+              }}
             />{' '}
             I agree to the safety terms
           </label>
+
+          {/* The two documents have to be confirmed as read before registering */}
+          {acceptedTerms && (
+            <div className="policy-consent">
+              <p className="policy-consent__note">
+                Please read both documents before creating your account:{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  Terms of Service
+                </a>{' '}
+                and{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </a>
+                .
+              </p>
+
+              <label className="policy-consent__check">
+                <input
+                  type="checkbox"
+                  checked={readTerms}
+                  onChange={(event) => setReadTerms(event.target.checked)}
+                />
+                I have read the Terms of Service
+              </label>
+
+              <label className="policy-consent__check">
+                <input
+                  type="checkbox"
+                  checked={readPrivacy}
+                  onChange={(event) => setReadPrivacy(event.target.checked)}
+                />
+                I have read the Privacy Policy
+              </label>
+            </div>
+          )}
 
           <p className="google-signin__heading google-signin__heading--start">
             OR CONTINUE WITH GOOGLE
@@ -264,7 +331,13 @@ export default function RegistrationSection() {
             </p>
           )}
 
-          <button type="submit" className="btn-submit" disabled={submitting || googleBusy}>
+          <button
+            type="submit"
+            className="btn-submit"
+            disabled={
+              submitting || googleBusy || !acceptedTerms || !readTerms || !readPrivacy
+            }
+          >
             {submitting ? 'SUBMITTING...' : googleBusy ? 'CONNECTING...' : 'SUBMIT'}
           </button>
         </form>
