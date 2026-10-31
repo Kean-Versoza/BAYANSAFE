@@ -87,7 +87,7 @@ export function accountRemovedMessage({ username }) {
       <p style="margin:0 0 12px;">Greetings ${safeUsername},</p>
       <p style="margin:0 0 12px;">An administrator has removed your BayanSafe account.</p>
       <p style="margin:0 0 12px;">
-        Your name, your email address and your linked card are no longer stored, and you can no longer
+        ${safeUsername}, your email address and your linked card are no longer stored, and you can no longer
         sign in with this account.
       </p>
       <p style="margin:0 0 12px;">
@@ -105,16 +105,28 @@ export function welcomeMessage({ username, email }) {
   return {
     subject: 'Welcome to BayanSafe!',
     text: [
-      `Greetings ${username},`,
+      `Greetings, ${username}`,
       'Welcome to BayanSafe!',
+      '',
+      'Your account is ready.',
       'If you are reading this, your email has been finally set up and the site can send email.',
+      'You can start playing and learning how to stay safe during disasters.',
       'Get ready to play and learn how to stay safe during disasters.',
+      '',
+      'Stay safe!',
       'The BayanSafe team',
     ].join('\n'),
     html: `
     <div style="${STYLES}">
-      <h2 style="margin:0 0 12px;color:#3b2410;">Welcome to BayanSafe, ${safeUsername}!</h2>
-      <p style="margin:0 0 12px;">Your account is ready. You can start playing and learning how to stay safe during disasters.</p>
+      <h2 style="margin:0 0 4px;color:#3b2410;">Greetings, ${safeUsername}</h2>
+      <p style="margin:0 0 12px;font-weight:700;">Welcome to BayanSafe!</p>
+
+      <p style="margin:0 0 12px;">
+        Your account is ready.<br />
+        If you are reading this, your email has been finally set up and the site can send email.<br />
+        You can start playing and learning how to stay safe during disasters.<br />
+        Get ready to play and learn how to stay safe during disasters.
+      </p>
       <p style="margin:0 0 12px;">Stay safe!</p>
       <p style="margin:0;color:#6b5a4a;">The BayanSafe team</p>
     </div>`,

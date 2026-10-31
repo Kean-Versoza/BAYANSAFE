@@ -47,10 +47,13 @@ router.post('/test', async (req, res) => {
       subject: 'BayanSafe - Account Setup',
       kind: 'test',
       text: [
-        'Greetings,',
-        'Welcome to BayanSafe!',
+        'Account Setup',
+        '',
+        'Greetings, Welcome to BayanSafe!',
+        '',
         'If you are reading this, your email has been finally set up and the site can send email.',
         'Get ready to play and learn how to stay safe during disasters.',
+        '',
         'The BayanSafe team',
       ].join('\n'),
       html: `
@@ -59,10 +62,8 @@ router.post('/test', async (req, res) => {
           <p style="margin:0 0 12px;">Greetings, Welcome to BayanSafe!</p>
 
           <p style="margin:0 0 12px;">
-            If you are reading this, your email has been finally set up and the site can send email.
-
+            If you are reading this, your email has been finally set up and the site can send email.<br />
             Get ready to play and learn how to stay safe during disasters.
-
           </p>
           <p style="margin:0;color:#6b5a4a;">The BayanSafe team</p>
         </div>`,
