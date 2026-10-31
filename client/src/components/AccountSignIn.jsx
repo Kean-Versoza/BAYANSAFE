@@ -86,7 +86,9 @@ export default function AccountSignIn({ onSignIn, onGoogleSignIn, busy }) {
           {busy ? 'SIGNING IN...' : 'SIGN IN'}
         </button>
 
-        <p className="google-signin__heading">OR CONTINUE WITH GOOGLE</p>
+        <p className="google-signin__heading google-signin__heading--start">
+          OR CONTINUE WITH GOOGLE
+        </p>
 
         <GoogleSignIn
           onCredential={onGoogleCredential}
