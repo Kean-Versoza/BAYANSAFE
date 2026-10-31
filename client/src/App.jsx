@@ -16,6 +16,16 @@ function ScrollToTop() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [pathname, hash]);
 
+  // index.html starts with data-section="home", and the home page keeps that
+  // attribute in step while it scrolls. On any other page it must not stay
+  // "home": the stylesheet hides the brand logo for that value, so a reload
+  // of /account (or any other page) would make the logo disappear.
+  useEffect(() => {
+    if (pathname === '/') return;
+    const first = pathname.split('/').filter(Boolean)[0] || 'home';
+    document.body.dataset.section = first;
+  }, [pathname]);
+
   return null;
 }
 
