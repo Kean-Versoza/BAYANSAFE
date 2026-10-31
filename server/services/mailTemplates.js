@@ -72,7 +72,7 @@ export function welcomeMessage({ username, email }) {
   return {
     subject: 'Welcome to BayanSafe!',
     text: [
-      `Hi ${username},`,
+      `Greetings ${username},`,
       '',
       'Your BayanSafe account is ready. You can start playing and learning how to stay safe during disasters.',
       '',
