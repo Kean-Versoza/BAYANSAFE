@@ -44,20 +44,26 @@ router.post('/test', async (req, res) => {
   try {
     await sendMail({
       to: mailRecipient(),
-      subject: 'BayanSafe - Google Account Setup',
+      subject: 'BayanSafe - Account Setup',
       kind: 'test',
       text: [
         'Greetings,',
-        '',
-        'If you are reading it, the email settings are correct and the site can send email.',
-        '',
+        'Welcome to BayanSafe!',
+        'If you are reading this, your email has been finally set up and the site can send email.',
+        'Get ready to play and learn how to stay safe during disasters.',
         'The BayanSafe team',
       ].join('\n'),
       html: `
         <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #1a1a2e;">
-          <h2 style="margin:0 0 12px;color:#3b2410;">Google Account Setup</h2>
-          <p style="margin:0 0 12px;">This is a test email from BayanSafe.</p>
-          <p style="margin:0 0 12px;">If you are reading it, the Gmail settings are correct and the site can send email.</p>
+          <h2 style="margin:0 0 12px;color:#3b2410;">Account Setup</h2>
+          <p style="margin:0 0 12px;">Greetings, Welcome to BayanSafe!</p>
+
+          <p style="margin:0 0 12px;">
+            If you are reading this, your email has been finally set up and the site can send email.
+
+            Get ready to play and learn how to stay safe during disasters.
+
+          </p>
           <p style="margin:0;color:#6b5a4a;">The BayanSafe team</p>
         </div>`,
     });
