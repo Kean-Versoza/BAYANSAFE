@@ -45,6 +45,22 @@ function formatDate(value) {
   });
 }
 
+/* Where a message came from: the site form or the admin Gmail inbox. */
+const SOURCE_LABELS = {
+  help: 'Help Center',
+  contact: 'Contact us',
+  gmail: 'Gmail',
+};
+
+function sourceLabel(source) {
+  return SOURCE_LABELS[source] ?? SOURCE_LABELS.contact;
+}
+
+function sourceClass(source) {
+  if (source === 'gmail') return 'is-gmail';
+  return source === 'help' ? 'is-help' : 'is-ok';
+}
+
 export default function AdminPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,6 +84,7 @@ export default function AdminPage() {
   const [message, setMessage] = useState(null);
   const [tab, setTab] = useState('users');
   const [refreshing, setRefreshing] = useState(false);
+  const [syncingGmail, setSyncingGmail] = useState(false);
 
   /* The name of the tab, so the window says which page is open */
   useEffect(() => {
@@ -147,10 +164,45 @@ export default function AdminPage() {
     setUnreadMessages(messagesData.unread);
   }, [search]);
 
+  /* ---- copying the admin Gmail inbox into the dashboard ---- */
+  const syncGmail = useCallback(async ({ force = false } = {}) => {
+    setSyncingGmail(true);
+    try {
+      const result = await api('/api/admin/messages/sync', {
+        method: 'POST',
+        body: JSON.stringify({ force }),
+      });
+
+      // New messages arrived: read the list again so they show up.
+      if (result.added > 0) {
+        const data = await api('/api/admin/messages?limit=50');
+        setMessages(data.messages);
+        setMessageTotal(data.total);
+        setUnreadMessages(data.unread);
+      }
+
+      if (result.error) setMessage({ type: 'error', text: result.error });
+      return result;
+    } catch (err) {
+      // A Gmail problem must not hide the messages that are already saved.
+      setMessage({ type: 'error', text: err.message });
+      return null;
+    } finally {
+      setSyncingGmail(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!session.signedIn) return;
     load().catch((err) => setMessage({ type: 'error', text: err.message }));
   }, [session.signedIn, load]);
+
+  useEffect(() => {
+    if (!session.signedIn) return;
+    // Check Gmail quietly once when the dashboard opens; it is usable while
+    // this runs. Searching or switching tabs does not trigger it again.
+    syncGmail().catch(() => {});
+  }, [session.signedIn, syncGmail]);
 
   /* The refresh button in the header: asks the server for everything again. */
   const reload = async () => {
@@ -469,6 +521,14 @@ export default function AdminPage() {
             <span className="admin-toolbar-count">
               {messageTotal} message(s) &middot; {unreadMessages} unread
             </span>
+            <button
+              type="button"
+              className="admin-sync"
+              onClick={() => syncGmail({ force: true })}
+              disabled={syncingGmail}
+            >
+              {syncingGmail ? 'Checking Gmail...' : 'Check Gmail now'}
+            </button>
           </div>
 
           <div className="admin-messages">
@@ -493,8 +553,8 @@ export default function AdminPage() {
                   </span>
 
                   <span className="admin-message-meta">
-                    <span className={`admin-tag ${item.source === 'help' ? 'is-help' : 'is-ok'}`}>
-                      {item.source === 'help' ? 'Help Center' : 'Contact us'}
+                    <span className={`admin-tag ${sourceClass(item.source)}`}>
+                      {sourceLabel(item.source)}
                     </span>
                     {!item.is_read && <span className="admin-tag is-new">New</span>}
                     <span className="admin-muted">{formatDate(item.created_at)}</span>

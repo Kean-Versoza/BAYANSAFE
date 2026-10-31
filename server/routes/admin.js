@@ -16,6 +16,7 @@ import {
 } from '../services/adminAuth.js';
 import { checkConnection, isMailConfigured, mailRecipient, provider, sendMail } from '../services/mailer.js';
 import { accountRemovedMessage } from '../services/mailTemplates.js';
+import { isInboxConfigured, syncInbox } from '../services/gmailInbox.js';
 
 const router = Router();
 
@@ -224,8 +225,40 @@ router.get('/emails', requireAdmin, async (req, res) => {
 });
 
 /**
+ * POST /api/admin/messages/sync
+ * Copies the messages from the admin Gmail inbox into the dashboard.
+ *
+ * This never fails the dashboard: if Gmail cannot be reached the stored
+ * messages are still shown, and the reason comes back in `error`.
+ */
+router.post('/messages/sync', requireAdmin, async (req, res) => {
+  if (!isInboxConfigured()) {
+    return res.json({
+      ok: false,
+      configured: false,
+      added: 0,
+      error: 'Gmail is not set up on the server.',
+    });
+  }
+
+  try {
+    const result = await syncInbox({ force: req.body?.force === true });
+    res.json({ configured: true, ...result });
+  } catch (err) {
+    console.error('Could not read the Gmail inbox:', describeError(err));
+    res.json({
+      ok: false,
+      configured: true,
+      added: 0,
+      error: 'The Gmail inbox could not be checked just now. The messages already saved are shown below.',
+    });
+  }
+});
+
+/**
  * GET /api/admin/messages
- * The messages visitors sent with the "Send us a message" form.
+ * The messages visitors sent with the "Send us a message" form, plus the
+ * messages copied from the admin Gmail inbox.
  */
 router.get('/messages', requireAdmin, async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
