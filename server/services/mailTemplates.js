@@ -65,6 +65,39 @@ export function contactMessage({ name, email, subject, message }) {
   };
 }
 
+/** The message sent when an administrator removes an account. */
+export function accountRemovedMessage({ username }) {
+  const safeUsername = escapeHtml(username);
+
+  return {
+    subject: 'Your BayanSafe account was removed',
+    text: [
+      `Greetings ${username},`,
+      '',
+      'An administrator has removed your BayanSafe account.',
+      'Your name, your email address and your linked card are no longer stored, and you can no longer sign in with this account.',
+      '',
+      'If you did not expect this, please reply to this email and the BayanSafe team will look into it.',
+      '',
+      'The BayanSafe team',
+    ].join('\n'),
+    html: `
+    <div style="${STYLES}">
+      <h2 style="margin:0 0 12px;color:#3b2410;">Your account was removed</h2>
+      <p style="margin:0 0 12px;">Greetings ${safeUsername},</p>
+      <p style="margin:0 0 12px;">An administrator has removed your BayanSafe account.</p>
+      <p style="margin:0 0 12px;">
+        Your name, your email address and your linked card are no longer stored, and you can no longer
+        sign in with this account.
+      </p>
+      <p style="margin:0 0 12px;">
+        If you did not expect this, please reply to this email and the BayanSafe team will look into it.
+      </p>
+      <p style="margin:0;color:#6b5a4a;">The BayanSafe team</p>
+    </div>`,
+  };
+}
+
 /** The welcome email sent after somebody creates an account. */
 export function welcomeMessage({ username, email }) {
   const safeUsername = escapeHtml(username);
@@ -73,10 +106,9 @@ export function welcomeMessage({ username, email }) {
     subject: 'Welcome to BayanSafe!',
     text: [
       `Greetings ${username},`,
-      '',
-      'Your BayanSafe account is ready. You can start playing and learning how to stay safe during disasters.',
-      '',
-      'Stay safe!',
+      'Welcome to BayanSafe!',
+      'If you are reading this, your email has been finally set up and the site can send email.',
+      'Get ready to play and learn how to stay safe during disasters.',
       'The BayanSafe team',
     ].join('\n'),
     html: `

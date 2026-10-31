@@ -14,7 +14,8 @@ import {
   setSessionCookie,
   signToken,
 } from '../services/adminAuth.js';
-import { checkConnection, isMailConfigured, mailRecipient, provider } from '../services/mailer.js';
+import { checkConnection, isMailConfigured, mailRecipient, provider, sendMail } from '../services/mailer.js';
+import { accountRemovedMessage } from '../services/mailTemplates.js';
 
 const router = Router();
 
@@ -322,11 +323,34 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
   }
 
   try {
-    const { rows } = await query('DELETE FROM users WHERE id = $1 RETURNING username', [id]);
+    const { rows } = await query(
+      'DELETE FROM users WHERE id = $1 RETURNING username, email',
+      [id],
+    );
     if (!rows.length) {
       return res.status(404).json({ ok: false, error: 'That account does not exist.' });
     }
-    res.json({ ok: true, message: `${rows[0].username} was removed.` });
+
+    // Tell the player that their account is gone. The account is already
+    // removed by now, so a mail problem is only noted, never a failure.
+    let emailNote = '';
+    if (isMailConfigured() && rows[0].email) {
+      try {
+        const message = accountRemovedMessage({ username: rows[0].username });
+        await sendMail({
+          to: rows[0].email,
+          subject: message.subject,
+          text: message.text,
+          html: message.html,
+          kind: 'account-removed',
+        });
+      } catch (err) {
+        console.error('Could not send the account removed email:', describeError(err));
+        emailNote = ' The player could not be emailed about it.';
+      }
+    }
+
+    res.json({ ok: true, message: `${rows[0].username} was removed.${emailNote}` });
   } catch (err) {
     console.error('Could not delete the account:', describeError(err));
     res.status(503).json({ ok: false, error: 'The database could not be reached.' });
