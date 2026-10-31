@@ -393,6 +393,14 @@
         padding: 1rem 1rem 7.5rem;       /* bottom space is reserved for the tagline */
     }
 
+    /* The registration card must start below the fixed nav pill. "safe center"
+       keeps it centered when there is room, but starts at the top padding
+       instead when the card is taller than the screen. */
+    #registration .register-page {
+        justify-content: safe center;
+        padding-top: 9.5rem;
+    }
+
     .register-page .btn-yellow.main-trigger {
         display: block;
         margin: 0 auto;
@@ -854,6 +862,9 @@
 
         .hero,
         .register-page { padding-bottom: 2rem; }
+
+        /* On a phone the nav is a bar across the top, so less room is needed */
+        #registration .register-page { padding-top: 5rem; }
 
         /* iOS zooms in when the text of a field is smaller than 16 pixels,
            so the fields of the phone get a bigger text. */
