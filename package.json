@@ -5,7 +5,7 @@
   "description": "BAYANSAFE - A Philippine Smart Community Disaster Intelligence and Preparedness Response Game (React + Node.js)",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=18"
   },
   "scripts": {
     "postinstall": "npm --prefix client install",
@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "google-auth-library": "^11.3.2",
     "nodemailer": "^6.9.16",
     "pg": "^8.13.1"
   },
