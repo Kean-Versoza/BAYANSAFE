@@ -61,6 +61,8 @@ export default function SwipeRow({
       style={{
         position: 'relative',
         overflow: 'hidden',
+        width: '100%',
+        maxWidth: '100%',
         borderRadius: radius,
         height,
         marginBottom: 8,
@@ -115,10 +117,13 @@ export default function SwipeRow({
           touchAction: 'pan-y',
           background: '#ffffff',
           height: '100%',
+          width: '100%',
+          minWidth: 0,
           display: 'flex',
           alignItems: 'center',
           position: 'relative',
           zIndex: 1,
+          overflow: 'hidden',
         }}
       >
         {children}
