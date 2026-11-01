@@ -1173,7 +1173,11 @@
             --nav-right: 0.75rem;
             --logo-h: 6rem;
         }
-        .nav-toggle { display: flex; }
+        .nav-toggle {
+            display: flex;
+            top: calc(var(--bar-pad) + var(--logo-h) / 2);
+            transform: translateY(-50%);
+        }
         .nav-pill {
             top: 0;
             right: auto;
@@ -1216,8 +1220,8 @@
 
         .nav-pill a:last-child { margin-bottom: 0; }
         .logo {
-            top: 1rem;
-            transform: none;
+            top: calc(var(--bar-pad) + var(--logo-h) / 2);
+            transform: translateY(-50%);
             left: 4rem;
             margin: 0;
         }
@@ -1251,8 +1255,18 @@
 
     @media (max-width: 480px) {
         :root { --logo-h: 4.5rem; }
-        .logo { left: 3.8rem; }
-        .nav-toggle { left: 0.75rem; width: 2.6rem; height: 2.6rem; }
+        .logo {
+            top: calc(var(--bar-pad) + var(--logo-h) / 2);
+            transform: translateY(-50%);
+            left: 3.8rem;
+        }
+        .nav-toggle {
+            top: calc(var(--bar-pad) + var(--logo-h) / 2);
+            transform: translateY(-50%);
+            left: 0.75rem;
+            width: 2.6rem;
+            height: 2.6rem;
+        }
         .nav-toggle span { width: 1.4rem; }
         .nav-pill a { font-size: 0.95rem; height: 2.6rem; }
         .logo img { max-width: 48vw; }
