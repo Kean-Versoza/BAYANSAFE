@@ -537,6 +537,65 @@
     box-shadow: 0 0 0 4px rgba(208, 52, 44, 0.14);
 }
 
+/* ---------- Mobile-only cards (swipe rows on phones) ---------- */
+.admin-desktop-only { display: block; }
+.admin-mobile-only { display: none; }
+
+@media (max-width: 768px) {
+    .admin-desktop-only { display: none; }
+    .admin-mobile-only { display: block; }
+}
+
+.admin-mobile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.75rem 0.9rem;
+    background: #ffffff;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--text);
+}
+
+.admin-mobile-card strong {
+    font-size: 0.92rem;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-mobile-card span {
+    font-size: 0.82rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-mobile-card__subject {
+    font-weight: 600;
+    color: var(--text) !important;
+}
+
+.admin-mobile-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.admin-mobile-card__body {
+    margin: 0.4rem 0 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 /* ---------- Tabs ---------- */
 .admin-tabs {
     display: inline-flex;

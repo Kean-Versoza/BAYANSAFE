@@ -324,6 +324,28 @@ router.get('/emails', requireAdmin, async (req, res) => {
 });
 
 /**
+ * DELETE /api/admin/emails/:id
+ * Removes an entry from the email log.
+ */
+router.delete('/emails/:id', requireAdmin, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({ ok: false, error: 'That is not a valid email id.' });
+  }
+
+  try {
+    const { rowCount } = await query('DELETE FROM email_log WHERE id = $1', [id]);
+    if (!rowCount) {
+      return res.status(404).json({ ok: false, error: 'That email does not exist.' });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Could not delete the email log entry:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/**
  * POST /api/admin/messages/sync
  * Copies the messages from the admin Gmail inbox into the dashboard.
  *
@@ -440,6 +462,28 @@ router.get('/messages', requireAdmin, async (req, res) => {
  * PATCH /api/admin/messages/:id/read
  * Marks one message as read (or unread again).
  */
+/**
+ * DELETE /api/admin/messages/:id
+ * Removes a message from the dashboard.
+ */
+router.delete('/messages/:id', requireAdmin, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({ ok: false, error: 'That is not a valid message id.' });
+  }
+
+  try {
+    const { rowCount } = await query('DELETE FROM contact_messages WHERE id = $1', [id]);
+    if (!rowCount) {
+      return res.status(404).json({ ok: false, error: 'That message does not exist.' });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Could not delete the message:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
 router.patch('/messages/:id/read', requireAdmin, async (req, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id < 1) {

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import SwipeRow from '../components/SwipeRow';
 import '../styles/admin.css';
 
 const PAGE_SIZE = 25;
@@ -292,6 +293,29 @@ export default function AdminPage() {
     }
   };
 
+  /* ---- delete helpers used by the swipe rows on phones ---- */
+  const deleteMessage = async (item) => {
+    if (!window.confirm('Delete this message?')) return;
+    try {
+      await api(`/api/admin/messages/${item.id}`, { method: 'DELETE' });
+      loadMessages().catch(() => {});
+      setMessage({ type: 'ok', text: 'Message deleted.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  const deleteEmail = async (item) => {
+    if (!window.confirm('Delete this email log entry?')) return;
+    try {
+      await api(`/api/admin/emails/${item.id}`, { method: 'DELETE' });
+      loadEmails().catch(() => {});
+      setMessage({ type: 'ok', text: 'Email log entry deleted.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
   /* ---- a message from the contact form / help center ---- */
   const markMessageRead = async (message) => {
     if (message.is_read) return;
@@ -573,48 +597,76 @@ export default function AdminPage() {
             </span>
           </div>
 
-          <table className="admin-table admin-table--users">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Card</th>
-                <th>Registered</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {users.length === 0 && (
+          <div className="admin-desktop-only">
+            <table className="admin-table admin-table--users">
+              <thead>
                 <tr>
-                  <td colSpan={5} className="admin-empty">
-                    {search || accountCard || accountSince
-                      ? 'No accounts match these filters.'
-                      : 'No accounts yet.'}
-                  </td>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Card</th>
+                  <th>Registered</th>
+                  <th />
                 </tr>
-              )}
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="admin-strong">{user.username}</td>
-                  <td>{user.email}</td>
-                  <td className="admin-card">{user.rfidUid ?? '-'}</td>
-                  <td className="admin-muted">{formatDate(user.createdAt)}</td>
-                  <td className="admin-actions">
-                    <button type="button" onClick={() => setCard(user)}>
-                      Card
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-action--danger"
-                      onClick={() => removeUser(user)}
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="admin-empty">
+                      {search || accountCard || accountSince
+                        ? 'No accounts match these filters.'
+                        : 'No accounts yet.'}
+                    </td>
+                  </tr>
+                )}
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <td className="admin-strong">{user.username}</td>
+                    <td>{user.email}</td>
+                    <td className="admin-card">{user.rfidUid ?? '-'}</td>
+                    <td className="admin-muted">{formatDate(user.createdAt)}</td>
+                    <td className="admin-actions">
+                      <button type="button" onClick={() => setCard(user)}>
+                        Card
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-action--danger"
+                        onClick={() => removeUser(user)}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="admin-mobile-only">
+            {users.length === 0 && (
+              <p className="admin-empty">
+                {search || accountCard || accountSince
+                  ? 'No accounts match these filters.'
+                  : 'No accounts yet.'}
+              </p>
+            )}
+            {users.map((user) => (
+              <SwipeRow
+                key={user.id}
+                actions={[
+                  { id: 'remove', label: 'Remove', color: '#e5484d' },
+                ]}
+                onAction={() => removeUser(user)}
+              >
+                <div className="admin-mobile-card">
+                  <strong>{user.username}</strong>
+                  <span>{user.email}</span>
+                  <span>Card: {user.rfidUid ?? '-'}</span>
+                  <span className="admin-muted">{formatDate(user.createdAt)}</span>
+                </div>
+              </SwipeRow>
+            ))}
+          </div>
         </section>
       )}
 
@@ -677,7 +729,59 @@ export default function AdminPage() {
             </button>
           </div>
 
-          <div className="admin-messages">
+          <div className="admin-desktop-only">
+            <div className="admin-messages">
+              {messages.length === 0 && (
+                <p className="admin-empty">
+                  {messageSearch || messageSource || messageStatus
+                    ? 'No messages match these filters.'
+                    : 'No messages yet.'}
+                </p>
+              )}
+
+              {messages.map((item) => (
+                <details
+                  key={item.id}
+                  className={`admin-message-item${item.is_read ? '' : ' is-unread'}`}
+                  onToggle={(event) => {
+                    if (event.currentTarget.open) markMessageRead(item);
+                  }}
+                >
+                  <summary className="admin-message-head">
+                    <span className="admin-message-from">
+                      <strong>{item.name}</strong>
+                      <span>{item.email}</span>
+                    </span>
+
+                    <span className="admin-message-subject">
+                      {item.subject || '(no subject)'}
+                    </span>
+
+                    <span className="admin-message-meta">
+                      <span className={`admin-tag ${sourceClass(item.source)}`}>
+                        {sourceLabel(item.source)}
+                      </span>
+                      {!item.is_read && <span className="admin-tag is-new">New</span>}
+                      <span className="admin-muted">{formatDate(item.created_at)}</span>
+                    </span>
+                  </summary>
+
+                  <p className="admin-message-body">{item.message}</p>
+
+                  <a
+                    className="admin-message-reply"
+                    href={`mailto:${item.email}?subject=${encodeURIComponent(
+                      `Re: ${item.subject || 'Your message to BayanSafe'}`,
+                    )}`}
+                  >
+                    Reply by email
+                  </a>
+                </details>
+              ))}
+            </div>
+          </div>
+
+          <div className="admin-mobile-only">
             {messages.length === 0 && (
               <p className="admin-empty">
                 {messageSearch || messageSource || messageStatus
@@ -685,45 +789,36 @@ export default function AdminPage() {
                   : 'No messages yet.'}
               </p>
             )}
-
             {messages.map((item) => (
-              <details
+              <SwipeRow
                 key={item.id}
-                className={`admin-message-item${item.is_read ? '' : ' is-unread'}`}
-                onToggle={(event) => {
-                  if (event.currentTarget.open) markMessageRead(item);
+                actions={[
+                  ...(item.is_read
+                    ? []
+                    : [{ id: 'read', label: 'Read', color: '#1c5b26' }]),
+                  { id: 'delete', label: 'Delete', color: '#e5484d' },
+                ]}
+                onAction={(action) => {
+                  if (action.id === 'read') markMessageRead(item);
+                  else deleteMessage(item);
                 }}
               >
-                <summary className="admin-message-head">
-                  <span className="admin-message-from">
-                    <strong>{item.name}</strong>
-                    <span>{item.email}</span>
-                  </span>
-
-                  <span className="admin-message-subject">
+                <div className="admin-mobile-card">
+                  <strong>{item.name}</strong>
+                  <span>{item.email}</span>
+                  <span className="admin-mobile-card__subject">
                     {item.subject || '(no subject)'}
                   </span>
-
-                  <span className="admin-message-meta">
+                  <div className="admin-mobile-card__meta">
                     <span className={`admin-tag ${sourceClass(item.source)}`}>
                       {sourceLabel(item.source)}
                     </span>
                     {!item.is_read && <span className="admin-tag is-new">New</span>}
                     <span className="admin-muted">{formatDate(item.created_at)}</span>
-                  </span>
-                </summary>
-
-                <p className="admin-message-body">{item.message}</p>
-
-                <a
-                  className="admin-message-reply"
-                  href={`mailto:${item.email}?subject=${encodeURIComponent(
-                    `Re: ${item.subject || 'Your message to BayanSafe'}`,
-                  )}`}
-                >
-                  Reply by email
-                </a>
-              </details>
+                  </div>
+                  <p className="admin-mobile-card__body">{item.message}</p>
+                </div>
+              </SwipeRow>
             ))}
           </div>
         </section>
@@ -792,39 +887,69 @@ export default function AdminPage() {
             </span>
           </div>
 
-          <table className="admin-table admin-table--emails">
-            <thead>
-              <tr>
-                <th>To</th>
-                <th>Subject</th>
-                <th>Kind</th>
-                <th>Sent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {emails.length === 0 && (
+          <div className="admin-desktop-only">
+            <table className="admin-table admin-table--emails">
+              <thead>
                 <tr>
-                  <td colSpan={4} className="admin-empty">
-                    {emailSearch || emailStatus
-                      ? 'No emails match these filters.'
-                      : 'No emails yet.'}
-                  </td>
+                  <th>To</th>
+                  <th>Subject</th>
+                  <th>Kind</th>
+                  <th>Sent</th>
                 </tr>
-              )}
-              {emails.map((mail) => (
-                <tr key={mail.id}>
-                  <td className="admin-strong">{mail.to_address}</td>
-                  <td>{mail.subject}</td>
-                  <td>
+              </thead>
+              <tbody>
+                {emails.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="admin-empty">
+                      {emailSearch || emailStatus || emailKind || emailSince
+                        ? 'No emails match these filters.'
+                        : 'No emails yet.'}
+                    </td>
+                  </tr>
+                )}
+                {emails.map((mail) => (
+                  <tr key={mail.id}>
+                    <td className="admin-strong">{mail.to_address}</td>
+                    <td>{mail.subject}</td>
+                    <td>
+                      <span className={`admin-tag ${mail.ok ? 'is-ok' : 'is-bad'}`}>
+                        {mail.ok ? mail.kind : 'failed'}
+                      </span>
+                    </td>
+                    <td className="admin-muted">{formatDate(mail.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="admin-mobile-only">
+            {emails.length === 0 && (
+              <p className="admin-empty">
+                {emailSearch || emailStatus || emailKind || emailSince
+                  ? 'No emails match these filters.'
+                  : 'No emails yet.'}
+              </p>
+            )}
+            {emails.map((mail) => (
+              <SwipeRow
+                key={mail.id}
+                actions={[{ id: 'delete', label: 'Delete', color: '#e5484d' }]}
+                onAction={() => deleteEmail(mail)}
+              >
+                <div className="admin-mobile-card">
+                  <strong>{mail.to_address}</strong>
+                  <span>{mail.subject}</span>
+                  <div className="admin-mobile-card__meta">
                     <span className={`admin-tag ${mail.ok ? 'is-ok' : 'is-bad'}`}>
                       {mail.ok ? mail.kind : 'failed'}
                     </span>
-                  </td>
-                  <td className="admin-muted">{formatDate(mail.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <span className="admin-muted">{formatDate(mail.created_at)}</span>
+                  </div>
+                </div>
+              </SwipeRow>
+            ))}
+          </div>
         </section>
       )}
 
