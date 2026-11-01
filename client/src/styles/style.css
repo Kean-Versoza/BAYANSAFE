@@ -839,7 +839,7 @@
     /* Phones / very narrow windows: only here do things stack */
     @media (max-width: 700px) {
         html { font-size: 14px; }
-        :root { --logo-h: 4.5rem; }
+        :root { --logo-h: 5.5rem; }
 
         .section-top {
             justify-content: center;
@@ -1171,7 +1171,7 @@
     @media (max-width: 768px) {
         :root {
             --nav-right: 0.75rem;
-            --logo-h: 6rem;
+            --logo-h: 7rem;
         }
         .nav-toggle {
             display: flex;
@@ -1186,7 +1186,7 @@
             flex-direction: column;
             align-items: stretch;
             gap: 0;
-            padding: 5.5rem 0.7rem 0.7rem;
+            padding: calc(var(--bar-pad) + var(--logo-h) / 2 + 2rem) 0.7rem 0.7rem;
             border-radius: 0 0 0.8rem 0;
             height: 100vh;
             height: 100dvh;
@@ -1254,7 +1254,7 @@
     }
 
     @media (max-width: 480px) {
-        :root { --logo-h: 4.5rem; }
+        :root { --logo-h: 5.5rem; }
         .logo {
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
