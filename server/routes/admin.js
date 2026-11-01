@@ -165,23 +165,63 @@ router.get('/users', requireAdmin, async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 25, 1), 200);
   const offset = Math.max(Number(req.query.offset) || 0, 0);
 
+  const card = ['yes', 'no'].includes(req.query.card) ? req.query.card : '';
+  const since = ['today', 'week', 'month'].includes(req.query.since)
+    ? req.query.since
+    : '';
+
+  // Plain values only, never raw user input: they are turned into SQL fragments
+  // from a fixed list, so they cannot carry anything else.
+  const sinceSql =
+    since === 'today'
+      ? "date_trunc('day', now())"
+      : since === 'week'
+        ? "now() - interval '7 days'"
+        : since === 'month'
+          ? "now() - interval '30 days'"
+          : null;
+
+  const where = [];
+  const params = [];
+
+  if (search) {
+    params.push(`%${search}%`);
+    where.push(
+      `(username ILIKE $${params.length} OR email ILIKE $${params.length} ` +
+        `OR rfid_uid ILIKE $${params.length})`,
+    );
+  }
+  if (card === 'yes') {
+    where.push(`(rfid_uid IS NOT NULL AND rfid_uid <> '')`);
+  } else if (card === 'no') {
+    where.push(`(rfid_uid IS NULL OR rfid_uid = '')`);
+  }
+  if (sinceSql) {
+    where.push(`created_at >= ${sinceSql}`);
+  }
+
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
   try {
-    const pattern = `%${search}%`;
+    const limitParam = params.length + 1;
+    const offsetParam = params.length + 2;
 
     const { rows } = await query(
       `SELECT id, username, email, rfid_uid, created_at
          FROM users
-        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2)
+         ${whereSql}
         ORDER BY created_at DESC
-        LIMIT $3 OFFSET $4`,
-      [search, pattern, limit, offset],
+        LIMIT $${limitParam} OFFSET $${offsetParam}`,
+      [...params, limit, offset],
     );
 
     const { rows: counts } = await query(
-      `SELECT count(*)::int AS count
-         FROM users
-        WHERE ($1 = '' OR username ILIKE $2 OR email ILIKE $2 OR rfid_uid ILIKE $2)`,
-      [search, pattern],
+      `SELECT count(*)::int AS count FROM users ${whereSql}`,
+      params,
+    );
+
+    const { rows: overall } = await query(
+      `SELECT count(*)::int AS count FROM users`,
     );
 
     res.json({
@@ -194,6 +234,7 @@ router.get('/users', requireAdmin, async (req, res) => {
         createdAt: u.created_at,
       })),
       total: counts[0].count,
+      allTotal: overall[0].count,
       limit,
       offset,
     });
@@ -212,6 +253,19 @@ router.get('/emails', requireAdmin, async (req, res) => {
 
   const search = typeof req.query.q === 'string' ? req.query.q.trim() : '';
   const status = ['sent', 'failed'].includes(req.query.status) ? req.query.status : '';
+  const kind = typeof req.query.kind === 'string' ? req.query.kind.trim() : '';
+  const since = ['today', 'week', 'month'].includes(req.query.since)
+    ? req.query.since
+    : '';
+
+  const sinceSql =
+    since === 'today'
+      ? "date_trunc('day', now())"
+      : since === 'week'
+        ? "now() - interval '7 days'"
+        : since === 'month'
+          ? "now() - interval '30 days'"
+          : null;
 
   const where = [];
   const params = [];
@@ -227,6 +281,13 @@ router.get('/emails', requireAdmin, async (req, res) => {
     params.push(status === 'sent');
     where.push(`ok = $${params.length}`);
   }
+  if (kind) {
+    params.push(kind);
+    where.push(`kind = $${params.length}`);
+  }
+  if (sinceSql) {
+    where.push(`created_at >= ${sinceSql}`);
+  }
 
   const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
@@ -239,7 +300,23 @@ router.get('/emails', requireAdmin, async (req, res) => {
         LIMIT $${params.length + 1}`,
       [...params, limit],
     );
-    res.json({ ok: true, emails: rows, total: rows.length, limit });
+
+    const { rows: counts } = await query(
+      `SELECT count(*)::int AS total FROM email_log ${whereSql}`,
+      params,
+    );
+
+    const { rows: overall } = await query(
+      `SELECT count(*)::int AS total FROM email_log`,
+    );
+
+    res.json({
+      ok: true,
+      emails: rows,
+      total: counts[0].total,
+      allTotal: overall[0].total,
+      limit,
+    });
   } catch (err) {
     console.error('Could not read the email log:', describeError(err));
     res.status(503).json({ ok: false, error: 'The database could not be reached.' });

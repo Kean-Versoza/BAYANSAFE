@@ -75,6 +75,9 @@ export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
+  const [accountAllTotal, setAccountAllTotal] = useState(0);
+  const [accountCard, setAccountCard] = useState('');
+  const [accountSince, setAccountSince] = useState('');
   const [messages, setMessages] = useState([]);
   const [messageTotal, setMessageTotal] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
@@ -85,8 +88,11 @@ export default function AdminPage() {
   const [messageStatus, setMessageStatus] = useState('');
   const [search, setSearch] = useState('');
   const [emails, setEmails] = useState([]);
+  const [emailAllTotal, setEmailAllTotal] = useState(0);
   const [emailSearch, setEmailSearch] = useState('');
   const [emailStatus, setEmailStatus] = useState('');
+  const [emailKind, setEmailKind] = useState('');
+  const [emailSince, setEmailSince] = useState('');
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState(null);
   const [tab, setTab] = useState('users');
@@ -153,7 +159,12 @@ export default function AdminPage() {
 
   /* ---- loading the dashboard ---- */
   const load = useCallback(async () => {
-    const query = search.trim() ? `?q=${encodeURIComponent(search.trim())}` : '';
+    const params = new URLSearchParams();
+    if (search.trim()) params.set('q', search.trim());
+    if (accountCard) params.set('card', accountCard);
+    if (accountSince) params.set('since', accountSince);
+    const query = params.toString() ? `?${params.toString()}` : '';
+
     const [statsData, usersData, statusData] = await Promise.all([
       api('/api/admin/stats'),
       api(`/api/admin/users${query}`),
@@ -162,8 +173,9 @@ export default function AdminPage() {
     setStats(statsData);
     setUsers(usersData.users);
     setTotal(usersData.total);
+    setAccountAllTotal(usersData.allTotal);
     setStatus(statusData);
-  }, [search]);
+  }, [search, accountCard, accountSince]);
 
   /* The messages tab, with its search and its two filters. */
   const loadMessages = useCallback(async () => {
@@ -185,10 +197,13 @@ export default function AdminPage() {
     const params = new URLSearchParams({ limit: '25' });
     if (emailSearch.trim()) params.set('q', emailSearch.trim());
     if (emailStatus) params.set('status', emailStatus);
+    if (emailKind) params.set('kind', emailKind);
+    if (emailSince) params.set('since', emailSince);
 
     const data = await api(`/api/admin/emails?${params.toString()}`);
     setEmails(data.emails);
-  }, [emailSearch, emailStatus]);
+    setEmailAllTotal(data.allTotal ?? data.total);
+  }, [emailSearch, emailStatus, emailKind, emailSince]);
 
   // The Gmail sync reloads the list with the filters that are in use now.
   const loadMessagesRef = useRef(loadMessages);
@@ -489,7 +504,7 @@ export default function AdminPage() {
           className={tab === 'users' ? 'is-active' : ''}
           onClick={() => setTab('users')}
         >
-          Accounts ({total})
+          Accounts ({accountAllTotal})
         </button>
         <button
           type="button"
@@ -510,19 +525,52 @@ export default function AdminPage() {
 
       {tab === 'users' && (
         <section className="admin-panel">
-          <div className="admin-toolbar">
+          <div className="admin-toolbar admin-toolbar--filters">
             <input
               type="search"
               placeholder="Search by name, email or card..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            {search && (
-              <button type="button" className="admin-clear" onClick={() => setSearch('')}>
+
+            <select
+              aria-label="Filter by card"
+              value={accountCard}
+              onChange={(e) => setAccountCard(e.target.value)}
+            >
+              <option value="">All cards</option>
+              <option value="yes">With card</option>
+              <option value="no">Without card</option>
+            </select>
+
+            <select
+              aria-label="Filter by registration date"
+              value={accountSince}
+              onChange={(e) => setAccountSince(e.target.value)}
+            >
+              <option value="">All time</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 days</option>
+              <option value="month">Last 30 days</option>
+            </select>
+
+            {(search || accountCard || accountSince) && (
+              <button
+                type="button"
+                className="admin-clear"
+                onClick={() => {
+                  setSearch('');
+                  setAccountCard('');
+                  setAccountSince('');
+                }}
+              >
                 Clear
               </button>
             )}
-            <span className="admin-toolbar-count">{total} account(s)</span>
+
+            <span className="admin-toolbar-count">
+              {total} of {accountAllTotal} account(s)
+            </span>
           </div>
 
           <table className="admin-table admin-table--users">
@@ -539,7 +587,9 @@ export default function AdminPage() {
               {users.length === 0 && (
                 <tr>
                   <td colSpan={5} className="admin-empty">
-                    {search ? 'No accounts match this search.' : 'No accounts yet.'}
+                    {search || accountCard || accountSince
+                      ? 'No accounts match these filters.'
+                      : 'No accounts yet.'}
                   </td>
                 </tr>
               )}
@@ -699,20 +749,47 @@ export default function AdminPage() {
               <option value="failed">Failed</option>
             </select>
 
-            {(emailSearch || emailStatus) && (
+            <select
+              aria-label="Filter by email kind"
+              value={emailKind}
+              onChange={(e) => setEmailKind(e.target.value)}
+            >
+              <option value="">All kinds</option>
+              <option value="welcome">Welcome</option>
+              <option value="contact">Contact</option>
+              <option value="test">Test</option>
+              <option value="account-removed">Account removed</option>
+            </select>
+
+            <select
+              aria-label="Filter by send date"
+              value={emailSince}
+              onChange={(e) => setEmailSince(e.target.value)}
+            >
+              <option value="">All time</option>
+              <option value="today">Today</option>
+              <option value="week">Last 7 days</option>
+              <option value="month">Last 30 days</option>
+            </select>
+
+            {(emailSearch || emailStatus || emailKind || emailSince) && (
               <button
                 type="button"
                 className="admin-clear"
                 onClick={() => {
                   setEmailSearch('');
                   setEmailStatus('');
+                  setEmailKind('');
+                  setEmailSince('');
                 }}
               >
                 Clear
               </button>
             )}
 
-            <span className="admin-toolbar-count">{emails.length} email(s)</span>
+            <span className="admin-toolbar-count">
+              {emails.length} of {emailAllTotal} email(s)
+            </span>
           </div>
 
           <table className="admin-table admin-table--emails">
