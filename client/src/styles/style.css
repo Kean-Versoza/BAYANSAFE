@@ -1,6 +1,7 @@
     /* ---------- Core Reset & Base Variables ---------- */
     * {
         margin: 0;
+        
         padding: 0;
         box-sizing: border-box;
     }
@@ -371,13 +372,13 @@
     }
 
     .disaster ul.stacked-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem 0;
-        align-items: flex-start;
+        margin: 0 0 0 1.125rem;
+        padding: 0;
+        list-style: disc;
     }
 
     .disaster ul.stacked-list li {
+        margin-bottom: 0.2rem;
         white-space: normal;
     }
 
