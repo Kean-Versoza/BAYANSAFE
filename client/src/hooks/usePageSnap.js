@@ -93,7 +93,11 @@ export default function usePageSnap() {
       document.querySelectorAll('.section').forEach((node) => {
         const top = Math.round(node.offsetTop);
         stops.push(top);
-        if (node.offsetHeight > viewport + 2) {
+        // Only reveal the lower part of a section when it is meaningfully
+        // taller than the screen. A section that is only a few pixels too
+        // tall (such as the about panel) would otherwise create a tiny,
+        // unusable "end reveal" stop that the swipe lands on.
+        if (node.offsetHeight > viewport + 80) {
           stops.push(Math.round(top + node.offsetHeight - viewport));
         }
       });
