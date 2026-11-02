@@ -788,14 +788,23 @@ export default function AdminPage() {
 
                   <p className="admin-message-body">{item.message}</p>
 
-                  <a
-                    className="admin-message-reply"
-                    href={`mailto:${item.email}?subject=${encodeURIComponent(
-                      `Re: ${item.subject || 'Your message to BayanSafe'}`,
-                    )}`}
-                  >
-                    Reply by email
-                  </a>
+                  <div className="admin-message-actions">
+                    <a
+                      className="admin-message-reply"
+                      href={`mailto:${item.email}?subject=${encodeURIComponent(
+                        `Re: ${item.subject || 'Your message to BayanSafe'}`,
+                      )}`}
+                    >
+                      Reply by email
+                    </a>
+                    <button
+                      type="button"
+                      className="admin-action--danger"
+                      onClick={() => deleteMessage(item)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </details>
               ))}
             </div>
@@ -916,12 +925,13 @@ export default function AdminPage() {
                   <th>Subject</th>
                   <th>Kind</th>
                   <th>Sent</th>
+                  <th />
                 </tr>
               </thead>
               <tbody>
                 {emails.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="admin-empty">
+                    <td colSpan={5} className="admin-empty">
                       {emailSearch || emailStatus || emailKind || emailSince
                         ? 'No emails match these filters.'
                         : 'No emails yet.'}
@@ -938,6 +948,15 @@ export default function AdminPage() {
                       </span>
                     </td>
                     <td className="admin-muted">{formatDate(mail.created_at)}</td>
+                    <td className="admin-actions">
+                      <button
+                        type="button"
+                        className="admin-action--danger"
+                        onClick={() => deleteEmail(mail)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
