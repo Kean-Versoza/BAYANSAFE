@@ -870,6 +870,14 @@
         .hero,
         .register-page { padding-bottom: 9rem; }
 
+        /* Keep the registration card (and the "REGISTER NOW" button that
+           opens it) below the fixed nav bar on a phone, while still
+           centering them when there is room. */
+        #registration .register-page {
+            justify-content: safe center;
+            padding-top: calc(var(--bar-pad) + var(--logo-h) + 1rem);
+        }
+
         /* iOS zooms in when the text of a field is smaller than 16 pixels,
            so the fields of the phone get a bigger text. */
         .reg-form input[type="email"],
