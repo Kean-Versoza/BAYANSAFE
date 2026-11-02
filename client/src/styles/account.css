@@ -476,7 +476,9 @@
 }
 
 .google-signin__slot iframe {
-    max-width: 100%;
+    /* Google may render the signed-in button slightly wider than the
+       requested width, so it must not be squeezed or clipped here. */
+    max-width: none;
 }
 
 .google-signin__slot.is-disabled {

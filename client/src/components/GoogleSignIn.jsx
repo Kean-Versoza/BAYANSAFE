@@ -112,24 +112,50 @@ export default function GoogleSignIn({
           ux_mode: 'popup',
         });
 
-        const holder = holderRef.current;
-        holder.replaceChildren();
+        const render = () => {
+          const holder = holderRef.current;
+          if (!holder || cancelled) return;
+          holder.replaceChildren();
 
-        // A hidden form measures 0, so a sensible width is used instead.
-        // The width is capped high enough to fit "Continue as <name>" when the
-        // visitor is already signed in to Google, otherwise that text gets cut.
-        const measured = holder.clientWidth || 0;
-        const width = Math.min(400, Math.max(240, Math.round(measured || 320)));
+          // A hidden form measures 0, so a sensible width is used instead.
+          // The width is capped high enough to fit "Continue as <name>" when
+          // the visitor is already signed in to Google, otherwise that text
+          // gets cut. Re-rendering on resize keeps it correct after the form
+          // is shown.
+          const measured = holder.clientWidth || 0;
+          const width = Math.min(400, Math.max(240, Math.round(measured || 320)));
 
-        identity.renderButton(holder, {
-          type: 'standard',
-          theme: 'outline',
-          size: 'large',
-          text,
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          width,
-        });
+          identity.renderButton(holder, {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text,
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width,
+          });
+        };
+
+        render();
+
+        // The form is hidden when this component first mounts, so the first
+        // measurement is 0. Re-render once the holder gets a real width.
+        let resizeObserver = null;
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(() => {
+            if (cancelled) return;
+            // Only re-render when the width actually changed, to avoid loops.
+            const now = holderRef.current?.clientWidth || 0;
+            if (now > 0 && now !== (holderRef.current?._lastWidth || 0)) {
+              holderRef.current._lastWidth = now;
+              render();
+            }
+          });
+          resizeObserver.observe(holderRef.current);
+        }
+
+        // Stash the observer so the cleanup can disconnect it.
+        holderRef.current._resizeObserver = resizeObserver;
       })
       .catch(() => {
         if (!cancelled) {
@@ -139,6 +165,11 @@ export default function GoogleSignIn({
 
     return () => {
       cancelled = true;
+      const holder = holderRef.current;
+      if (holder?._resizeObserver) {
+        holder._resizeObserver.disconnect();
+        holder._resizeObserver = null;
+      }
     };
   }, [clientId, text]);
 
