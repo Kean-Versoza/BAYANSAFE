@@ -870,6 +870,12 @@
             flex-direction: column;
             gap: 0.9rem;
         }
+
+        /* On a phone the forced line breaks in the about text make it look
+           stretched and full of holes. Let the text wrap naturally instead. */
+        #about .panel br { display: none; }
+        #about .intro-section { margin-bottom: 1rem; }
+        #about .panel p { margin-bottom: 0.75rem; }
         .panel {
             width: 94%;
             padding: 1rem 1.1rem 1.25rem;
