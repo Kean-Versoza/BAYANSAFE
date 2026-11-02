@@ -339,6 +339,26 @@ export default function AdminPage() {
     }
   };
 
+  const markMessageUnread = async (message) => {
+    if (!message.is_read) return;
+
+    setMessages((list) =>
+      list.map((item) => (item.id === message.id ? { ...item, is_read: false } : item)),
+    );
+    setUnreadMessages((count) => count + 1);
+    setFilteredUnread((count) => count + 1);
+
+    try {
+      await api(`/api/admin/messages/${message.id}/read`, {
+        method: 'PATCH',
+        body: JSON.stringify({ read: false }),
+      });
+      loadMessages().catch(() => {});
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
   /* ---- the card of a player ---- */
   const setCard = async (user) => {
     const answer = window.prompt(
@@ -793,13 +813,14 @@ export default function AdminPage() {
               <SwipeRow
                 key={item.id}
                 actions={[
-                  ...(item.is_read
-                    ? []
-                    : [{ id: 'read', label: 'Read', color: '#1c5b26' }]),
+                  item.is_read
+                    ? { id: 'unread', label: 'Unread', color: '#8a5a00' }
+                    : { id: 'read', label: 'Read', color: '#1c5b26' },
                   { id: 'delete', label: 'Delete', color: '#e5484d' },
                 ]}
                 onAction={(action) => {
                   if (action.id === 'read') markMessageRead(item);
+                  else if (action.id === 'unread') markMessageUnread(item);
                   else deleteMessage(item);
                 }}
               >
