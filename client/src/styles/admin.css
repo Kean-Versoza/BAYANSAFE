@@ -993,6 +993,36 @@
 
 .admin-message-reply:hover { text-decoration: underline; }
 
+.admin-message-toggle {
+    padding: 0.32rem 0.65rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: #ffffff;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.4rem;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.admin-message-toggle:hover {
+    background: #faf4e9;
+    border-color: #c9bda9;
+    color: var(--text);
+}
+
+.admin-message-toggle--read {
+    color: var(--ok-ink);
+    background: #e8f8ee;
+    border-color: #b7e6c8;
+}
+
+.admin-message-toggle--read:hover {
+    background: #dcf3e3;
+    border-color: #9fd9b3;
+}
+
 .admin-message-actions {
     display: flex;
     align-items: center;

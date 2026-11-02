@@ -797,6 +797,25 @@ export default function AdminPage() {
                     >
                       Reply by email
                     </a>
+
+                    {item.is_read ? (
+                      <button
+                        type="button"
+                        className="admin-message-toggle"
+                        onClick={() => markMessageUnread(item)}
+                      >
+                        Mark unread
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="admin-message-toggle admin-message-toggle--read"
+                        onClick={() => markMessageRead(item)}
+                      >
+                        Mark read
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       className="admin-action--danger"
