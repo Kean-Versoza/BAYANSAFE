@@ -116,8 +116,10 @@ export default function GoogleSignIn({
         holder.replaceChildren();
 
         // A hidden form measures 0, so a sensible width is used instead.
+        // The width is capped high enough to fit "Continue as <name>" when the
+        // visitor is already signed in to Google, otherwise that text gets cut.
         const measured = holder.clientWidth || 0;
-        const width = Math.min(340, Math.max(220, Math.round(measured || 300)));
+        const width = Math.min(400, Math.max(240, Math.round(measured || 320)));
 
         identity.renderButton(holder, {
           type: 'standard',

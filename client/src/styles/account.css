@@ -471,6 +471,8 @@
     align-items: center;
     width: 100%;
     min-height: 44px;
+    height: auto;
+    overflow: visible;
 }
 
 .google-signin__slot iframe {
