@@ -393,6 +393,14 @@
         padding: 1rem 1rem 7.5rem;       /* bottom space is reserved for the tagline */
     }
 
+    /* Keep the registration card (and the "REGISTER NOW" button that opens it)
+       below the fixed nav bar, on every screen size, while still centering
+       them when there is room. */
+    #registration .register-page {
+        justify-content: safe center;
+        padding-top: calc(var(--bar-pad) + var(--logo-h) + 1rem);
+    }
+
     .register-page .btn-yellow.main-trigger {
         display: block;
         margin: 0 auto;
