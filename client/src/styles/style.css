@@ -371,13 +371,13 @@
         flex-shrink: 0;
     }
 
-    .disaster ul.stacked-list {
+    .disaster ul {
         margin: 0 0 0 1.125rem;
         padding: 0;
         list-style: disc;
     }
 
-    .disaster ul.stacked-list li {
+    .disaster ul li {
         margin-bottom: 0.2rem;
         white-space: normal;
     }
