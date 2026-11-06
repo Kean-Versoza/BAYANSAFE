@@ -34,7 +34,7 @@ export default function HomeSection() {
         {/* The registration form now lives on its own page, reached from here. */}
         <div className="hero-actions">
           <Link to="/register" onClick={handleRegister} className="btn-yellow main-trigger">
-            REGISTER NOW
+            REGISTER
           </Link>
           <button type="button" className="btn-yellow main-trigger" onClick={() => {}}>
             DOWNLOAD
