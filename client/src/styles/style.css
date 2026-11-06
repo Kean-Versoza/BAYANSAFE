@@ -317,6 +317,7 @@
         border: 3px solid #3b2410;
         border-radius: 0.75rem;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        align-self: center;
 
         font-size: 1.0625rem;
         line-height: 1.4;

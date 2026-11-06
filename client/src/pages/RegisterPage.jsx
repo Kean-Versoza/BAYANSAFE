@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import RegistrationSection from '../sections/RegistrationSection';
+import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
 /**
@@ -29,6 +30,8 @@ export default function RegisterPage() {
       </nav>
 
       <RegistrationSection pageMode />
+
+      <SiteFooter config={config} />
     </>
   );
 }
