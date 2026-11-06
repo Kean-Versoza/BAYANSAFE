@@ -414,7 +414,7 @@
        below the fixed nav bar, on every screen size, while still centering
        them when there is room. */
     #registration .register-page {
-        justify-content: safe center;
+        justify-content: center;
         padding-top: calc(var(--bar-pad) + var(--logo-h) + 1rem);
     }
 
@@ -952,7 +952,7 @@
            opens it) below the fixed nav bar on a phone, while still
            centering them when there is room. */
         #registration .register-page {
-            justify-content: safe center;
+            justify-content: center;
             padding-top: calc(var(--bar-pad) + var(--logo-h) + 3rem);
         }
 
