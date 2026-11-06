@@ -450,9 +450,18 @@
     }
 
     /* The same button on the home page hero, between the logo and the tagline */
+    .hero-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
     .hero .btn-yellow.main-trigger {
         display: block;
-        margin: 0.5rem auto 0;
+        margin: 0;
         background: var(--yellow);
         color: var(--text);
         font-family: 'Pixelify Sans', sans-serif;

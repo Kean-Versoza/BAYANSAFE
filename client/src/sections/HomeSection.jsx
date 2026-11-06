@@ -32,9 +32,14 @@ export default function HomeSection() {
         </div>
 
         {/* The registration form now lives on its own page, reached from here. */}
-        <Link to="/register" onClick={handleRegister} className="btn-yellow main-trigger">
-          REGISTER NOW
-        </Link>
+        <div className="hero-actions">
+          <Link to="/register" onClick={handleRegister} className="btn-yellow main-trigger">
+            REGISTER NOW
+          </Link>
+          <button type="button" className="btn-yellow main-trigger" onClick={() => {}}>
+            DOWNLOAD
+          </button>
+        </div>
 
         <p className="tagline">
           A Philippine Smart Community Disaster Intelligence and Preparedness Response Game
