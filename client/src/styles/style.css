@@ -462,7 +462,7 @@
     .hero .btn-yellow.main-trigger {
         display: block;
         margin: 0;
-        min-width: 23rem;
+        min-width: 20rem;
         text-align: center;
         background: var(--yellow);
         color: var(--text);
@@ -999,7 +999,7 @@
         .hero .btn-yellow.main-trigger {
             font-size: 1.4rem;
             padding: 0.9rem 2.5rem;
-            min-width: 22rem;
+            min-width: 18rem;
             text-align: center;
         }
     }
