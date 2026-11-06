@@ -1394,7 +1394,7 @@
     @media (max-width: 700px) {
         .site-footer { padding: 1.5rem 1.25rem 9rem; }
         .footer-contact {
-            display: inline;
+            display: block;
             text-align: center;
             line-height: 1.8;
             max-width: 90vw;
@@ -1403,14 +1403,11 @@
         .footer-contact .sep { margin: 0 0.25rem; }
         .footer-contact a,
         .footer-contact span {
-            white-space: nowrap;
+            white-space: normal;
+            overflow-wrap: anywhere;
         }
         .footer-contact .sep:nth-of-type(4) {
-            display: block;
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-            overflow: hidden;
+            display: inline;
         }
         .contact-form-row { flex-direction: column; }
         .cookie-banner {
