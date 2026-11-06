@@ -1105,7 +1105,9 @@
         width: auto;
         display: block;
     }
-    .site-footer p { margin-bottom: 0.35rem; }
+    .site-footer p { margin-bottom: 0.35rem; text-wrap: pretty; }
+
+    .footer-line-break { display: none; }
     .site-footer a {
         color: inherit;
         text-decoration: underline;
@@ -1406,6 +1408,7 @@
             white-space: normal;
             overflow-wrap: anywhere;
         }
+        .footer-line-break { display: block; height: 0; }
         .footer-contact .sep:nth-of-type(4) {
             display: inline;
         }

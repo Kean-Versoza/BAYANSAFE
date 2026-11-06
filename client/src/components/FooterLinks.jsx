@@ -46,6 +46,9 @@ export default function FooterLinks({ links = [], onJump }) {
       <Fragment key={`${link.label}-${link.url}`}>
         {index > 0 && <span className="sep">|</span>}
         {content}
+        {/* On phones the link row wraps after "About us" so the two
+            remaining links sit on their own line instead of mid-word. */}
+        {index === 2 && <span className="footer-line-break" />}
       </Fragment>
     );
   });
