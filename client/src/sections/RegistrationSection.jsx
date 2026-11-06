@@ -7,8 +7,8 @@ import { FORM_LOADER_MS, paintFormContents } from '../lib/skeleton';
 const EMPTY_MESSAGE = { type: '', text: '' };
 
 /** Registration view: the big trigger button and the account card. */
-export default function RegistrationSection() {
-  const [open, setOpen] = useState(false);
+export default function RegistrationSection({ pageMode = false }) {
+  const [open, setOpen] = useState(pageMode);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');

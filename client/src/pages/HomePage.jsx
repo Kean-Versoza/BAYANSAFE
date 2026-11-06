@@ -6,7 +6,7 @@ import { useSiteConfig } from '../hooks/useSiteConfig';
 import usePageSnap from '../hooks/usePageSnap';
 import AboutSection from '../sections/AboutSection';
 import HomeSection from '../sections/HomeSection';
-import RegistrationSection from '../sections/RegistrationSection';
+
 import {
   LEAVE_DELAY,
   MIN_SHOW,
@@ -141,7 +141,6 @@ export default function HomePage() {
 
       <HomeSection />
       <AboutSection onJump={jumpTo} />
-      <RegistrationSection />
 
       <SiteFooter config={config} onJump={jumpTo} />
       <CookieBanner />

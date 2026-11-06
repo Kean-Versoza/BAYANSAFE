@@ -1,0 +1,34 @@
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+import RegistrationSection from '../sections/RegistrationSection';
+import { useSiteConfig } from '../hooks/useSiteConfig';
+
+/**
+ * The registration page.
+ *
+ * Reached from the "REGISTER NOW" button on the home page. It shows the same
+ * form as the old in-page registration section, with the brand logo in its
+ * usual spot and a back button instead of the full navigation pill.
+ */
+export default function RegisterPage() {
+  const config = useSiteConfig();
+
+  useEffect(() => {
+    document.title = 'Register | BayanSafe';
+    return () => {
+      document.title = 'BayanSafe';
+    };
+  }, []);
+
+  return (
+    <>
+      {/* Back to the main site, in the same spot as the nav pill */}
+      <nav className="nav-pill nav-pill--single">
+        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
+      </nav>
+
+      <RegistrationSection pageMode />
+    </>
+  );
+}

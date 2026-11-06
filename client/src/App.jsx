@@ -6,6 +6,7 @@ import Terms from './pages/Terms';
 import AccountPage from './pages/AccountPage';
 import AdminPage from './pages/AdminPage';
 import HelpPage from './pages/HelpPage';
+import RegisterPage from './pages/RegisterPage';
 
 /** SPA route changes behave like real page loads: start at the top. */
 function ScrollToTop() {
@@ -36,9 +37,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
 
-        {/* Old addresses still work: they jump to the section on the one page */}
+        {/* Old addresses still work */}
         <Route path="/about" element={<Navigate to="/#about" replace />} />
-        <Route path="/registration" element={<Navigate to="/#registration" replace />} />
+        <Route path="/registration" element={<Navigate to="/register" replace />} />
 
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
@@ -49,6 +50,9 @@ export default function App() {
         {/* The dashboard for the team */}
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/admin/dashboard" element={<AdminPage />} />
+
+        {/* The registration form on its own page */}
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* The "Send us a message" form on its own page */}
         <Route path="/help" element={<HelpPage />} />

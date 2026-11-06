@@ -443,6 +443,34 @@
         box-shadow: 0 2px 0 #3b2410;
     }
 
+    /* The same button on the home page hero, between the logo and the tagline */
+    .hero .btn-yellow.main-trigger {
+        display: block;
+        margin: 1.5rem auto 0;
+        background: var(--yellow);
+        color: var(--text);
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.75rem;
+        border: 3px solid #3b2410;
+        border-radius: 0.5rem;
+        padding: 1rem 4rem;
+        cursor: pointer;
+        box-shadow: 0 0.375rem 0 #3b2410, 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: transform 0.05s, box-shadow 0.05s;
+        z-index: 10;
+        text-decoration: none;
+    }
+
+    .hero .btn-yellow.main-trigger:hover {
+        background: #ffe14d;
+    }
+
+    .hero .btn-yellow.main-trigger:active {
+        transform: translateY(4px);
+        box-shadow: 0 2px 0 #3b2410;
+    }
+
     /* ---------- Registration Form Card ---------- */
     .reg-form {
         display: flex;
@@ -950,7 +978,8 @@
                 0    2px 4px rgba(0, 0, 0, 0.75);
         }
 
-        .register-page .btn-yellow.main-trigger {
+        .register-page .btn-yellow.main-trigger,
+        .hero .btn-yellow.main-trigger {
             font-size: 1.4rem;
             padding: 0.9rem 2.5rem;
         }

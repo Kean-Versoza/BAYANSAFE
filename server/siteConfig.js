@@ -22,7 +22,6 @@ export const siteConfig = {
   nav: [
     { id: 'home', label: 'HOME' },
     { id: 'about', label: 'ABOUT' },
-    { id: 'registration', label: 'REGISTER' },
     { id: 'account', label: 'ACCOUNT', path: '/account' },
   ],
 
