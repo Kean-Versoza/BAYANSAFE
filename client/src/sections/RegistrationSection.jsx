@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PasswordChecklist from '../components/PasswordChecklist';
 import GoogleSignIn from '../components/GoogleSignIn';
 import { describePasswordProblem } from '@shared/password';
@@ -202,6 +203,14 @@ export default function RegistrationSection({ pageMode = false }) {
   return (
     <section id="registration" className="section frame frame-inner">
       <div className="register-page">
+        {pageMode && (
+          <div className="register-back-mobile">
+            <Link to="/" className="register-back-mobile__link">
+              &larr; BACK TO BAYANSAFE
+            </Link>
+          </div>
+        )}
+
         {!open && (
           <button type="button" id="openFormBtn" className="btn-yellow main-trigger" onClick={openForm}>
             REGISTER NOW

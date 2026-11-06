@@ -1260,7 +1260,8 @@
 
         .register-back-mobile {
             display: block;
-            margin: 0.75rem 1rem 0;
+            align-self: flex-start;
+            margin: 0.5rem 0 0.25rem;
             font-family: 'Pixelify Sans', sans-serif;
             font-weight: 700;
             font-size: 0.95rem;

@@ -29,11 +29,6 @@ export default function RegisterPage() {
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>
       </nav>
 
-      {/* Same back link, shown above the form on phones */}
-      <div className="register-back-mobile">
-        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
-      </div>
-
       <RegistrationSection pageMode />
 
       <SiteFooter config={config} />
