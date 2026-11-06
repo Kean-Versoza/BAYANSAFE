@@ -12,7 +12,7 @@ export default function HomeSection() {
     const skeleton = document.getElementById('pageSkeleton');
 
     if (SHOW_LOADER_ON_NAV && skeleton) {
-      buildSkeleton(skeleton, 'registration');
+      buildSkeleton(skeleton, 'home');
       skeleton.classList.add('is-active');
       window.setTimeout(() => {
         navigate('/register');
