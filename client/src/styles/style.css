@@ -447,7 +447,7 @@
     /* The same button on the home page hero, between the logo and the tagline */
     .hero .btn-yellow.main-trigger {
         display: block;
-        margin: 1.5rem auto 0;
+        margin: 0.5rem auto 0;
         background: var(--yellow);
         color: var(--text);
         font-family: 'Pixelify Sans', sans-serif;
