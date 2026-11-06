@@ -24,10 +24,15 @@ export default function RegisterPage() {
 
   return (
     <>
-      {/* Back to the main site, in the same spot as the nav pill */}
-      <nav className="nav-pill nav-pill--single">
+      {/* Back to the main site (top bar on desktop) */}
+      <nav className="nav-pill nav-pill--register-back">
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>
       </nav>
+
+      {/* Same back link, shown above the form on phones */}
+      <div className="register-back-mobile">
+        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
+      </div>
 
       <RegistrationSection pageMode />
 

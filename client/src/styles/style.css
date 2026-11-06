@@ -444,6 +444,11 @@
         box-shadow: 0 2px 0 #3b2410;
     }
 
+    /* Back link shown above the form on phones (the fixed pill is hidden there) */
+    .register-back-mobile {
+        display: none;
+    }
+
     /* The same button on the home page hero, between the logo and the tagline */
     .hero .btn-yellow.main-trigger {
         display: block;
@@ -1249,22 +1254,21 @@
 
         /* Pages with a single back button (register, help, legal) are not a
            drawer: keep the pill visible and out of the way of the logo. */
-        .nav-pill.nav-pill--single {
-            top: calc(var(--bar-pad) + var(--logo-h) / 2);
-            left: 1rem;
-            right: auto;
-            transform: translateY(-50%);
-            flex-direction: row;
-            align-items: center;
-            gap: 0.2rem;
-            padding: 0.35rem 0.4rem;
-            border-radius: 3rem;
-            height: auto;
-            width: auto;
-            background: rgba(255, 255, 255, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(6px);
+        .nav-pill--register-back {
+            display: none;
         }
+
+        .register-back-mobile {
+            display: block;
+            margin: 0.75rem 1rem 0;
+            font-family: 'Pixelify Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #3b2410;
+            text-decoration: none;
+        }
+
+        .register-back-mobile:hover { text-decoration: underline; }
         .nav-pill {
             top: 0;
             right: auto;
