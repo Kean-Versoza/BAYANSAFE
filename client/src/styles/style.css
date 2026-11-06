@@ -1246,6 +1246,25 @@
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
         }
+
+        /* Pages with a single back button (register, help, legal) are not a
+           drawer: keep the pill visible and out of the way of the logo. */
+        .nav-pill.nav-pill--single {
+            top: calc(var(--bar-pad) + var(--logo-h) / 2);
+            left: 1rem;
+            right: auto;
+            transform: translateY(-50%);
+            flex-direction: row;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.35rem 0.4rem;
+            border-radius: 3rem;
+            height: auto;
+            width: auto;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(6px);
+        }
         .nav-pill {
             top: 0;
             right: auto;
@@ -1323,6 +1342,7 @@
 
     @media (max-width: 480px) {
         :root { --logo-h: 5.5rem; }
+        .nav-pill.nav-pill--single { left: 0.75rem; }
         .logo {
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
