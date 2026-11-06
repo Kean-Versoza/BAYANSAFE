@@ -8,6 +8,7 @@ import googleAuthRoutes from './routes/googleAuth.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
 import mailRoutes from './routes/mail.js';
+import cronRoutes from './routes/cron.js';
 
 /**
  * The whole API of the site, as one Express app.
@@ -69,6 +70,9 @@ export function createApiApp() {
 
   // Email status, used to tell the visitor when email is not set up
   app.use('/api/mail', mailRoutes);
+
+  // Scheduled jobs (Vercel Cron): database health check and keep-alive
+  app.use('/api/cron', cronRoutes);
 
   // Registration with an account, a card and the welcome email
   app.use('/api/register', registerRoutes);
