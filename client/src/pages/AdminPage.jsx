@@ -538,6 +538,25 @@ export default function AdminPage() {
                 {status?.mail.recipient && <small>To {status.mail.recipient}</small>}
               </div>
             </li>
+            <li>
+              <span className="admin-dot is-info" />
+              <div>
+                <strong>Supabase (free tier)</strong>
+                <p>
+                  The database pauses after 7 days without activity. Open the
+                  Supabase dashboard at least once a week to keep it awake.
+                </p>
+                <small>
+                  <a
+                    href="https://supabase.com/dashboard"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open Supabase dashboard
+                  </a>
+                </small>
+              </div>
+            </li>
           </ul>
         </section>
       </div>

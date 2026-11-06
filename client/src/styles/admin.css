@@ -537,6 +537,11 @@
     box-shadow: 0 0 0 4px rgba(208, 52, 44, 0.14);
 }
 
+.admin-dot.is-info {
+    background: var(--sky);
+    box-shadow: 0 0 0 4px rgba(43, 156, 242, 0.18);
+}
+
 /* ---------- Mobile-only cards (swipe rows on phones) ---------- */
 .admin-desktop-only { display: block; }
 .admin-mobile-only {
