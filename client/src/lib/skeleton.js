@@ -179,10 +179,12 @@ export function buildSkeleton(sk, id) {
   const fixed = { x: 0, y: 0 }; // nav, logo, cookie bar stay on screen
   const flow = { x: 0, y: sec.getBoundingClientRect().top }; // after the jump the section top is the screen top
 
-  // nav pill + its three tabs
+  // nav pill + its three tabs (desktop only; on phones the drawer is hidden)
   const nav = document.querySelector('.nav-pill');
-  paintBox(sk, fixed, nav, 'sk-pill');
-  if (nav) nav.querySelectorAll('a').forEach((a) => paintBox(sk, fixed, a, 'sk'));
+  if (window.innerWidth > 768) {
+    paintBox(sk, fixed, nav, 'sk-pill');
+    if (nav) nav.querySelectorAll('a').forEach((a) => paintBox(sk, fixed, a, 'sk'));
+  }
 
   // brand logo (not on Home)
   if (id !== 'home') {
