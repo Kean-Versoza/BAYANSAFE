@@ -953,7 +953,7 @@
            centering them when there is room. */
         #registration .register-page {
             justify-content: safe center;
-            padding-top: calc(var(--bar-pad) + var(--logo-h) + 4rem);
+            padding-top: calc(var(--bar-pad) + var(--logo-h) + 3rem);
         }
 
         /* iOS zooms in when the text of a field is smaller than 16 pixels,
