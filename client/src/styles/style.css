@@ -1409,6 +1409,7 @@
             overflow-wrap: anywhere;
         }
         .footer-line-break { display: block; height: 0; }
+        .sep--line-start { display: none; }
         .footer-contact .sep:nth-of-type(4) {
             display: inline;
         }
