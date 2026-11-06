@@ -318,6 +318,7 @@
         border-radius: 0.75rem;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         align-self: center;
+        margin-bottom: 3rem;
 
         font-size: 1.0625rem;
         line-height: 1.4;
@@ -941,6 +942,8 @@
             padding: 0.75rem 0.9rem 0.9rem;
             font-size: 1rem;
         }
+
+        #about .panel { margin-bottom: 2rem; }
 
         .hero,
         .register-page { padding-bottom: 9rem; }
