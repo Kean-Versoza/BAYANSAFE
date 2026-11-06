@@ -462,6 +462,8 @@
     .hero .btn-yellow.main-trigger {
         display: block;
         margin: 0;
+        min-width: 14rem;
+        text-align: center;
         background: var(--yellow);
         color: var(--text);
         font-family: 'Pixelify Sans', sans-serif;
@@ -997,6 +999,8 @@
         .hero .btn-yellow.main-trigger {
             font-size: 1.4rem;
             padding: 0.9rem 2.5rem;
+            min-width: 11rem;
+            text-align: center;
         }
     }
 
