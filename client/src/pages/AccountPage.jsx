@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
@@ -23,6 +23,7 @@ import {
  */
 export default function AccountPage() {
   const config = useSiteConfig();
+  const navigate = useNavigate();
   const skeletonRef = useRef(null);
   const {
     user,
@@ -67,15 +68,20 @@ export default function AccountPage() {
       const to = anchor.getAttribute('to');
       // Only show the loader when jumping to other pages/sections, not staying on account
       if (to === '/account' || href.endsWith('/account')) return;
+
       if (skeletonRef.current) {
+        event.preventDefault();
         showSkeleton();
-        window.setTimeout(hideSkeleton, NAV_LOADER_MS);
+        window.setTimeout(() => {
+          navigate(to || href);
+          window.setTimeout(hideSkeleton, NAV_LOADER_MS);
+        }, LEAVE_DELAY);
       }
     };
 
     nav.addEventListener('click', handler);
     return () => nav.removeEventListener('click', handler);
-  }, [showSkeleton, hideSkeleton]);
+  }, [showSkeleton, hideSkeleton, navigate]);
 
   useEffect(() => {
     if (known) return undefined;
