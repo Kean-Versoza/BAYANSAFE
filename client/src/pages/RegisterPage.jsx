@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import RegistrationSection from '../sections/RegistrationSection';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import {
+  LEAVE_DELAY,
   MIN_SHOW,
+  NAV_LOADER_MS,
+  SHOW_LOADER_ON_NAV,
   buildSkeleton,
 } from '../lib/skeleton';
 
@@ -18,7 +21,23 @@ import {
  */
 export default function RegisterPage() {
   const config = useSiteConfig();
+  const navigate = useNavigate();
   const skeletonRef = useRef(null);
+
+  const handleBack = useCallback((event) => {
+    event.preventDefault();
+    const skeleton = skeletonRef.current;
+    if (SHOW_LOADER_ON_NAV && skeleton) {
+      buildSkeleton(skeleton, 'home');
+      skeleton.classList.add('is-active');
+      window.setTimeout(() => {
+        navigate('/');
+        window.setTimeout(() => skeleton.classList.remove('is-active'), NAV_LOADER_MS);
+      }, LEAVE_DELAY);
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     document.title = 'Register | BayanSafe';
@@ -50,7 +69,7 @@ export default function RegisterPage() {
       <div id="pageSkeleton" ref={skeletonRef} className="page-skeleton" aria-hidden="true" />
       {/* Back to the main site (top bar on desktop) */}
       <nav className="nav-pill nav-pill--register-back">
-        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
+        <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
       </nav>
 
       <RegistrationSection pageMode />

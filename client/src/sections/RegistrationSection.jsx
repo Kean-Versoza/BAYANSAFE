@@ -205,7 +205,21 @@ export default function RegistrationSection({ pageMode = false }) {
       <div className="register-page">
         {pageMode && (
           <div className="register-back-mobile">
-            <Link to="/" className="register-back-mobile__link">
+            <Link
+              to="/"
+              className="register-back-mobile__link"
+              onClick={(event) => {
+                event.preventDefault();
+                const skeleton = document.getElementById('pageSkeleton');
+                if (skeleton) {
+                  // reuse the home skeleton view
+                  skeleton.classList.add('is-active');
+                }
+                window.setTimeout(() => {
+                  window.location.href = '/';
+                }, 300);
+              }}
+            >
               &larr; BACK TO BAYANSAFE
             </Link>
           </div>
