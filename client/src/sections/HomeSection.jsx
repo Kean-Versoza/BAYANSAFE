@@ -36,7 +36,18 @@ export default function HomeSection() {
           <Link to="/register" onClick={handleRegister} className="btn-yellow main-trigger">
             REGISTER
           </Link>
-          <button type="button" className="btn-yellow main-trigger">
+          <button
+            type="button"
+            className="btn-yellow main-trigger"
+            onClick={() => {
+              const skeleton = document.getElementById('pageSkeleton');
+              if (skeleton) {
+                buildSkeleton(skeleton, 'home');
+                skeleton.classList.add('is-active');
+                window.setTimeout(() => skeleton.classList.remove('is-active'), 1200);
+              }
+            }}
+          >
             DOWNLOAD
           </button>
         </div>
