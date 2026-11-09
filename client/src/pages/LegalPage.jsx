@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteConfig } from '../hooks/useSiteConfig.js';
+import { MIN_SHOW, buildSkeleton } from '../lib/skeleton';
 
 /**
  * The frame shared by the Privacy Policy and the Terms of Service.
@@ -9,6 +10,7 @@ import { useSiteConfig } from '../hooks/useSiteConfig.js';
 export default function LegalPage({ title, updated, children }) {
   const config = useSiteConfig();
   const year = new Date().getFullYear();
+  const skeletonRef = useRef(null);
 
   useEffect(() => {
     document.title = `${title} | BayanSafe`;
@@ -17,8 +19,27 @@ export default function LegalPage({ title, updated, children }) {
     };
   }, [title]);
 
+  const showSkeleton = useCallback(() => {
+    const skeleton = skeletonRef.current;
+    if (!skeleton) return;
+    buildSkeleton(skeleton, 'legal');
+    skeleton.classList.add('is-active');
+  }, []);
+
+  const hideSkeleton = useCallback(() => {
+    skeletonRef.current?.classList.remove('is-active');
+  }, []);
+
+  useEffect(() => {
+    if (!skeletonRef.current) return undefined;
+    showSkeleton();
+    const timer = window.setTimeout(hideSkeleton, MIN_SHOW);
+    return () => window.clearTimeout(timer);
+  }, [showSkeleton, hideSkeleton]);
+
   return (
     <>
+      <div id="pageSkeleton" ref={skeletonRef} className="page-skeleton" aria-hidden="true" />
       {/* Back to the main site (same spot as the nav on the main site) */}
       <nav className="nav-pill nav-pill--single">
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>

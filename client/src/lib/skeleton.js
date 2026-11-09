@@ -211,6 +211,14 @@ export function buildSkeleton(sk, id) {
       paintBox(sk, flow, form, 'sk-card');
       paintFormContents(sk, flow, form);
     }
+  } else if (id === 'help') {
+    const logo = document.querySelector('.help-logo img');
+    paintInk(sk, flow, logo, '0.6rem');
+    const form = document.querySelector('.contact-form');
+    if (form) paintBox(sk, flow, form, 'sk-card');
+  } else if (id === 'legal') {
+    const panel = sec.querySelector('.legal-panel, .panel');
+    if (panel) paintBox(sk, flow, panel, 'sk-card');
   } else {
     const form = sec.querySelector('.reg-form');
     if (form && !form.classList.contains('hidden-form')) {

@@ -1,9 +1,13 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import RegistrationSection from '../sections/RegistrationSection';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
+import {
+  MIN_SHOW,
+  buildSkeleton,
+} from '../lib/skeleton';
 
 /**
  * The registration page.
@@ -14,6 +18,7 @@ import { useSiteConfig } from '../hooks/useSiteConfig';
  */
 export default function RegisterPage() {
   const config = useSiteConfig();
+  const skeletonRef = useRef(null);
 
   useEffect(() => {
     document.title = 'Register | BayanSafe';
@@ -22,8 +27,27 @@ export default function RegisterPage() {
     };
   }, []);
 
+  const showSkeleton = useCallback(() => {
+    const skeleton = skeletonRef.current;
+    if (!skeleton) return;
+    buildSkeleton(skeleton, 'registration');
+    skeleton.classList.add('is-active');
+  }, []);
+
+  const hideSkeleton = useCallback(() => {
+    skeletonRef.current?.classList.remove('is-active');
+  }, []);
+
+  useEffect(() => {
+    if (!skeletonRef.current) return undefined;
+    showSkeleton();
+    const timer = window.setTimeout(hideSkeleton, MIN_SHOW);
+    return () => window.clearTimeout(timer);
+  }, [showSkeleton, hideSkeleton]);
+
   return (
     <>
+      <div id="pageSkeleton" ref={skeletonRef} className="page-skeleton" aria-hidden="true" />
       {/* Back to the main site (top bar on desktop) */}
       <nav className="nav-pill nav-pill--register-back">
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>

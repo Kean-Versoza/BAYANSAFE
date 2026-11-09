@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import FooterLinks from '../components/FooterLinks';
 import defaultFooter from '../config/footer';
+import { MIN_SHOW, buildSkeleton } from '../lib/skeleton';
 
 /** Shared shell for the Privacy Policy and Terms of Service pages. */
 export default function LegalLayout({ title, children }) {
   const year = new Date().getFullYear();
+  const skeletonRef = useRef(null);
 
   useEffect(() => {
     document.title = title ? `${title} | BayanSafe` : 'BayanSafe';
@@ -14,8 +16,27 @@ export default function LegalLayout({ title, children }) {
     };
   }, [title]);
 
+  const showSkeleton = useCallback(() => {
+    const skeleton = skeletonRef.current;
+    if (!skeleton) return;
+    buildSkeleton(skeleton, 'legal');
+    skeleton.classList.add('is-active');
+  }, []);
+
+  const hideSkeleton = useCallback(() => {
+    skeletonRef.current?.classList.remove('is-active');
+  }, []);
+
+  useEffect(() => {
+    if (!skeletonRef.current) return undefined;
+    showSkeleton();
+    const timer = window.setTimeout(hideSkeleton, MIN_SHOW);
+    return () => window.clearTimeout(timer);
+  }, [showSkeleton, hideSkeleton]);
+
   return (
     <>
+      <div ref={skeletonRef} id="pageSkeleton" className="page-skeleton" aria-hidden="true" />
       {/* Back to the main site (same spot as the nav on the main site) */}
       <nav className="nav-pill nav-pill--single">
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>
