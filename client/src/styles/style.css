@@ -104,7 +104,9 @@
         filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
     }
 
-    .logo {
+    .logo,
+    .legal-logo,
+    .about-logo {
         align-self: center;
         position: fixed;
         top: calc(var(--bar-pad) + var(--logo-h) / 2);
@@ -1430,7 +1432,9 @@
         }
 
         .nav-pill a:last-child { margin-bottom: 0; }
-        .logo {
+        .logo,
+        .legal-logo,
+        .about-logo {
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
             left: 4rem;
@@ -1467,7 +1471,9 @@
     @media (max-width: 480px) {
         :root { --logo-h: 5.5rem; }
         .nav-pill.nav-pill--single { left: 0.75rem; }
-        .logo {
+        .logo,
+        .legal-logo,
+        .about-logo {
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
             left: 3.8rem;
