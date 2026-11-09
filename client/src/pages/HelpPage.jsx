@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import NavPill from '../components/NavPill';
 import ContactForm from '../components/ContactForm';
+import { useSiteConfig } from '../hooks/useSiteConfig';
 import { LEAVE_DELAY, MIN_SHOW, NAV_LOADER_MS, SHOW_LOADER_ON_NAV, buildSkeleton } from '../lib/skeleton';
 
 /**
@@ -12,6 +14,7 @@ import { LEAVE_DELAY, MIN_SHOW, NAV_LOADER_MS, SHOW_LOADER_ON_NAV, buildSkeleton
  * visitor lands straight on it.
  */
 export default function HelpPage() {
+  const config = useSiteConfig();
   const location = useLocation();
   const navigate = useNavigate();
   const source =
@@ -62,6 +65,7 @@ export default function HelpPage() {
   return (
     <>
       <div id="pageSkeleton" ref={skeletonRef} className="page-skeleton" aria-hidden="true" />
+      <NavPill items={config.nav} active="help" />
       {/* Back to the main site (same spot as the nav on the main site) */}
       <nav className="nav-pill nav-pill--single">
         <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
@@ -78,6 +82,10 @@ export default function HelpPage() {
           <ContactForm source={source} />
 
           <Link className="help-back" to="/" onClick={handleBack}>
+            &larr; Back to BAYANSAFE
+          </Link>
+
+          <Link className="legal-back" to="/" onClick={handleBack}>
             &larr; Back to BAYANSAFE
           </Link>
         </main>

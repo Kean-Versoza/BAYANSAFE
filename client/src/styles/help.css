@@ -106,4 +106,7 @@
     .help-page .contact-form textarea {
         font-size: 16px;
     }
+
+    /* The bottom back button is redundant with the top one on phones */
+    .help-page .legal-back { display: none; }
 }
