@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
@@ -29,6 +30,7 @@ export default function AboutPage() {
 
   return (
     <>
+      <NavPill items={config.nav} active="about" />
       <nav className="nav-pill nav-pill--single">
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>
       </nav>
