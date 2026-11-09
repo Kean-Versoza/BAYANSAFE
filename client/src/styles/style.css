@@ -129,15 +129,11 @@
         /* The in-container back button is redundant on desktop (the top bar
            already has one), so hide it there. */
         body[data-section="privacy"] .legal-back,
-        body[data-section="terms"] .legal-back {
+        body[data-section="terms"] .legal-back,
+        body[data-section="help"] .legal-back {
             display: none;
         }
 
-        /* The help center's top nav bar goes away on desktop; the bottom
-           back link is enough. */
-        body[data-section="help"] .nav-pill--single {
-            display: none;
-        }
     }
 
     /* Hidden while Home is on screen */
