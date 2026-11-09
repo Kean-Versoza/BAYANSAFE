@@ -8,7 +8,7 @@
  */
 
 /** Contact address - the footer's "Contact us" link opens it. */
-const CONTACT_EMAIL = 'versozakean@gmail.com';
+const CONTACT_EMAIL = 'bayansafe.admin@gmail.com';
 
 const footerConfig = {
   // Logo shown on the left
@@ -33,8 +33,8 @@ const footerConfig = {
     { label: 'Privacy Policy', url: '/privacy' },
     { label: 'Terms of Service', url: '/terms' },
     { label: 'About us', url: '#' },
-    { label: 'Contact us', url: `mailto:${CONTACT_EMAIL}` },
-    { label: 'Help Center', url: '#' },
+    { label: 'Contact us', url: `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT_EMAIL}&su=Message%20to%20BayanSafe` },
+    { label: 'Help Center', url: '/help' },
   ],
 
   // Small print: one paragraph per line (sample text, change it to yours)

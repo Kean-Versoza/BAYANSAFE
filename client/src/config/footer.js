@@ -6,7 +6,7 @@
  */
 
 /** Contact address - the footer's "Contact us" link opens it. */
-const CONTACT_EMAIL = ' bayansafe.admin@gmail.com';
+const CONTACT_EMAIL = 'bayansafe.admin@gmail.com';
 
 const defaultFooter = {
   logo: '/images/logo.png',
@@ -18,12 +18,13 @@ const defaultFooter = {
     { label: 'Privacy Policy', url: '/privacy' },
     { label: 'Terms of Service', url: '/terms' },
     { label: 'About us', url: '#' },
-    { label: 'Contact us', url: `mailto:${CONTACT_EMAIL}` },
-    { label: 'Help Center', url: '#' },
+    { label: 'Contact us', url: `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT_EMAIL}&su=Message%20to%20BayanSafe` },
+    { label: 'Help Center', url: '/help' },
   ],
   notes: [
     'BayanSafe is an educational game about disaster preparedness in the Philippines.',
-    'Add credits, trademark notes, or school and project details here.',
+    'BayanSafe is a collaboration project between 3 subjects across different principles and creative approaches.',
+    'And it is created by a team of students from the Quezon City University (QCU) consisting of 11 members.',
   ],
   cookie: {
     show: true,
