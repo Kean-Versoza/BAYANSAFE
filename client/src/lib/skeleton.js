@@ -195,7 +195,7 @@ export function buildSkeleton(sk, id) {
   if (id === 'home') {
     paintInk(sk, flow, sec.querySelector('.main-banner img'), '1rem');
     paintLines(sk, flow, sec.querySelector('.tagline'));
-    paintBox(sk, flow, sec.querySelector('.btn-yellow.main-trigger'), 'sk');
+    sec.querySelectorAll('.btn-yellow.main-trigger').forEach((btn) => paintBox(sk, flow, btn, 'sk'));
     // fixed bars that stay on screen
     const cookie = document.querySelector('.cookie-banner');
     paintBox(sk, fixed, cookie, 'sk');
