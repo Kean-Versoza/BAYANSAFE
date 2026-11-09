@@ -108,6 +108,7 @@
         align-self: center;
         position: fixed;
         top: calc(var(--bar-pad) + var(--logo-h) / 2);
+        left: 2.5rem;
         transform: translateY(-50%);
         margin: 0;
         z-index: 125;               /* above the page content, below the loader (150) */
