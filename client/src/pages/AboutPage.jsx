@@ -13,7 +13,7 @@ const TEAM = [
   { name: 'Gino Claveria', role: 'Research Software Engineer' },
   { name: 'Kean Versoza', role: 'Production, Website Deployment' },
   { name: 'James Galit', role: 'Gameplay engineer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Cris Villoria', role: 'Research Software Engineer' },
   { name: 'Amir Pascual', role: 'Hardware engineer' },
 ];
 
