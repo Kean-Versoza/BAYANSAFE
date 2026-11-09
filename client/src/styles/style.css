@@ -117,9 +117,11 @@
         transition: opacity 0.25s ease, visibility 0.25s ease;
     }
 
-    /* On desktop the about page keeps only its back button, not the full nav pill */
+    /* On desktop these pages keep only their back button, not the full nav pill */
     @media (min-width: 769px) {
-        body[data-section="about-us"] .nav-pill:not(.nav-pill--single) {
+        body[data-section="about-us"] .nav-pill:not(.nav-pill--single),
+        body[data-section="privacy"] .nav-pill:not(.nav-pill--single),
+        body[data-section="terms"] .nav-pill:not(.nav-pill--single) {
             display: none;
         }
     }
