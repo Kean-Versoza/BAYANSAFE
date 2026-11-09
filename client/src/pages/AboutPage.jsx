@@ -5,16 +5,16 @@ import { useSiteConfig } from '../hooks/useSiteConfig';
 
 const TEAM = [
   { name: 'Dave Adriano', role: 'Research Software Engineer' },
-  { name: 'Mikel Agustin', role: 'Story Editor' },
-  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
-  { name: 'Gino Claveria', role: 'Research Software Engineer' },
-  { name: 'James Galit', role: 'Gameplay engineer' },
-  { name: 'Amir Pascual', role: 'Hardware engineer' },
   { name: 'Iron Salbador', role: 'Research Software Engineer' },
+  { name: 'Mikel Agustin', role: 'Story Editor, Research Software Engineer' },
   { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
+  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
   { name: 'Ryan Sumndad', role: 'Story Producer' },
+  { name: 'Gino Claveria', role: 'Research Software Engineer' },
   { name: 'Kean Versoza', role: 'Production, Website Deployment' },
-  { name: 'Cris Villoria', role: 'Research Software Engineer' },
+  { name: 'James Galit', role: 'Gameplay engineer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Amir Pascual', role: 'Hardware engineer' },
 ];
 
 export default function AboutPage() {
@@ -49,8 +49,8 @@ export default function AboutPage() {
 
           <h2>The team</h2>
           <ul className="about-team">
-            {TEAM.map((member) => (
-              <li key={member.name}>
+            {TEAM.map((member, index) => (
+              <li key={index}>
                 <strong>{member.name}</strong>
                 <span>{member.role}</span>
               </li>
