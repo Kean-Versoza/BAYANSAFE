@@ -13,6 +13,12 @@ import RegisterPage from './pages/RegisterPage';
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
+  // The scroll behaviour (no overscroll bounce, no scroll anchoring) is wanted
+  // on every page, not only on the home page that turns one screen at a time.
+  useEffect(() => {
+    document.documentElement.classList.add('snap-scroll');
+  }, []);
+
   useEffect(() => {
     if (hash) return; // in-page anchors handle their own scrolling
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
