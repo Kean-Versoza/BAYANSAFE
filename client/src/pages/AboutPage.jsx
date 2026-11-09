@@ -57,9 +57,6 @@ export default function AboutPage() {
             ))}
           </ul>
 
-          <Link className="legal-back" to="/">
-            &larr; Back to BAYANSAFE
-          </Link>
         </main>
 
       </div>
