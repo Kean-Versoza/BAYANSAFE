@@ -44,7 +44,7 @@ export default function HomeSection() {
               if (skeleton) {
                 buildSkeleton(skeleton, 'home');
                 skeleton.classList.add('is-active');
-                window.setTimeout(() => skeleton.classList.remove('is-active'), NAV_LOADER_MS);
+                window.setTimeout(() => skeleton.classList.remove('is-active'), 1200);
               }
             }}
           >
