@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import ContactForm from '../components/ContactForm';
-import { MIN_SHOW, buildSkeleton } from '../lib/skeleton';
+import { LEAVE_DELAY, MIN_SHOW, NAV_LOADER_MS, SHOW_LOADER_ON_NAV, buildSkeleton } from '../lib/skeleton';
 
 /**
  * The Help Center page.
@@ -13,10 +13,26 @@ import { MIN_SHOW, buildSkeleton } from '../lib/skeleton';
  */
 export default function HelpPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const source =
     new URLSearchParams(location.search).get('from') === 'contact' ? 'contact' : 'help';
 
   const skeletonRef = useRef(null);
+
+  const handleBack = useCallback((event) => {
+    event.preventDefault();
+    const skeleton = skeletonRef.current;
+    if (SHOW_LOADER_ON_NAV && skeleton) {
+      buildSkeleton(skeleton, 'home');
+      skeleton.classList.add('is-active');
+      window.setTimeout(() => {
+        navigate('/');
+        window.setTimeout(() => skeleton.classList.remove('is-active'), NAV_LOADER_MS);
+      }, LEAVE_DELAY);
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     document.title = 'Help Center | BayanSafe';
@@ -48,7 +64,7 @@ export default function HelpPage() {
       <div id="pageSkeleton" ref={skeletonRef} className="page-skeleton" aria-hidden="true" />
       {/* Back to the main site (same spot as the nav on the main site) */}
       <nav className="nav-pill nav-pill--single">
-        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
+        <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
       </nav>
 
       <div className="frame frame-inner help-frame">
@@ -61,7 +77,7 @@ export default function HelpPage() {
         <main className="help-page">
           <ContactForm source={source} />
 
-          <Link className="help-back" to="/">
+          <Link className="help-back" to="/" onClick={handleBack}>
             &larr; Back to BAYANSAFE
           </Link>
         </main>

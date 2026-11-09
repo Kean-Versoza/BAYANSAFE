@@ -1,13 +1,29 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FooterLinks from '../components/FooterLinks';
 import defaultFooter from '../config/footer';
-import { MIN_SHOW, buildSkeleton } from '../lib/skeleton';
+import { LEAVE_DELAY, MIN_SHOW, NAV_LOADER_MS, SHOW_LOADER_ON_NAV, buildSkeleton } from '../lib/skeleton';
 
 /** Shared shell for the Privacy Policy and Terms of Service pages. */
 export default function LegalLayout({ title, children }) {
   const year = new Date().getFullYear();
+  const navigate = useNavigate();
   const skeletonRef = useRef(null);
+
+  const handleBack = useCallback((event) => {
+    event.preventDefault();
+    const skeleton = skeletonRef.current;
+    if (SHOW_LOADER_ON_NAV && skeleton) {
+      buildSkeleton(skeleton, 'legal');
+      skeleton.classList.add('is-active');
+      window.setTimeout(() => {
+        navigate('/');
+        window.setTimeout(() => skeleton.classList.remove('is-active'), NAV_LOADER_MS);
+      }, LEAVE_DELAY);
+    } else {
+      navigate('/');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     document.title = title ? `${title} | BayanSafe` : 'BayanSafe';
@@ -39,7 +55,7 @@ export default function LegalLayout({ title, children }) {
       <div ref={skeletonRef} id="pageSkeleton" className="page-skeleton" aria-hidden="true" />
       {/* Back to the main site (same spot as the nav on the main site) */}
       <nav className="nav-pill nav-pill--single">
-        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
+        <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
       </nav>
 
       <div className="frame frame-inner legal-frame">
@@ -51,7 +67,7 @@ export default function LegalLayout({ title, children }) {
 
         <main className="panel legal-panel">
           {children}
-          <Link className="legal-back" to="/">
+          <Link className="legal-back" to="/" onClick={handleBack}>
             &larr; Back to BAYANSAFE
           </Link>
         </main>
