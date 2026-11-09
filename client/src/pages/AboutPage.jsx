@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
 const TEAM = [
@@ -61,25 +62,9 @@ export default function AboutPage() {
           </Link>
         </main>
 
-        <footer className="site-footer legal-footer">
-          <div className="footer-inner">
-            <p>Copyright &copy; {new Date().getFullYear()} BAYANSAFE. ALL RIGHTS RESERVED.</p>
-            <p className="footer-contact">
-              <Link to="/">BAYANSAFE</Link>
-              <span className="sep">|</span>
-              <Link to="/privacy">Privacy Policy</Link>
-              <span className="sep">|</span>
-              <Link to="/terms">Terms of Service</Link>
-              <span className="sep">|</span>
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=bayansafe.admin@gmail.com&su=Message%20to%20BayanSafe">
-                Contact us
-              </a>
-              <span className="sep">|</span>
-              <Link to="/help">Help Center</Link>
-            </p>
-          </div>
-        </footer>
       </div>
+
+      <SiteFooter config={config} />
     </>
   );
 }
