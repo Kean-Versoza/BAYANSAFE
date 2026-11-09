@@ -4,17 +4,17 @@ import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
 const TEAM = [
-  { name: 'Maud Ferris', role: 'Creative director' },
-  { name: 'Toby Anand', role: 'Studio lead' },
-  { name: 'Sofia Klein', role: 'Lead engineer' },
-  { name: 'Jonah Price', role: 'Engine and tools' },
-  { name: 'Amara Obi', role: 'Gameplay engineer' },
-  { name: 'Ruairi Doyle', role: 'Art director' },
-  { name: 'Elsa Berg', role: 'Environment art' },
-  { name: 'Kit Nakamura', role: 'Character art' },
-  { name: 'Pavel Ruzicka', role: 'Animation' },
-  { name: 'Nora Hall', role: 'Audio and music' },
-  { name: 'Daniel Oke', role: 'Production' },
+  { name: 'Dave Adriano', role: 'Creative director' },
+  { name: 'Mikel Agustin', role: 'Studio lead' },
+  { name: 'Joyce Blanza', role: 'Lead engineer' },
+  { name: 'Gino Claveria', role: 'Engine and tools' },
+  { name: 'James Galit', role: 'Gameplay engineer' },
+  { name: 'Amir Pascual', role: 'Art director' },
+  { name: 'Iron Salbador', role: 'Environment art' },
+  { name: 'Jay-el Segarino', role: 'Character art' },
+  { name: 'Ryan Sumndad', role: 'Animation' },
+  { name: 'Kean Versoza', role: 'Audio and music' },
+  { name: 'Cris Villoria', role: 'Production' },
 ];
 
 export default function AboutPage() {
