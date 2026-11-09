@@ -398,6 +398,89 @@
         white-space: normal;
     }
 
+    /* ---------- About Us Page ---------- */
+    .about-top {
+        display: flex;
+        align-items: flex-start;
+        flex-shrink: 0;
+        height: calc(var(--bar-pad) * 2 + var(--logo-h));
+        padding: var(--bar-pad) 2.5rem;
+    }
+
+    .about-logo img {
+        height: var(--logo-h);
+        width: auto;
+        max-width: 60vw;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+    }
+
+    .about-panel {
+        max-width: 52rem;
+        margin-bottom: 2rem;
+        padding: 1.75rem 2.4rem 2rem;
+    }
+
+    .about-panel h1 {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-size: 2.1rem;
+        line-height: 1.2;
+        color: #3b2410;
+        text-shadow: 0 1px 0 #ffffff;
+        margin-bottom: 0.2rem;
+    }
+
+    .about-lead {
+        font-weight: 400;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #5a4632;
+        margin-bottom: 1.2rem;
+    }
+
+    .about-panel h2 {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #3b2410;
+        margin: 1.4rem 0 0.45rem;
+        padding-bottom: 0.15rem;
+        border-bottom: 2px dashed rgba(59, 36, 16, 0.2);
+    }
+
+    .about-team {
+        list-style: none;
+        margin: 0 0 1rem;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem 1.5rem;
+    }
+
+    .about-team li {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        padding: 0.4rem 0;
+        border-bottom: 1px dashed rgba(59, 36, 16, 0.15);
+    }
+
+    .about-team li strong {
+        font-family: 'Pixelify Sans', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #3b2410;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .about-team li span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6b5a4a;
+    }
+
     /* ---------- Registration Page ---------- */
     .register-page {
         flex: 1;
@@ -1528,6 +1611,16 @@
         }
         .legal-panel { padding: 1.25rem 1.2rem 1.5rem; }
         .legal-panel h1 { font-size: 1.7rem; }
+
+        .about-top {
+            height: auto;
+            justify-content: center;
+            padding: 4.8rem 1rem 0.9rem;
+        }
+        .about-logo img { height: 3.4rem; }
+        .about-panel { padding: 1.25rem 1.2rem 1.5rem; }
+        .about-panel h1 { font-size: 1.7rem; }
+        .about-team { grid-template-columns: 1fr; gap: 0.3rem 0; }
     }
 /* ---------- Registration feedback message ---------- */
 .reg-form .form-message {
