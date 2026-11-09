@@ -80,14 +80,6 @@ export default function HelpPage() {
 
         <main className="help-page">
           <ContactForm source={source} />
-
-          <Link className="help-back" to="/" onClick={handleBack}>
-            &larr; Back to BAYANSAFE
-          </Link>
-
-          <Link className="legal-back" to="/" onClick={handleBack}>
-            &larr; Back to BAYANSAFE
-          </Link>
         </main>
       </div>
     </>
