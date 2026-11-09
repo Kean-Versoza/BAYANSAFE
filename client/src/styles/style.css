@@ -106,7 +106,8 @@
 
     .logo,
     .legal-logo,
-    .about-logo {
+    .about-logo,
+    .help-logo {
         align-self: center;
         position: fixed;
         top: calc(var(--bar-pad) + var(--logo-h) / 2);
@@ -1453,7 +1454,8 @@
         .nav-pill a:last-child { margin-bottom: 0; }
         .logo,
         .legal-logo,
-        .about-logo {
+        .about-logo,
+        .help-logo {
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
             left: 4rem;
@@ -1492,7 +1494,8 @@
         .nav-pill.nav-pill--single { left: 0.75rem; }
         .logo,
         .legal-logo,
-        .about-logo {
+        .about-logo,
+        .help-logo {
             top: calc(var(--bar-pad) + var(--logo-h) / 2);
             transform: translateY(-50%);
             left: 3.8rem;
