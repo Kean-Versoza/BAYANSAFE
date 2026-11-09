@@ -4,17 +4,17 @@ import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
 const TEAM = [
-  { name: 'Dave Adriano', role: 'Creative director' },
-  { name: 'Mikel Agustin', role: 'Studio lead' },
-  { name: 'Joyce Blanza', role: 'Lead engineer' },
-  { name: 'Gino Claveria', role: 'Engine and tools' },
+  { name: 'Dave Adriano', role: 'Research Software Engineer' },
+  { name: 'Mikel Agustin', role: 'Story Editor' },
+  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
+  { name: 'Gino Claveria', role: 'Research Software Engineer' },
   { name: 'James Galit', role: 'Gameplay engineer' },
-  { name: 'Amir Pascual', role: 'Art director' },
-  { name: 'Iron Salbador', role: 'Environment art' },
-  { name: 'Jay-el Segarino', role: 'Character art' },
-  { name: 'Ryan Sumndad', role: 'Animation' },
-  { name: 'Kean Versoza', role: 'Audio and music' },
-  { name: 'Cris Villoria', role: 'Production' },
+  { name: 'Amir Pascual', role: 'Hardware engineer' },
+  { name: 'Iron Salbador', role: 'Research Software Engineer' },
+  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
+  { name: 'Ryan Sumndad', role: 'Story Producer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Cris Villoria', role: 'Research Software Engineer' },
 ];
 
 export default function AboutPage() {
