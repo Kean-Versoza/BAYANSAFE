@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import NavPill from '../components/NavPill';
+import SiteFooter from '../components/SiteFooter';
 import ContactForm from '../components/ContactForm';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import { LEAVE_DELAY, MIN_SHOW, NAV_LOADER_MS, SHOW_LOADER_ON_NAV, buildSkeleton } from '../lib/skeleton';
@@ -82,6 +83,8 @@ export default function HelpPage() {
           <ContactForm source={source} />
         </main>
       </div>
+
+      <SiteFooter config={config} />
     </>
   );
 }

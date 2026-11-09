@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import FooterLinks from '../components/FooterLinks';
+import NavPill from '../components/NavPill';
+import SiteFooter from '../components/SiteFooter';
+import { useSiteConfig } from '../hooks/useSiteConfig';
 import defaultFooter from '../config/footer';
 import { LEAVE_DELAY, MIN_SHOW, NAV_LOADER_MS, SHOW_LOADER_ON_NAV, buildSkeleton } from '../lib/skeleton';
 
 /** Shared shell for the Privacy Policy and Terms of Service pages. */
 export default function LegalLayout({ title, children }) {
+  const config = useSiteConfig();
   const year = new Date().getFullYear();
   const navigate = useNavigate();
   const skeletonRef = useRef(null);
@@ -53,6 +56,7 @@ export default function LegalLayout({ title, children }) {
   return (
     <>
       <div ref={skeletonRef} id="pageSkeleton" className="page-skeleton" aria-hidden="true" />
+      <NavPill items={config.nav} active="legal" />
       {/* Back to the main site (same spot as the nav on the main site) */}
       <nav className="nav-pill nav-pill--single">
         <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
@@ -72,19 +76,9 @@ export default function LegalLayout({ title, children }) {
           </Link>
         </main>
 
-        <footer className="site-footer legal-footer">
-          <div className="footer-inner">
-            <p>
-              Copyright &copy; {year} BAYANSAFE. ALL RIGHTS RESERVED.
-            </p>
-            <p className="footer-contact">
-              <Link to="/">BAYANSAFE</Link>
-              <span className="sep">|</span>
-              <FooterLinks links={defaultFooter.links} />
-            </p>
-          </div>
-        </footer>
       </div>
+
+      <SiteFooter config={config} />
     </>
   );
 }
