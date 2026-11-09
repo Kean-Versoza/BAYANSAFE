@@ -440,7 +440,7 @@
 
     .about-panel {
         max-width: 52rem;
-        margin: 0.25rem auto 2rem;
+        margin: 2rem auto 2rem;
         padding: 1.75rem 2.4rem 2rem;
     }
 
@@ -1048,7 +1048,7 @@
             font-size: 1rem;
         }
 
-        #about .panel { margin-bottom: 2rem; }
+        #about .panel { margin: 2rem auto 2rem; }
 
         .hero,
         .register-page { padding-bottom: 9rem; }
@@ -1644,7 +1644,7 @@
             padding: 4.8rem 1rem 0.9rem;
         }
         .about-logo img { height: 3.4rem; }
-        .about-panel { padding: 1.25rem 1.2rem 1.5rem; }
+        .about-panel { padding: 1.25rem 1.2rem 1.5rem; margin-top: 3rem; margin-bottom: 2rem; }
         .about-panel h1 { font-size: 1.7rem; }
         .about-team { grid-template-columns: 1fr; gap: 0.3rem 0; }
     }
