@@ -6,21 +6,6 @@ import { useSiteConfig } from '../hooks/useSiteConfig';
 // Desktop layout: the original order.
 const TEAM_DESKTOP = [
   { name: 'Dave Adriano', role: 'Research Software Engineer' },
-  { name: 'Iron Salbador', role: 'Research Software Engineer' },
-  { name: 'Mikel Agustin', role: 'Story Editor, Research Software Engineer' },
-  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
-  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
-  { name: 'Ryan Sumndad', role: 'Story Producer' },
-  { name: 'Gino Claveria', role: 'Research Software Engineer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
-  { name: 'James Galit', role: 'Gameplay engineer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
-  { name: 'Amir Pascual', role: 'Hardware engineer' },
-];
-
-// Mobile layout: a different order, with the updated roles.
-const TEAM_MOBILE = [
-  { name: 'Dave Adriano', role: 'Research Software Engineer' },
   { name: 'Mikel Agustin', role: 'Story Editor' },
   { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
   { name: 'Gino Claveria', role: 'Research Software Engineer' },
@@ -31,6 +16,21 @@ const TEAM_MOBILE = [
   { name: 'Ryan Sumndad', role: 'Story Producer' },
   { name: 'Kean Versoza', role: 'Production, Website Deployment' },
   { name: 'Cris Villoria', role: 'Research Software Engineer' },
+];
+
+// Mobile layout: a different order, with the updated roles.
+const TEAM_MOBILE = [
+  { name: 'Dave Adriano', role: 'Research Software Engineer' },
+  { name: 'Iron Salbador', role: 'Research Software Engineer' },
+  { name: 'Mikel Agustin', role: 'Story Editor, Research Software Engineer' },
+  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
+  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
+  { name: 'Ryan Sumndad', role: 'Story Producer' },
+  { name: 'Gino Claveria', role: 'Research Software Engineer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'James Galit', role: 'Gameplay engineer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Amir Pascual', role: 'Hardware engineer' },
 ];
 
 export default function AboutPage() {
@@ -80,14 +80,11 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
-
-          <Link className="legal-back" to="/">
-            &larr; Back to BAYANSAFE
-          </Link>
         </main>
 
-        <SiteFooter config={config} />
       </div>
+
+      <SiteFooter config={config} />
     </>
   );
 }
