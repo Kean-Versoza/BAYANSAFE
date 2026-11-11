@@ -15,7 +15,7 @@ const TEAM_DESKTOP = [
   { name: 'Iron Salbador', role: 'Research Software Engineer' },
   { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
   { name: 'Ryan Sumndad', role: 'Story Producer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Kean Versoza', role: 'Website Production, Website Deployment' },
   { name: 'Cris Villoria', role: 'Research Software Engineer' },
 ];
 
@@ -30,7 +30,7 @@ const TEAM_MOBILE = [
   { name: 'Iron Salbador', role: 'Research Software Engineer' },
   { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
   { name: 'Ryan Sumndad', role: 'Story Producer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Kean Versoza', role: 'Website Production, Website Deployment' },
   { name: 'Cris Villoria', role: 'Research Software Engineer' },
 ];
 
