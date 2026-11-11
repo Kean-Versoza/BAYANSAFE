@@ -21,16 +21,16 @@ const TEAM_DESKTOP = [
 // Mobile layout: a different order, with the updated roles.
 const TEAM_MOBILE = [
   { name: 'Dave Adriano', role: 'Research Software Engineer' },
-  { name: 'Iron Salbador', role: 'Research Software Engineer' },
-  { name: 'Mikel Agustin', role: 'Story Editor, Research Software Engineer' },
-  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
+  { name: 'Mikel Agustin', role: 'Story Editor' },
   { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
-  { name: 'Ryan Sumndad', role: 'Story Producer' },
   { name: 'Gino Claveria', role: 'Research Software Engineer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
   { name: 'James Galit', role: 'Gameplay engineer' },
-  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
   { name: 'Amir Pascual', role: 'Hardware engineer' },
+  { name: 'Iron Salbador', role: 'Research Software Engineer' },
+  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
+  { name: 'Ryan Sumndad', role: 'Story Producer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Cris Villoria', role: 'Research Software Engineer' },
 ];
 
 export default function AboutPage() {
