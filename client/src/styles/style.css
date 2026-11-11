@@ -481,9 +481,13 @@
         list-style: none;
         margin: 0 0 1rem;
         padding: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem 1.5rem;
+        columns: 2;
+        column-gap: 1.5rem;
+    }
+
+    .about-team li {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 
     .about-team--mobile { display: none; }
@@ -1660,9 +1664,10 @@
     .help-logo img { height: 3.4rem; }
         .about-panel { padding: 1.25rem 1.2rem 1.5rem; margin-top: 3rem; margin-bottom: 2rem; }
         .about-panel h1 { font-size: 1.7rem; }
-        .about-team { grid-template-columns: 1fr; gap: 0.3rem 0; }
+        .about-team { columns: 1; column-gap: 0; }
+        .about-team li { margin-bottom: 0.3rem; }
         .about-team--desktop { display: none; }
-        .about-team--mobile { display: grid; }
+        .about-team--mobile { display: block; }
     }
 /* ---------- Registration feedback message ---------- */
 .reg-form .form-message {
