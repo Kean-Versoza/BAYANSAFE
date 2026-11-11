@@ -68,7 +68,7 @@ export default function RegisterPage() {
   return (
     <>
       <div id="pageSkeleton" ref={skeletonRef} className="page-skeleton" aria-hidden="true" />
-      <NavPill items={config.nav} active="register" />
+      <NavPill items={config.nav.filter((item) => item.id !== 'home')} active="register" />
       {/* Back to the main site (top bar on desktop) */}
       <nav className="nav-pill nav-pill--register-back">
         <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
