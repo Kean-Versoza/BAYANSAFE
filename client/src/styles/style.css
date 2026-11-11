@@ -486,6 +486,8 @@
         gap: 0.5rem 1.5rem;
     }
 
+    .about-team--mobile { display: none; }
+
     .about-team li {
         display: flex;
         flex-direction: column;
@@ -1659,6 +1661,8 @@
         .about-panel { padding: 1.25rem 1.2rem 1.5rem; margin-top: 3rem; margin-bottom: 2rem; }
         .about-panel h1 { font-size: 1.7rem; }
         .about-team { grid-template-columns: 1fr; gap: 0.3rem 0; }
+        .about-team--desktop { display: none; }
+        .about-team--mobile { display: grid; }
     }
 /* ---------- Registration feedback message ---------- */
 .reg-form .form-message {

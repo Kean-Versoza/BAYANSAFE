@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
-const TEAM = [
+// Desktop layout: the original order.
+const TEAM_DESKTOP = [
   { name: 'Dave Adriano', role: 'Research Software Engineer' },
-  { name: 'Mikel Agustin', role: 'Story Editor, Research Software Engineer' },
+  { name: 'Mikel Agustin', role: 'Story Editor' },
   { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
   { name: 'Gino Claveria', role: 'Research Software Engineer' },
   { name: 'James Galit', role: 'Gameplay engineer' },
@@ -16,6 +16,21 @@ const TEAM = [
   { name: 'Ryan Sumndad', role: 'Story Producer' },
   { name: 'Kean Versoza', role: 'Production, Website Deployment' },
   { name: 'Cris Villoria', role: 'Research Software Engineer' },
+];
+
+// Mobile layout: a different order, with the updated roles.
+const TEAM_MOBILE = [
+  { name: 'Dave Adriano', role: 'Research Software Engineer' },
+  { name: 'Iron Salbador', role: 'Research Software Engineer' },
+  { name: 'Mikel Agustin', role: 'Story Editor, Research Software Engineer' },
+  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
+  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
+  { name: 'Ryan Sumndad', role: 'Story Producer' },
+  { name: 'Gino Claveria', role: 'Research Software Engineer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'James Galit', role: 'Gameplay engineer' },
+  { name: 'Kean Versoza', role: 'Production, Website Deployment' },
+  { name: 'Amir Pascual', role: 'Hardware engineer' },
 ];
 
 export default function AboutPage() {
@@ -30,7 +45,6 @@ export default function AboutPage() {
 
   return (
     <>
-      <NavPill items={config.nav} active="about" />
       <nav className="nav-pill nav-pill--single">
         <Link to="/">&larr; BACK TO BAYANSAFE</Link>
       </nav>
@@ -50,20 +64,30 @@ export default function AboutPage() {
           </p>
 
           <h2>The team</h2>
-          <ul className="about-team">
-            {TEAM.map((member, index) => (
-              <li key={index}>
+          <ul className="about-team about-team--desktop">
+            {TEAM_DESKTOP.map((member, index) => (
+              <li key={`d-${index}`}>
+                <strong>{member.name}</strong>
+                <span>{member.role}</span>
+              </li>
+            ))}
+          </ul>
+          <ul className="about-team about-team--mobile">
+            {TEAM_MOBILE.map((member, index) => (
+              <li key={`m-${index}`}>
                 <strong>{member.name}</strong>
                 <span>{member.role}</span>
               </li>
             ))}
           </ul>
 
+          <Link className="legal-back" to="/">
+            &larr; Back to BAYANSAFE
+          </Link>
         </main>
 
+        <SiteFooter config={config} />
       </div>
-
-      <SiteFooter config={config} />
     </>
   );
 }
