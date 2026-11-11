@@ -97,7 +97,7 @@ export default function AccountSignIn({ onSignIn, onGoogleSignIn, busy }) {
         />
 
         <p className="account-foot">
-          No account yet? <Link to="/#registration">Register here</Link>.
+          No account yet? <Link to="/register">Register here</Link>.
         </p>
       </form>
     </div>
