@@ -144,6 +144,11 @@
         pointer-events: none;
     }
 
+    /* The registration page only shows its back button, not the brand logo. */
+    body[data-section="register"] .logo {
+        display: none;
+    }
+
     /* The logo is fixed, so About's copy already follows you into Registration.
     This hides the second copy so two logos never stack on top of each other. */
     #registration .logo {
