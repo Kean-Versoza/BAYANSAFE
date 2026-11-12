@@ -23,7 +23,7 @@
 }
 
 .help-logo {
-    z-index: 200;
+    z-index: 9999 !important;
 }
 
 .help-logo img {
