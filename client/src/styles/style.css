@@ -119,7 +119,7 @@
     }
 
     .help-logo {
-        z-index: 160;               /* above everything on the help page, including the loader */
+        z-index: 200;               /* in front of the contact form and everything else on the help page */
     }
 
     /* On desktop these pages keep only their back button, not the full nav pill */
