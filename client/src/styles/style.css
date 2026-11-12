@@ -122,6 +122,14 @@
         z-index: 200;               /* in front of the contact form and everything else on the help page */
     }
 
+    .account-logo img {
+        height: 3.4rem;
+    }
+
+    .account-logo {
+        z-index: 999;
+    }
+
     /* On desktop these pages keep only their back button, not the full nav pill */
     @media (min-width: 769px) {
         body[data-section="about-us"] .nav-pill:not(.nav-pill--single),

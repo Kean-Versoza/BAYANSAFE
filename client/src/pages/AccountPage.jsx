@@ -104,7 +104,7 @@ export default function AccountPage() {
 
       <section id="account" className="section frame frame-inner account-frame">
         <div className="section-top section-top--logo">
-          <Link className="logo" to="/" aria-label="Back to BAYANSAFE">
+          <Link className="logo account-logo" to="/" aria-label="Back to BAYANSAFE">
             <img src={config.brand.logo} alt={config.brand.name} />
           </Link>
         </div>
