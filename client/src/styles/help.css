@@ -67,6 +67,7 @@
     background: rgba(255, 255, 255, 0.94);
     border-radius: 0.9rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    z-index: 150; /* in front of the logo, but behind the nav pill */
 }
 
 .help-page .contact-form-title {
