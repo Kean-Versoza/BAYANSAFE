@@ -1143,9 +1143,10 @@
     }
 
     @media (max-width: 400px) {
+        .logo img,
         .legal-logo img,
         .about-logo img,
-        .help-logo img { height: 2.8rem;}
+        .help-logo img { height: 2.8rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1667,6 +1668,7 @@
             justify-content: center;
             padding: 4.8rem 1rem 0.9rem;
         }
+        .logo img,
         .legal-logo img,
         .about-logo img,
         .help-logo img { height: 3.4rem; max-width: 45vw; }
