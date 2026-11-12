@@ -23,7 +23,7 @@
 }
 
 .help-logo {
-    z-index: 160;
+    z-index: 200;
 }
 
 .help-logo img {
@@ -67,7 +67,7 @@
     background: rgba(255, 255, 255, 0.94);
     border-radius: 0.9rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-    z-index: 1; /* in front of the logo, but behind the nav pill */
+    z-index: 0; /* behind the brand logo */
 }
 
 .help-page .contact-form-title {
