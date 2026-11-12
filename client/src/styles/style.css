@@ -115,6 +115,10 @@
         transform: translateY(-50%);
         margin: 0;
         z-index: 145;               /* above the page content and nav pill, below the loader (150) */
+
+    .help-logo {
+        z-index: 160;               /* above everything on the help page, including the loader */
+    }
         transition: opacity 0.25s ease, visibility 0.25s ease;
     }
 
