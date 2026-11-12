@@ -414,7 +414,10 @@
         justify-content: center;
     }
 
-    .account-logo img { height: 3.4rem; }
+    .account-logo img { 
+        height: 3.4rem; 
+        z-index: 999; 
+    }
 
     /* the face is a little smaller, so the text next to it fits */
     .pixel-avatar { --avatar-size: 4.5rem; }
