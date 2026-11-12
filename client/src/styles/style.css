@@ -1142,6 +1142,12 @@
         .register-page .tagline { font-size: 1.05rem; }
     }
 
+    @media (max-width: 400px) {
+        .legal-logo img,
+        .about-logo img,
+        .help-logo img { height: 2.8rem; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
     }
@@ -1663,7 +1669,7 @@
         }
         .legal-logo img,
         .about-logo img,
-        .help-logo img { height: 3.4rem; }
+        .help-logo img { height: 3.4rem; max-width: 45vw; }
         .about-panel { padding: 1.25rem 1.2rem 1.5rem; margin-top: 3rem; margin-bottom: 2rem; }
         .about-panel h1 { font-size: 1.7rem; }
         .about-team { columns: 1; column-gap: 0; }
