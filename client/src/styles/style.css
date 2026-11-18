@@ -1484,6 +1484,14 @@
             margin: 0;
         }
 
+        .logo img,
+        .legal-logo img,
+        .about-logo img,
+        .help-logo img {
+            height: 3.4rem;
+            max-width: 45vw;
+        }
+
           .nav-close { margin-bottom: 0.75rem; }
 
         .logo img { height: var(--logo-h); max-width: 40vw; }
