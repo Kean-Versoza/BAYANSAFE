@@ -23,14 +23,7 @@
 }
 
 .help-logo {
-    align-self: center;
-    position: fixed;
-    top: calc(var(--bar-pad) + var(--logo-h) / 2);
-    left: 2.5rem;
-    transform: translateY(-50%);
-    margin: 0;
     z-index: 145;
-    transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .help-logo img {
