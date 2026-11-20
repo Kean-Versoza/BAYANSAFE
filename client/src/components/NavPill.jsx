@@ -76,8 +76,8 @@ export default function NavPill({ items = [], active, onJump }) {
                 )}
               </Link>
 
-              {isAccount && accountOpen && (
-                <div className="nav-submenu">
+              {isAccount && (
+                <div className={`nav-submenu${accountOpen ? ' is-open' : ''}`}>
                   <Link to="/register" className="nav-submenu__link" onClick={close}>
                     Register
                   </Link>

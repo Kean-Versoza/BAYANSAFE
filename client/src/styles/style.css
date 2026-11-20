@@ -1521,8 +1521,15 @@
         border-radius: 0.5rem;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         z-index: 145;
-        display: flex;
+        display: none;
         flex-direction: column;
+    }
+
+    .nav-submenu.is-open { display: flex; }
+
+    /* Floating drop-down on desktop: reveal on hover or when opened. */
+    @media (min-width: 769px) {
+        .nav-item--account:hover > .nav-submenu { display: flex; }
     }
 
     .nav-submenu__link {
