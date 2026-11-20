@@ -121,6 +121,7 @@
     /* Match the about page logo size on phones */
     .help-logo img { 
         height: 3.4rem; 
+        position: relative;
         z-index: 145;
     }
 }
