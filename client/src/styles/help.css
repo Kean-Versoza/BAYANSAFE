@@ -98,7 +98,10 @@
     .help-page { padding: 0 1rem 2rem; }
 
     /* a little less padding, so the form keeps room on a small screen */
-    .help-page .contact-form { padding: 1.4rem; }
+    .help-page .contact-form { 
+        padding: 1.4rem; 
+        z-index: 0; /* behind the brand logo */
+    }
 
     /* the two fields go under each other */
     .help-page .contact-form-row {
@@ -116,5 +119,8 @@
     .help-page .legal-back { display: none; }
 
     /* Match the about page logo size on phones */
-    .help-logo img { height: 3.4rem; }
+    .help-logo img { 
+        height: 3.4rem; 
+        z-index: 145;
+    }
 }
