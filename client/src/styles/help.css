@@ -23,16 +23,19 @@
 }
 
 .help-logo {
-    z-index: 145;
+    position: fixed;
+    z-index: 9999 !important;
 }
 
-.help-logo img {
+.help-logo img { 
     height: var(--logo-h);
     width: auto;
     max-width: 60vw;
     display: block;
     object-fit: contain;
     filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+    position: relative;
+    z-index: 9999 !important;
 }
 
 /* The form is the only thing on the page, so it is centered both ways.
