@@ -119,7 +119,7 @@
     }
 
     .help-logo {
-        z-index: 200;               /* in front of the contact form and everything else on the help page */
+        z-index: 9999 !important;   /* in front of the contact form and everything else on the help page */
     }
 
     #account .logo {
