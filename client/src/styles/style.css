@@ -123,7 +123,7 @@
     }
 
     #account .logo {
-        z-index: 9999 !important;   /* in front of the account form */
+        z-index: 145;   /* match the standard brand logo */
     }
 
     /* On desktop these pages keep only their back button, not the full nav pill */
