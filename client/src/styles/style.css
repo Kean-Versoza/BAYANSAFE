@@ -1488,6 +1488,13 @@
             margin: 0;
         }
 
+        /* On phones the account and help logos must stay in front of their
+           forms, so they get a higher stacking order than the page content. */
+        #account .logo,
+        .help-logo {
+            z-index: 999;
+        }
+
         .logo img,
         .legal-logo img,
         .about-logo img,
