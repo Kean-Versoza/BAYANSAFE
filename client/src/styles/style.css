@@ -1487,6 +1487,7 @@
             box-shadow: none;
             border: 1px solid rgba(59, 36, 16, 0.15);
         }
+    }  /* end @media (max-width: 768px) */
 
     /* ---------- Account drop-down (Register) ---------- */
     .nav-item {
@@ -1513,9 +1514,9 @@
         position: absolute;
         top: 100%;
         left: 0;
-        margin-top: 0.35rem;
+        margin-top: 0;
+        padding: 0.6rem 0 0.35rem;
         min-width: 8rem;
-        padding: 0.35rem 0;
         background: rgba(255, 255, 255, 0.95);
         border: 1px solid rgba(59, 36, 16, 0.25);
         border-radius: 0.5rem;
@@ -1596,7 +1597,6 @@
         .tagline { font-size: clamp(1rem, 4vw, 1.5rem); bottom: 2rem; }
         .reg-form,
         .account-card { width: min(95vw, 30rem); padding: 1.25rem 1rem; }
-    }
 
     @media (max-width: 480px) {
         :root { --logo-h: 5.5rem; }

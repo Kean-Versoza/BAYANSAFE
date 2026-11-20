@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 /**
@@ -21,6 +21,17 @@ export default function NavPill({ items = [], active, onJump }) {
     setOpen(false);
     setAccountOpen(false);
   };
+
+  // Close the account drop-down when clicking anywhere outside of it.
+  useEffect(() => {
+    if (!accountOpen) return undefined;
+    const handler = (event) => {
+      const item = document.querySelector('.nav-item--account');
+      if (item && !item.contains(event.target)) setAccountOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [accountOpen]);
 
   return (
     <>
