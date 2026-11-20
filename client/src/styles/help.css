@@ -33,6 +33,7 @@
     display: block;
     object-fit: contain;
     filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.3));
+    z-index: 145;
 }
 
 /* The form is the only thing on the page, so it is centered both ways.

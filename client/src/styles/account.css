@@ -416,7 +416,7 @@
 
     .account-logo img { 
         height: 3.4rem; 
-        z-index: 999; 
+        z-index: 145; 
     }
 
     /* the face is a little smaller, so the text next to it fits */
