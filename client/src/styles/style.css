@@ -165,11 +165,9 @@
         pointer-events: none;
     }
 
-    /* Register page: mobile shows the nav bar + brand logo (no back button);
-       desktop shows only the brand logo. */
-    body[data-section="register"] .nav-pill--register-back { display: none; }
-    @media (min-width: 769px) {
-        body[data-section="register"] .nav-pill:not(.nav-pill--register-back) { display: none; }
+    /* The registration page only shows its back button, not the brand logo. */
+    body[data-section="register"] .logo {
+        display: none;
     }
 
     /* The logo is fixed, so About's copy already follows you into Registration.

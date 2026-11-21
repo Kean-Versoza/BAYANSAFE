@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import NavPill from '../components/NavPill';
 import RegistrationSection from '../sections/RegistrationSection';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
@@ -72,8 +71,6 @@ export default function RegisterPage() {
       <nav className="nav-pill nav-pill--register-back">
         <Link to="/" onClick={handleBack}>&larr; BACK TO BAYANSAFE</Link>
       </nav>
-
-      <NavPill items={config.nav.filter((item) => item.id !== 'home')} active="register" />
 
       <RegistrationSection pageMode />
 
