@@ -375,6 +375,8 @@
 
     .panel p {
         margin-bottom: 0.5rem;
+        text-wrap: pretty;
+        overflow-wrap: break-word;
     }
 
     .content-columns {
@@ -405,6 +407,8 @@
 
     .features-list li {
         margin-bottom: 0.25rem;
+        text-wrap: pretty;
+        overflow-wrap: break-word;
     }
 
     .disaster-grid {
