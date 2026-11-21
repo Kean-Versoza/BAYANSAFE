@@ -406,7 +406,7 @@
     .account-card { padding: 1.1rem; }
 
     .account-page {
-        padding-top: calc(var(--bar-pad) + var(--logo-h) + 0.5rem);
+        padding-top: calc(var(--bar-pad) + var(--logo-h));
         justify-content: flex-start;
     }
 
