@@ -1594,7 +1594,7 @@
            forms, so they get a higher stacking order than the page content. */
         #account .logo,
         .help-logo {
-            z-index: 145;
+            z-index: 9999 !important;
         }
 
         .logo img,
