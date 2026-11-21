@@ -175,6 +175,11 @@
         height: calc(var(--bar-pad) * 2 + var(--logo-h) - var(--about-lift));
     }
 
+    /* Center the about panel inside its section when the page is snapped to it */
+    #about {
+        justify-content: center;
+    }
+
     /* ---------- Nav pill: fixed, always visible while scrolling ---------- */
     .nav-pill {
         position: fixed;
