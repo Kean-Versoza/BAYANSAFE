@@ -8,6 +8,7 @@ import AdminPage from './pages/AdminPage';
 import HelpPage from './pages/HelpPage';
 import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
+import PullToRefresh from './components/PullToRefresh';
 
 /** SPA route changes behave like real page loads: start at the top. */
 function ScrollToTop() {
@@ -41,6 +42,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <PullToRefresh />
       <Routes>
         <Route path="/" element={<HomePage />} />
 
