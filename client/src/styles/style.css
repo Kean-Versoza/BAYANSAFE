@@ -16,6 +16,7 @@
         --topbar-h: 6.875rem;
         --bar-pad: 1.75rem;     /* space above the logo / nav */
         --logo-h: 9.5rem;       /* logo height (the nav centers itself on this) */
+        --logo-size: 9.5rem;    /* rendered height of the brand logo image */
         --nav-right: 6rem;      /* distance of the nav from the right edge */
         --about-lift: 2rem;     /* how much higher the About panel sits (bigger = higher) */
     }
@@ -96,7 +97,7 @@
 
     /* ---------- Brand Logo (fixed; visible from About onwards) ---------- */
     .logo img {
-        height: var(--logo-h);
+        height: var(--logo-size);
         width: auto;
         max-width: 60vw;
         display: block;
@@ -116,6 +117,18 @@
         margin: 0;
         z-index: 145;               /* above the page content and nav pill, below the loader (150) */
         transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    /* On desktop the brand logo uses its full height (the 3.4rem rule above
+       is meant for phones only and gets hoisted by the bundler). */
+    @media (min-width: 769px) {
+        .logo img,
+        .legal-logo img,
+        .about-logo img,
+        .help-logo img {
+            height: var(--logo-size);
+            max-width: 60vw;
+        }
     }
 
     .help-logo {
@@ -460,7 +473,7 @@
     }
 
     .about-logo img {
-        height: var(--logo-h);
+        height: var(--logo-size);
         width: auto;
         max-width: 60vw;
         display: block;
@@ -1151,6 +1164,7 @@
 
     /* Very small phones */
     @media (max-width: 400px) {
+        :root { --logo-size: 2.8rem; }
         .nav-pill { gap: 0.25rem; padding: 0.4rem 0.5rem; }
         .nav-pill a {
             min-width: 0;
@@ -1168,7 +1182,7 @@
         .logo img,
         .legal-logo img,
         .about-logo img,
-        .help-logo img { height: 2.8rem; }
+        .help-logo img { max-width: 45vw; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1413,6 +1427,7 @@
         :root {
             --nav-right: 0.75rem;
             --logo-h: 7rem;
+            --logo-size: 3.4rem;
         }
         .nav-toggle {
             display: flex;
@@ -1586,7 +1601,6 @@
         .legal-logo img,
         .about-logo img,
         .help-logo img {
-            height: 3.4rem;
             max-width: 45vw;
         }
 
@@ -1688,7 +1702,7 @@
         padding: var(--bar-pad) 2.5rem;
     }
     .legal-logo img {
-        height: var(--logo-h);
+        height: var(--logo-size);
         width: auto;
         max-width: 60vw;
         display: block;
@@ -1776,7 +1790,7 @@
         .logo img,
         .legal-logo img,
         .about-logo img,
-        .help-logo img { height: 3.4rem; max-width: 45vw; }
+        .help-logo img { max-width: 45vw; }
         .about-panel { padding: 1.25rem 1.2rem 1.5rem; margin-top: 3rem; margin-bottom: 2rem; }
         .about-panel h1 { font-size: 1.7rem; }
         .about-team { columns: 1; column-gap: 0; }
