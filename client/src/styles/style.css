@@ -1785,6 +1785,9 @@
         .legal-panel { padding: 1.25rem 1.2rem 1.5rem; }
         .legal-panel h1 { font-size: 1.7rem; }
 
+        /* The top back button is enough on phones. */
+        .legal-back { display: none; }
+
         .about-top {
             height: auto;
             justify-content: center;
