@@ -414,6 +414,11 @@
         justify-content: center;
     }
 
+    .account-page {
+        padding-top: calc(var(--bar-pad) + var(--logo-h) + 1rem);
+        justify-content: safe center;
+    }
+
     .account-logo img { 
         height: 3.4rem; 
         z-index: 145; 
