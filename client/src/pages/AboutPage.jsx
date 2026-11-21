@@ -4,7 +4,7 @@ import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
-// Desktop layout: the original order.
+// Desktop layout.
 const TEAM_DESKTOP = [
   { name: 'Dave Adriano', role: 'Research Software Engineer' },
   { name: 'Mikel Agustin', role: 'Story Editor' },
@@ -19,7 +19,7 @@ const TEAM_DESKTOP = [
   { name: 'Cris Villoria', role: 'Research Software Engineer' },
 ];
 
-// Mobile layout: a different order, with the updated roles.
+// Mobile layout.
 const TEAM_MOBILE = [
   { name: 'Dave Adriano', role: 'Research Software Engineer' },
   { name: 'Mikel Agustin', role: 'Story Editor' },
@@ -83,11 +83,10 @@ export default function AboutPage() {
               </li>
             ))}
           </ul>
+
+          <SiteFooter config={config} />
         </main>
-
       </div>
-
-      <SiteFooter config={config} />
     </>
   );
 }
