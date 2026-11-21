@@ -128,10 +128,6 @@
     .help-logo img { 
         height: 3.4rem; 
         position: relative;
-        z-index: 9999 !important;
-    }
-
-    .help-logo {
-        z-index: 9999 !important;
+        z-index: 145;
     }
 }

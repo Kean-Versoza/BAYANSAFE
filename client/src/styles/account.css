@@ -414,15 +414,6 @@
         position: relative;
         z-index: 0;
     }
-
-    .logo {
-        z-index: 9999 !important;
-    }
-
-    .logo img {
-        position: relative;
-        z-index: 9999 !important;
-    }
     .account-signout { padding: 0.45rem 0.7rem; font-size: 0.85rem; }
 
     /* the navigation pill sits at the top of a phone, so the logo goes below it */
