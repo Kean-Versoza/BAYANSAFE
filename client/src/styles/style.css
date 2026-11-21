@@ -1564,6 +1564,9 @@
     /* Floating drop-down on desktop: reveal on hover or when opened. */
     @media (min-width: 769px) {
         .nav-item--account:hover > .nav-submenu { display: flex; }
+
+        /* The caret is only needed on phones, where the submenu is tapped open. */
+        .nav-caret { display: none; }
     }
 
     .nav-submenu__link {
