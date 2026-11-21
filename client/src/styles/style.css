@@ -165,11 +165,9 @@
         pointer-events: none;
     }
 
-    /* The registration page shows the brand logo on desktop only. */
-    @media (max-width: 768px) {
-        body[data-section="register"] .logo {
-            display: none;
-        }
+    /* The registration page only shows its back button, not the brand logo. */
+    body[data-section="register"] .logo {
+        display: none;
     }
 
     /* The logo is fixed, so About's copy already follows you into Registration.
