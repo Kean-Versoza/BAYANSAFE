@@ -406,7 +406,6 @@
     .account-card { padding: 1.1rem; }
 
     .account-page {
-        padding-top: calc(var(--bar-pad) + var(--logo-h));
         justify-content: flex-start;
     }
 
