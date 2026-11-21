@@ -175,6 +175,13 @@
         height: calc(var(--bar-pad) * 2 + var(--logo-h) - var(--about-lift));
     }
 
+    /* Give the about panel more room on desktop so the two columns (and
+       their text) don't get squished into a narrow strip. */
+    #about .panel {
+        max-width: 72rem;
+        width: 92%;
+    }
+
     /* Center the about panel inside its section when the page is snapped to it */
     #about {
         justify-content: center;
