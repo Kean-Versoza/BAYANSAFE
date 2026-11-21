@@ -99,8 +99,8 @@
     .help-top { padding: var(--bar-pad) 1.25rem; }
 
     .help-page {
-        padding: calc(var(--bar-pad) + var(--logo-h) + 1rem) 1rem 2rem;
-        justify-content: safe center;
+        padding: calc(var(--bar-pad) + var(--logo-h) + 0.5rem) 1rem 2rem;
+        justify-content: flex-start;
     }
 
     /* a little less padding, so the form keeps room on a small screen */
