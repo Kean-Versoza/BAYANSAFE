@@ -1550,12 +1550,12 @@
         margin-top: 0;
         padding: 0.6rem 0 0.35rem;
         min-width: 8rem;
-        background: rgba(255, 255, 255, 0.65);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: none;
         border-radius: 0.5rem;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         z-index: 145;
         display: none;
         flex-direction: column;
