@@ -18,20 +18,6 @@ const HOW_IT_WORKS = [
   'Earn points and track your progress',
 ];
 
-const TEAM = [
-  { name: 'Dave Adriano', role: 'Research Software Engineer' },
-  { name: 'Mikel Agustin', role: 'Story Editor' },
-  { name: 'Joyce Blanza', role: 'Creative director, Character art, Environment art' },
-  { name: 'Gino Claveria', role: 'Research Software Engineer' },
-  { name: 'James Galit', role: 'Gameplay engineer' },
-  { name: 'Amir Pascual', role: 'Hardware engineer' },
-  { name: 'Iron Salbador', role: 'Research Software Engineer' },
-  { name: 'Jay-el Segarino', role: 'Lead engineer, Gameplay engineer, Animation' },
-  { name: 'Ryan Sumndad', role: 'Story Producer' },
-  { name: 'Kean Versoza', role: 'Website Production, Website Deployment' },
-  { name: 'Cris Villoria', role: 'Research Software Engineer' },
-];
-
 /** About view: the story of the game and what it teaches. */
 export default function AboutSection({ onJump }) {
   const logoClick = (event) => {
@@ -95,24 +81,6 @@ export default function AboutSection({ onJump }) {
             </div>
           </div>
         </div>
-
-        <h2 className="about-team-heading">The team</h2>
-        <ul className="about-team about-team--desktop">
-          {TEAM.map((member, index) => (
-            <li key={`d-${index}`}>
-              <strong>{member.name}</strong>
-              <span>{member.role}</span>
-            </li>
-          ))}
-        </ul>
-        <ul className="about-team about-team--mobile">
-          {TEAM.map((member, index) => (
-            <li key={`m-${index}`}>
-              <strong>{member.name}</strong>
-              <span>{member.role}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
