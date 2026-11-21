@@ -404,6 +404,16 @@
 /* ---------- small screens ---------- */
 @media (max-width: 700px) {
     .account-card { padding: 1.1rem; }
+
+    .account-page {
+        padding-top: calc(var(--bar-pad) + var(--logo-h) + 1rem);
+        justify-content: safe center;
+    }
+
+    .account-card {
+        position: relative;
+        z-index: 0;
+    }
     .account-signout { padding: 0.45rem 0.7rem; font-size: 0.85rem; }
 
     /* the navigation pill sits at the top of a phone, so the logo goes below it */
