@@ -19,6 +19,7 @@ function sweep() {
 
 function siteUrl() {
   if (process.env.SITE_URL) return process.env.SITE_URL.replace(/\/$/, '');
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return process.env.NODE_ENV === 'production'
     ? `http://localhost:${process.env.PORT || 3001}`
     : 'http://localhost:5173';
