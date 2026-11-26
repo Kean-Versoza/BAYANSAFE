@@ -41,21 +41,33 @@ class DatabaseManager:
             return
 
         try:
-            host = os.getenv("DB_HOST", "localhost")
-            port = os.getenv("DB_PORT", "5432")
-            dbname = os.getenv("DB_NAME", "bayansafe")
-            user = os.getenv("DB_USER", "bayan_api")
-            password = os.getenv("DB_PASSWORD", "")
-
-            # Test connection
-            conn = psycopg2.connect(
-                host=host,
-                port=port,
-                dbname=dbname,
-                user=user,
-                password=password,
-                connect_timeout=3
-            )
+            from urllib.parse import urlparse
+            database_url = os.getenv("DATABASE_URL")
+            if database_url:
+                parsed = urlparse(database_url)
+                conn = psycopg2.connect(
+                    host=parsed.hostname,
+                    port=parsed.port or 5432,
+                    dbname=(parsed.path or "/").lstrip("/") or "postgres",
+                    user=parsed.username,
+                    password=parsed.password,
+                    sslmode="require" if os.getenv("DATABASE_SSL", "").lower() == "true" else None,
+                    connect_timeout=3
+                )
+            else:
+                host = os.getenv("DB_HOST", "localhost")
+                port = os.getenv("DB_PORT", "5432")
+                dbname = os.getenv("DB_NAME", "bayansafe")
+                user = os.getenv("DB_USER", "bayan_api")
+                password = os.getenv("DB_PASSWORD", "")
+                conn = psycopg2.connect(
+                    host=host,
+                    port=port,
+                    dbname=dbname,
+                    user=user,
+                    password=password,
+                    connect_timeout=3
+                )
             conn.close()
             self._connected = True
             logger.info("Database connection established successfully.")
@@ -72,6 +84,19 @@ class DatabaseManager:
         """Return a fresh raw connection from .env settings."""
         if not PSYCOPG2_AVAILABLE:
             raise RuntimeError("psycopg2 is not available")
+        from urllib.parse import urlparse
+        database_url = os.getenv("DATABASE_URL")
+        if database_url:
+            parsed = urlparse(database_url)
+            return psycopg2.connect(
+                host=parsed.hostname,
+                port=parsed.port or 5432,
+                dbname=(parsed.path or "/").lstrip("/") or "postgres",
+                user=parsed.username,
+                password=parsed.password,
+                sslmode="require" if os.getenv("DATABASE_SSL", "").lower() == "true" else None,
+                connect_timeout=3
+            )
         return psycopg2.connect(
             host=os.getenv("DB_HOST", "localhost"),
             port=os.getenv("DB_PORT", "5432"),
