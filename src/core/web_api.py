@@ -19,7 +19,7 @@ from http.cookiejar import CookieJar
 
 
 ENV_URL = "BAYANSAFE_SERVER_URL"
-DEFAULT_URL = "http://localhost:3000"
+DEFAULT_URL = "http://localhost:3001"
 
 
 class WebApiError(Exception):
