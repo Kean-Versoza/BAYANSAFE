@@ -1,0 +1,399 @@
+/*
+  BayanSafe ESP32 + RC522 RFID bridge (WiFiManager edition)
+  ---------------------------------------------------------
+  Reads a card with an MFRC522 module and posts the UID to the BayanSafe
+  Node.js server over Wi-Fi. The server forwards the UID to the browser over
+  Server-Sent Events, so the website can detect the card during enrollment.
+
+  It ALSO reads a 2-axis analog joystick and four buttons and prints their
+  state to USB serial so the desktop game can use them as a controller.
+
+  Wi-Fi is configured through WiFiManager: on first boot (or whenever the saved
+  network is unreachable) the ESP32 creates a captive portal. Connect to it
+  with your phone/laptop, open the portal page, and enter your Wi-Fi details.
+  They are saved to flash and reused on every future boot. No reflashing needed
+  when you change networks.
+
+  Wiring (ESP32 <-> RC522):
+    RC522 SDA/SS  -> GPIO 5
+    RC522 SCK     -> GPIO 18
+    RC522 MOSI    -> GPIO 23
+    RC522 MISO    -> GPIO 19
+    RC522 RST     -> GPIO 22
+    RC522 3.3V    -> 3.3V
+    RC522 GND     -> GND
+
+  Wiring (ESP32 <-> joystick module, e.g. KY-023 / PS2 stick):
+    VRx  -> GPIO 34   (ADC1 - analogue input)
+    VRy  -> GPIO 35   (ADC1 - analogue input)
+    GND  -> GND
+    +5V  -> VIN  (5V)  -- some modules need 3.3V; check your module
+    NOTE: use ADC1 pins (32-39) for analogue sticks. ADC2 pins cannot be
+          read while Wi-Fi is active on a classic ESP32.
+
+  Wiring (buttons - each button between the pin and GND):
+    Button 1  -> GPIO 13   next / confirm / pick up / equip
+    Button 2  -> GPIO 14   back / cancel / throw / unequip
+    Button 3  -> GPIO 26   select / objective
+    Button 4  -> GPIO 27   start / pause
+
+  Serial protocol (115200 baud):
+    JOY,x,y,b1,b2,b3,b4
+      x, y : -100 .. 100 (auto-centred, deadzone removed in the sketch)
+      b1..b4: 0 = released, 1 = pressed
+    A line is printed whenever the state changes (max 25 times/second) and
+    once a second as a heartbeat. All other serial lines (Wi-Fi logs, card
+    UIDs, ...) are ignored by the Python reader.
+
+  Required Arduino libraries (install via Library Manager):
+    - MFRC522      (by GithubCommunity)
+    - WiFiManager  (by tzapu)
+    - (WiFi and HTTPClient are built into the ESP32 core)
+
+  Board: "ESP32 Dev Module" (or your board) in Arduino IDE.
+
+  First run:
+    1. Flash this sketch.
+    2. The ESP32 creates an AP named "BayanSafe-Setup".
+    3. Connect to that AP with your phone (password: bayansafe).
+    4. A captive portal opens. Pick your Wi-Fi network, enter its password,
+       and (optionally) set the Server URL and Bridge token.
+    5. Save. The ESP32 reboots and connects to your network.
+
+  To reset Wi-Fi settings later: hold the BOOT button (GPIO 0) for 3 seconds
+  during startup, or send 'R' over the serial monitor.
+
+  PC side: set BAYANSAFE_ESP32_PORT=COM3 (your port) and run the game. The
+  built-in serial reader feeds the stick/buttons into pygame. Do not run
+  esp32_rfid_handler.py on the same COM port at the same time.
+*/
+
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <WiFiManager.h>
+
+// ---------------- CONFIGURATION ----------------
+// Defaults used the first time (and as fallback if the portal is skipped).
+const char* DEFAULT_SERVER_URL = "http://192.168.100.5:3000";
+const char* DEFAULT_BRIDGE_TOKEN = "";
+
+// AP shown during setup
+const char* AP_NAME     = "BayanSafe-Setup";
+const char* AP_PASSWORD = "bayansafe";
+
+// RC522 pins
+#define SS_PIN   5
+#define RST_PIN  22
+
+// Reset button (BOOT button on most ESP32 dev boards)
+#define RESET_PIN 0
+
+// ---- Joystick + button pins ----
+// ADC1 pins are safe to read while Wi-Fi is on.
+#define JOY_X_PIN  34
+#define JOY_Y_PIN  35
+
+// Buttons are active LOW (INPUT_PULLUP).
+#define BTN1_PIN   13   // confirm / pick up / equip
+#define BTN2_PIN   14   // back / throw / unequip
+#define BTN3_PIN   26   // select / objective
+#define BTN4_PIN   27   // start / pause
+// ----------------------------------------------
+
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+// Runtime config (filled in by WiFiManager custom parameters)
+char serverUrl[96]    = "";
+char bridgeToken[96]  = "";
+
+// Debounce: avoid repeatedly submitting the same card while it stays on reader.
+String lastUid       = "";
+unsigned long lastSentAt = 0;
+const unsigned long RESEND_DELAY_MS = 3000;
+
+// ---------------- CONTROLLER STATE ----------------
+struct InputState {
+  int  x;        // -100 .. 100
+  int  y;        // -100 .. 100
+  bool b[4];     // button 1..4
+};
+InputState inputState = {0, 0, {false, false, false, false}};
+
+int joyCenterX = 2048;
+int joyCenterY = 2048;
+
+// Raw ADC counts around the centre that count as "no movement".
+const int JOY_DEADZONE = 220;
+// A typical stick moves about 1800 counts from centre to the end.
+const int JOY_FULL_SCALE = 1800;
+
+// Button debounce
+bool buttonRaw[4]     = {false, false, false, false};
+bool buttonStable[4]  = {false, false, false, false};
+unsigned long buttonChangedAt[4] = {0, 0, 0, 0};
+const unsigned long DEBOUNCE_MS = 40;
+
+// Serial reporting
+unsigned long lastInputReport = 0;
+unsigned long lastHeartbeat   = 0;
+unsigned long lastRfidDebug   = 0;
+int  lastReportedX = 0;
+int  lastReportedY = 0;
+bool lastReportedB[4] = {false, false, false, false};
+const unsigned long INPUT_INTERVAL_MS = 40;   // 25 Hz max
+const unsigned long HEARTBEAT_MS      = 1000;
+// ------------------------------------------------
+
+void calibrateJoystick() {
+  long sx = 0, sy = 0;
+  const int samples = 20;
+  for (int i = 0; i < samples; i++) {
+    sx += analogRead(JOY_X_PIN);
+    sy += analogRead(JOY_Y_PIN);
+    delay(20);
+  }
+  joyCenterX = sx / samples;
+  joyCenterY = sy / samples;
+  Serial.printf("Joystick centre: X=%d Y=%d\n", joyCenterX, joyCenterY);
+}
+
+int normalizeAxis(int raw, int center) {
+  int delta = raw - center;
+  if (abs(delta) < JOY_DEADZONE) return 0;
+  long scaled = (long)delta * 100 / JOY_FULL_SCALE;
+  if (scaled > 100)  scaled = 100;
+  if (scaled < -100) scaled = -100;
+  return (int)scaled;
+}
+
+void setupInput() {
+  pinMode(BTN1_PIN, INPUT_PULLUP);
+  pinMode(BTN2_PIN, INPUT_PULLUP);
+  pinMode(BTN3_PIN, INPUT_PULLUP);
+  pinMode(BTN4_PIN, INPUT_PULLUP);
+  calibrateJoystick();
+}
+
+void readInput() {
+  // Analog stick (normalised and deadzoned here so the PC gets clean values).
+  inputState.x = normalizeAxis(analogRead(JOY_X_PIN), joyCenterX);
+  inputState.y = normalizeAxis(analogRead(JOY_Y_PIN), joyCenterY);
+
+  // Four buttons with simple debounce.
+  const int pins[4] = {BTN1_PIN, BTN2_PIN, BTN3_PIN, BTN4_PIN};
+  unsigned long now = millis();
+  for (int i = 0; i < 4; i++) {
+    bool reading = (digitalRead(pins[i]) == LOW);
+    if (reading != buttonRaw[i]) {
+      buttonRaw[i] = reading;
+      buttonChangedAt[i] = now;
+    }
+    if (now - buttonChangedAt[i] >= DEBOUNCE_MS) {
+      buttonStable[i] = buttonRaw[i];
+    }
+    inputState.b[i] = buttonStable[i];
+  }
+}
+
+void reportInput(bool force) {
+  unsigned long now = millis();
+
+  bool changed = (inputState.x != lastReportedX) || (inputState.y != lastReportedY);
+  for (int i = 0; i < 4; i++) {
+    if (inputState.b[i] != lastReportedB[i]) changed = true;
+  }
+
+  if (!force && !changed) return;
+  if (!force && (now - lastInputReport) < INPUT_INTERVAL_MS) return;
+
+  Serial.print("JOY,");
+  Serial.print(inputState.x);
+  Serial.print(',');
+  Serial.print(inputState.y);
+  for (int i = 0; i < 4; i++) {
+    Serial.print(',');
+    Serial.print(inputState.b[i] ? 1 : 0);
+  }
+  Serial.println();
+
+  lastReportedX = inputState.x;
+  lastReportedY = inputState.y;
+  for (int i = 0; i < 4; i++) lastReportedB[i] = inputState.b[i];
+  lastInputReport = now;
+}
+// ------------------------------------------------
+
+void connectWiFi() {
+  WiFiManager wm;
+
+  // Custom parameters so the server URL and bridge token can be set from
+  // the captive portal instead of being hardcoded.
+  WiFiManagerParameter serverParam("server", "Server URL", DEFAULT_SERVER_URL, sizeof(serverUrl) - 1);
+  WiFiManagerParameter tokenParam("token", "Bridge token (optional)", DEFAULT_BRIDGE_TOKEN, sizeof(bridgeToken) - 1);
+  wm.addParameter(&serverParam);
+  wm.addParameter(&tokenParam);
+
+  // Reset trigger: BOOT button held low at startup clears saved settings.
+  if (digitalRead(RESET_PIN) == LOW) {
+    Serial.println("Reset button held: clearing saved Wi-Fi settings.");
+    wm.resetSettings();
+    delay(1000);
+  }
+
+  // Auto-connect; if it fails, start the captive portal.
+  wm.setConfigPortalTimeout(180); // 3 minutes to configure
+  bool ok = wm.autoConnect(AP_NAME, AP_PASSWORD);
+
+  if (!ok) {
+    Serial.println("Failed to connect / configure. Restarting...");
+    delay(3000);
+    ESP.restart();
+  }
+
+  // Save whatever the user entered (or the defaults).
+  strncpy(serverUrl, serverParam.getValue(), sizeof(serverUrl) - 1);
+  serverUrl[sizeof(serverUrl) - 1] = '\0';
+  strncpy(bridgeToken, tokenParam.getValue(), sizeof(bridgeToken) - 1);
+  bridgeToken[sizeof(bridgeToken) - 1] = '\0';
+
+  // Fallback to defaults if left empty.
+  if (strlen(serverUrl) == 0)    strcpy(serverUrl, DEFAULT_SERVER_URL);
+  if (strlen(bridgeToken) == 0)  strcpy(bridgeToken, DEFAULT_BRIDGE_TOKEN);
+
+  Serial.println("WiFi connected.");
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("Server URL: ");
+  Serial.println(serverUrl);
+}
+
+String readUid() {
+  String uid = "";
+  for (byte i = 0; i < mfrc522.uid.size; i++) {
+    if (mfrc522.uid.uidByte[i] < 0x10) uid += "0";
+    uid += String(mfrc522.uid.uidByte[i], HEX);
+  }
+  uid.toUpperCase();
+  return uid;
+}
+
+void postUid(const String& uid) {
+  if (WiFi.status() != WL_CONNECTED) {
+    // WiFiManager will reconnect automatically on next autoConnect attempt;
+    // here we just bail and retry later.
+    Serial.println("WiFi not connected, skipping post.");
+    return;
+  }
+
+  HTTPClient http;
+  String url = String(serverUrl) + "/api/rfid/scan";
+  http.begin(url);
+  http.addHeader("Content-Type", "application/json");
+  if (strlen(bridgeToken) > 0) {
+    http.addHeader("x-bridge-token", bridgeToken);
+  }
+
+  String payload = "{\"uid\":\"" + uid + "\"}";
+  int code = http.POST(payload);
+
+  if (code > 0) {
+    Serial.printf("POST %s -> %d\n", url.c_str(), code);
+    String response = http.getString();
+    Serial.println(response);
+  } else {
+    Serial.printf("POST failed: %s\n", http.errorToString(code).c_str());
+  }
+  http.end();
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println();
+  Serial.println("BayanSafe ESP32 RFID bridge (WiFiManager) starting...");
+
+  pinMode(RESET_PIN, INPUT_PULLUP);
+
+  SPI.begin();
+  mfrc522.PCD_Init();
+  // Some RC522 boards ship with a weak default receiver gain. Maximum gain
+  // makes small/key-fob cards readable and costs nothing on a powered reader.
+  mfrc522.PCD_SetAntennaGain(mfrc522.RxGain_max);
+  Serial.println("RC522 initialized (max antenna gain).");
+
+  setupInput();
+  reportInput(true);   // tell the PC we are alive
+
+  connectWiFi();
+}
+
+void loop() {
+  // ---- Controller: read and report every loop, before any early return ----
+  readInput();
+  reportInput(false);
+
+  unsigned long now = millis();
+  if (now - lastHeartbeat >= HEARTBEAT_MS) {
+    reportInput(true);
+    lastHeartbeat = now;
+  }
+
+  // Serial command to reset Wi-Fi settings: send 'R'.
+  if (Serial.available() > 0) {
+    char c = Serial.read();
+    if (c == 'R' || c == 'r') {
+      Serial.println("Resetting Wi-Fi settings...");
+      WiFiManager wm;
+      wm.resetSettings();
+      delay(1000);
+      ESP.restart();
+    }
+  }
+
+  // ---- RFID: poll the reader BEFORE any Wi-Fi check.  The desktop game
+  //      reads the serial line, so a network outage must never stop scans.
+  if (now - lastRfidDebug >= 10000) {
+    Serial.println("RFID: reader polling");
+    lastRfidDebug = now;
+  }
+
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+    String uid = readUid();
+    Serial.print("Card detected: ");
+    Serial.println(uid);
+
+    // Debounce repeated submissions while the card stays on the reader.
+    unsigned long scanNow = millis();
+    bool sameCard = (uid == lastUid);
+    bool tooSoon  = (scanNow - lastSentAt) < RESEND_DELAY_MS;
+
+    if (WiFi.status() == WL_CONNECTED) {
+      if (!(sameCard && tooSoon)) {
+        postUid(uid);
+      } else {
+        Serial.println("Skipping duplicate scan (card still on reader).");
+      }
+    } else {
+      Serial.println("Wi-Fi offline - card logged to serial only.");
+    }
+    lastUid     = uid;
+    lastSentAt  = scanNow;
+
+    // Halt PICC and stop crypto to be ready for next card
+    mfrc522.PICC_HaltA();
+    mfrc522.PCD_StopCrypto1();
+
+    delay(200);
+  } else {
+    delay(50);
+  }
+
+  // Reconnect if dropped (this no longer blocks card reads).
+  if (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    WiFi.reconnect();
+    delay(2000);
+  }
+}
