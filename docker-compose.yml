@@ -1,0 +1,31 @@
+# A PostgreSQL server for the site.
+#
+#   docker compose up -d      start it
+#   docker compose stop       stop it
+#   docker compose down       stop it and throw the data away
+#
+# The data stays in the volume "bayansafe-db", so it is still there
+# after you stop and start it again.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: bayansafe-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bayansafe
+      POSTGRES_PASSWORD: bayansafe
+      POSTGRES_DB: bayansafe
+    ports:
+      # 5432 is the default port for PostgreSQL
+      - "5432:5432"
+    volumes:
+      - bayansafe-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bayansafe -d bayansafe"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  bayansafe-db:
