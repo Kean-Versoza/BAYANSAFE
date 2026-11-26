@@ -5,6 +5,7 @@ import siteConfig from './siteConfig.js';
 import registerRoutes from './routes/register.js';
 import accountRoutes from './routes/account.js';
 import googleAuthRoutes from './routes/googleAuth.js';
+import clientLoginRoutes from './routes/clientLogin.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
 import mailRoutes from './routes/mail.js';
@@ -61,6 +62,9 @@ export function createApiApp() {
 
   // "Continue with Google" for the registration form and the sign in card
   app.use('/api/auth', googleAuthRoutes);
+
+  // Device sign-in bridge for the desktop game
+  app.use('/api/client', clientLoginRoutes);
 
   // The dashboard behind /admin
   app.use('/api/admin', adminRoutes);

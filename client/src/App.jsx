@@ -8,6 +8,7 @@ import AdminPage from './pages/AdminPage';
 import HelpPage from './pages/HelpPage';
 import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
+import GameLoginPage from './pages/GameLoginPage';
 import PullToRefresh from './components/PullToRefresh';
 
 /** SPA route changes behave like real page loads: start at the top. */
@@ -62,6 +63,7 @@ export default function App() {
 
         {/* The registration form on its own page */}
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/game-login" element={<GameLoginPage />} />
 
         {/* The "About us" page */}
         <Route path="/about-us" element={<AboutPage />} />
