@@ -43,7 +43,7 @@ router.post('/device/start', (req, res) => {
   res.json({
     ok: true,
     code,
-    url: `${siteUrl()}/game-login?code=${code}`,
+    url: `${siteUrl()}/account?code=${code}`,
     expiresAt: new Date(Date.now() + CODE_TTL_MS).toISOString(),
   });
 });

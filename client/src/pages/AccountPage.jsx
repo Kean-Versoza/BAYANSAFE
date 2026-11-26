@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
@@ -24,6 +24,7 @@ import {
 export default function AccountPage() {
   const config = useSiteConfig();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const skeletonRef = useRef(null);
   const {
     user,
@@ -96,6 +97,31 @@ export default function AccountPage() {
       timer = window.setTimeout(hideSkeleton, wait);
     };
   }, [known, showSkeleton, hideSkeleton]);
+
+  // Device sign-in bridge: complete the game's code once the player is signed in.
+  const deviceCode = searchParams.get('code');
+  useEffect(() => {
+    if (!deviceCode || !user) return undefined;
+    let cancelled = false;
+    (async () => {
+      try {
+        await fetch('/api/client/device/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ code: deviceCode }),
+        });
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Could not complete game sign in:', err);
+      }
+      if (!cancelled) {
+        // Clean the code from the URL
+        navigate('/account', { replace: true });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [deviceCode, user, navigate]);
 
   return (
     <>
