@@ -4,7 +4,7 @@ import psycopg2
 from dotenv import load_dotenv
 from urllib.parse import urlparse
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 
 def get_connection():
