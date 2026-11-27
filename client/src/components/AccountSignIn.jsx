@@ -10,7 +10,7 @@ import GoogleSignIn from './GoogleSignIn.jsx';
  * rest of the site. A player may sign in with their email and password, or
  * with Google.
  */
-export default function AccountSignIn({ onSignIn, onGoogleSignIn, busy }) {
+export default function AccountSignIn({ onSignIn, onGoogleSignIn, busy, autoPrompt = false }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -94,6 +94,7 @@ export default function AccountSignIn({ onSignIn, onGoogleSignIn, busy }) {
           onCredential={onGoogleCredential}
           text="signin_with"
           disabled={busy}
+          autoPrompt={autoPrompt}
         />
 
         <p className="account-foot">

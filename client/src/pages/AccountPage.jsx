@@ -123,27 +123,7 @@ export default function AccountPage() {
     return () => { cancelled = true; };
   }, [deviceCode, user, navigate]);
 
-  // Auto-open the Google account chooser when arriving from the game.
-  useEffect(() => {
-    if (!deviceCode || user) return undefined;
-    let cancelled = false;
-    const tryOpen = () => {
-      if (cancelled) return;
-      const iframe = document.querySelector('.google-signin__slot iframe');
-      if (iframe) {
-        iframe.click();
-        return;
-      }
-      const btn = document.querySelector('.google-signin__slot button, .google-signin__slot div[role="button"]');
-      if (btn) {
-        btn.click();
-        return;
-      }
-      window.setTimeout(tryOpen, 300);
-    };
-    const timer = window.setTimeout(tryOpen, 500);
-    return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [deviceCode, user]);
+
 
   return (
     <>
@@ -168,7 +148,7 @@ export default function AccountPage() {
               onSignOut={signOut}
             />
           ) : (
-            <AccountSignIn onSignIn={signIn} onGoogleSignIn={signInWithGoogle} busy={busy} />
+            <AccountSignIn onSignIn={signIn} onGoogleSignIn={signInWithGoogle} busy={busy} autoPrompt={Boolean(deviceCode)} />
           )}
 
           {!known && <p className="account-loading">Loading your account...</p>}

@@ -76,6 +76,7 @@ export default function GoogleSignIn({
   text = 'continue_with',
   disabled = false,
   className = '',
+  autoPrompt = false,
 }) {
   const config = useSiteConfig();
   const clientId = config.googleClientId || null;
@@ -138,6 +139,14 @@ export default function GoogleSignIn({
 
         render();
 
+        if (autoPrompt) {
+          try {
+            identity.prompt();
+          } catch (err) {
+            // ignore
+          }
+        }
+
         // The form is hidden when this component first mounts, so the first
         // measurement is 0. Re-render once the holder gets a real width.
         let resizeObserver = null;
@@ -171,7 +180,7 @@ export default function GoogleSignIn({
         holder._resizeObserver = null;
       }
     };
-  }, [clientId, text]);
+  }, [clientId, text, autoPrompt]);
 
   if (!clientId) {
     return (
