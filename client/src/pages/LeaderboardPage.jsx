@@ -40,7 +40,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
-  const [filters, setFilters] = useState({ player: '', chapter: '', level: '', time: '', points: '' });
+  const [query, setQuery] = useState('');
   const [sortKey, setSortKey] = useState('points');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -66,19 +66,14 @@ export default function LeaderboardPage() {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const q = query.trim().toLowerCase();
   const filteredScores = scores
     .filter((s) => {
-      const player = String(s.username ?? '').toLowerCase();
-      const chapter = String(s.chapter ?? '').toLowerCase();
-      const level = String(s.level ?? '').toLowerCase();
-      const time = s.best_time == null ? '' : String(s.best_time);
-      const points = String(s.score ?? '');
-      if (filters.player && !player.includes(filters.player.toLowerCase())) return false;
-      if (filters.chapter && !chapter.includes(filters.chapter.toLowerCase())) return false;
-      if (filters.level && !level.includes(filters.level.toLowerCase())) return false;
-      if (filters.time && !time.includes(filters.time)) return false;
-      if (filters.points && !points.includes(filters.points)) return false;
-      return true;
+      if (!q) return true;
+      const haystack = [
+        s.username, s.chapter, s.level, s.best_time, s.score,
+      ].map((v) => (v == null ? '' : String(v))).join(' ').toLowerCase();
+      return haystack.includes(q);
     })
     .sort((a, b) => {
       let va, vb;
@@ -112,7 +107,16 @@ export default function LeaderboardPage() {
           ) : scores.length === 0 ? (
             <p className="about-lead">No scores yet. Be the first!</p>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
+            <>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search..."
+                  style={{ width: '220px', padding: '0.3rem 0.5rem' }}
+                />
+              </div>
+              <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr>
@@ -135,23 +139,6 @@ export default function LeaderboardPage() {
                       </th>
                     ))}
                   </tr>
-                <tr>
-                  <th style={{ padding: '0.2rem' }}>
-                    <input value={filters.player} onChange={(e) => setFilters((f) => ({ ...f, player: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
-                  </th>
-                  <th style={{ padding: '0.2rem' }}>
-                    <input value={filters.chapter} onChange={(e) => setFilters((f) => ({ ...f, chapter: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
-                  </th>
-                  <th style={{ padding: '0.2rem' }}>
-                    <input value={filters.level} onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
-                  </th>
-                  <th style={{ padding: '0.2rem' }}>
-                    <input value={filters.time} onChange={(e) => setFilters((f) => ({ ...f, time: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
-                  </th>
-                  <th style={{ padding: '0.2rem' }}>
-                    <input value={filters.points} onChange={(e) => setFilters((f) => ({ ...f, points: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
-                  </th>
-                </tr>
               </thead>
                 <tbody>
                   {filteredScores.map((s, i) => (
@@ -166,7 +153,7 @@ export default function LeaderboardPage() {
                 </tbody>
               </table>
             </div>
-          )}
+          </>)}
 
           {!loading && totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
