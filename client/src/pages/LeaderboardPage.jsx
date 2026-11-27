@@ -4,6 +4,16 @@ import NavPill from '../components/NavPill';
 import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 
+function chapterNumber(chapter) {
+  if (!chapter) return '-';
+  const c = String(chapter).toLowerCase();
+  if (c === 'prologue') return '1';
+  const m = c.match(/chapter_(\d+)/);
+  if (m) return String(Number(m[1]) + 1);
+  if (c.includes('final')) return '7';
+  return chapter;
+}
+
 function formatTime(seconds) {
   if (seconds == null) return '-';
   const s = Number(seconds);
@@ -71,7 +81,7 @@ export default function LeaderboardPage() {
                   {scores.map((s, i) => (
                     <tr key={i}>
                       <td style={{ padding: '0.4rem' }}>{s.username}</td>
-                      <td style={{ padding: '0.4rem' }}>{s.chapter || '-'}</td>
+                      <td style={{ padding: '0.4rem' }}>{chapterNumber(s.chapter)}</td>
                       <td style={{ padding: '0.4rem' }}>{s.level || '-'}</td>
                       <td style={{ padding: '0.4rem' }}>{formatTime(s.best_time)}</td>
                       <td style={{ padding: '0.4rem', textAlign: 'right' }}>{s.score}</td>
