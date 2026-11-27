@@ -71,7 +71,7 @@ router.get('/leaderboard', async (req, res) => {
       `SELECT username, score, best_time, chapter, level, created_at
        FROM high_scores
        ${where}
-       ORDER BY (regexp_match(level, '_(\\\\d+)$'))[1]::int NULLS LAST, score DESC, created_at ASC
+       ORDER BY (regexp_match(level, '_([0-9]+)$'))[1]::int NULLS LAST, score DESC, created_at ASC
        LIMIT $${params.length}`,
       params,
     );
