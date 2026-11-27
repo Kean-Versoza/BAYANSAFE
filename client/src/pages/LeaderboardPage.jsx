@@ -35,8 +35,11 @@ function formatTime(seconds) {
 
 export default function LeaderboardPage() {
   const config = useSiteConfig();
+  const PAGE_SIZE = 10;
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     document.title = 'Leaderboards | BayanSafe';
@@ -45,16 +48,20 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/scores/leaderboard?limit=50')
+    setLoading(true);
+    fetch(`/api/scores/leaderboard?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`)
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;
         setScores(Array.isArray(data?.scores) ? data.scores : []);
+        setTotal(Number(data?.total) || 0);
       })
       .catch(() => { if (!cancelled) setScores([]); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [page]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <>
@@ -99,6 +106,27 @@ export default function LeaderboardPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {!loading && totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+              <button type="button" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>
+                Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => setPage(i)}
+                  style={{ fontWeight: i === page ? 'bold' : 'normal' }}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button type="button" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>
+                Next
+              </button>
             </div>
           )}
         </main>

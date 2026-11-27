@@ -59,6 +59,7 @@ router.get('/leaderboard', async (req, res) => {
   await ensureTable();
   try {
     const limit = Math.min(50, Math.max(1, Number(req.query?.limit) || 20));
+    const offset = Math.max(0, Number(req.query?.offset) || 0);
     const level = typeof req.query?.level === 'string' ? req.query.level.slice(0, 64) : null;
     const params = [];
     let where = '';
@@ -67,15 +68,23 @@ router.get('/leaderboard', async (req, res) => {
       where = 'WHERE level = $1';
     }
     params.push(limit);
+    params.push(offset);
     const { rows } = await query(
       `SELECT username, score, best_time, chapter, level, created_at
        FROM high_scores
        ${where}
        ORDER BY (regexp_match(level, '_([0-9]+)$'))[1]::int NULLS LAST, score DESC, created_at ASC
-       LIMIT $${params.length}`,
+       LIMIT $${params.length - 1} OFFSET $${params.length}`,
       params,
     );
-    res.json({ ok: true, scores: rows });
+    // Total count for pagination
+    const countParams = level ? [level] : [];
+    const countWhere = level ? 'WHERE level = $1' : '';
+    const { rows: countRows } = await query(
+      `SELECT COUNT(*)::int AS total FROM high_scores ${countWhere}`,
+      countParams,
+    );
+    res.json({ ok: true, scores: rows, total: countRows[0]?.total ?? 0, limit, offset });
   } catch (err) {
     console.error('Could not load leaderboard:', describeError(err));
     res.status(503).json({ ok: false, error: 'The database could not be reached.' });
