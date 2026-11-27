@@ -455,13 +455,14 @@ class LoginState(BaseState):
             key = self._focused_field()
             if event.key == pygame.K_TAB:
                 self._move_focus(1)
-            elif event.key in (pygame.K_UP, pygame.K_w):
+            elif event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT):
+                if event.key in (pygame.K_UP, pygame.K_LEFT):
+                    self._move_focus(-1)
+                else:
+                    self._move_focus(1)
+            elif self._focused_field() is None and event.key in (pygame.K_w, pygame.K_a):
                 self._move_focus(-1)
-            elif event.key in (pygame.K_DOWN, pygame.K_s):
-                self._move_focus(1)
-            elif event.key in (pygame.K_LEFT, pygame.K_a):
-                self._move_focus(-1)
-            elif event.key in (pygame.K_RIGHT, pygame.K_d):
+            elif self._focused_field() is None and event.key in (pygame.K_s, pygame.K_d):
                 self._move_focus(1)
             elif event.key == pygame.K_BACKSPACE:
                 if key is None and self.widgets:
