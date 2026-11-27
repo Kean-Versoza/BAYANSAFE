@@ -40,6 +40,8 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState('');
+  const [activeChapter, setActiveChapter] = useState('all');
+  const [activeLevel, setActiveLevel] = useState('all');
   const [sortKey, setSortKey] = useState('points');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -62,11 +64,13 @@ export default function LeaderboardPage() {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => { setPage(0); }, [query, sortKey, sortDir]);
+  useEffect(() => { setPage(0); }, [query, sortKey, sortDir, activeChapter, activeLevel]);
 
   const q = query.trim().toLowerCase();
   const filteredScores = allScores
     .filter((s) => {
+      if (activeChapter !== 'all' && chapterNumber(s.chapter) !== activeChapter) return false;
+      if (activeLevel !== 'all' && levelNumber(s.level) !== activeLevel) return false;
       if (!q) return true;
       const haystack = [
         s.username,
@@ -108,6 +112,30 @@ export default function LeaderboardPage() {
           <h1>Leaderboards</h1>
           <p className="about-lead">Top scores from players around the world.</p>
 
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', justifyContent: 'center', marginBottom: '0.4rem' }}>
+            {['all', '1', '2', '3', '4', '5', '6', '7'].map((c) => (
+              <button
+                type="button"
+                key={'ch-' + c}
+                onClick={() => setActiveChapter(c)}
+                style={{ fontWeight: activeChapter === c ? 'bold' : 'normal', padding: '0.2rem 0.5rem' }}
+              >
+                {c === 'all' ? 'All Chapters' : `Ch ${c}`}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', justifyContent: 'center', marginBottom: '0.4rem' }}>
+            {['all', '1', '2', '3', '4'].map((l) => (
+              <button
+                type="button"
+                key={'lv-' + l}
+                onClick={() => setActiveLevel(l)}
+                style={{ fontWeight: activeLevel === l ? 'bold' : 'normal', padding: '0.2rem 0.5rem' }}
+              >
+                {l === 'all' ? 'All Levels' : `Lv ${l}`}
+              </button>
+            ))}
+          </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.15rem', marginTop: '-0.25rem' }}>
             <input
               value={query}
