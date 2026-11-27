@@ -10,6 +10,7 @@ import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
 import GameLoginPage from './pages/GameLoginPage';
 import PullToRefresh from './components/PullToRefresh';
+import GlobalLoader from './components/GlobalLoader';
 
 /** SPA route changes behave like real page loads: start at the top. */
 function ScrollToTop() {
@@ -44,6 +45,7 @@ export default function App() {
     <>
       <ScrollToTop />
       <PullToRefresh />
+      <GlobalLoader />
       <Routes>
         <Route path="/" element={<HomePage />} />
 
