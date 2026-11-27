@@ -107,7 +107,7 @@ export default function LeaderboardPage() {
         <main className="panel about-panel">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h1 style={{ margin: 0 }}>Leaderboards</h1>
-            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+            <div className="lb-search-desktop" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -116,7 +116,7 @@ export default function LeaderboardPage() {
               />
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '0.3rem' }}>
+          <div className="lb-search-desktop" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '0.3rem' }}>
             <select value={searchColumn} onChange={(e) => setSearchColumn(e.target.value)} style={{ padding: '0.3rem 0.5rem' }}>
               <option value="all">All</option>
               <option value="player">Player</option>
@@ -134,6 +134,32 @@ export default function LeaderboardPage() {
             </button>
           </div>
           <p className="about-lead">Top scores from players around the world.</p>
+
+          <div className="lb-search-mobile" style={{ display: 'none', flexDirection: 'column', gap: '0.4rem', marginTop: '0.5rem' }}>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search..."
+              style={{ width: '100%', padding: '0.3rem 0.5rem' }}
+            />
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              <select value={searchColumn} onChange={(e) => setSearchColumn(e.target.value)} style={{ padding: '0.3rem 0.5rem', flex: 1 }}>
+                <option value="all">All</option>
+                <option value="player">Player</option>
+                <option value="chapter">Chapter</option>
+                <option value="level">Level</option>
+                <option value="time">Best Time</option>
+                <option value="points">Points</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => { setQuery(''); setSearchColumn('all'); }}
+                style={{ padding: '0.3rem 0.6rem' }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
 
 
 

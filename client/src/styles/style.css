@@ -2208,3 +2208,9 @@ html.snap-scroll {
         .password-rules li { font-size: 0.7rem; }
         .password-rules-summary { font-size: 0.68rem; }
     }
+
+/* Leaderboards: on phones the search controls sit under the subheading */
+@media (max-width: 768px) {
+    .lb-search-desktop { display: none !important; }
+    .lb-search-mobile { display: flex !important; }
+}
