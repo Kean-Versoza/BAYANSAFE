@@ -182,7 +182,7 @@ export default function LeaderboardPage() {
                       ].map((col) => (
                         <th
                           key={col.key}
-                          style={{ textAlign: col.align, padding: '0.6rem', cursor: 'pointer', userSelect: 'none', width: col.key === 'player' ? '30%' : col.key === 'points' ? '15%' : '18%' }}
+                          style={{ textAlign: col.align, padding: '0.6rem', cursor: 'pointer', userSelect: 'none', width: '20%' }}
                           onClick={() => {
                             if (sortKey === col.key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
                             else { setSortKey(col.key); setSortDir('asc'); }
