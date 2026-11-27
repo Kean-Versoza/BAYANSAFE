@@ -13,10 +13,12 @@ async function ensureTable() {
       user_id     INTEGER,
       username    TEXT NOT NULL,
       score       INTEGER NOT NULL,
+      best_time   INTEGER,
       level       TEXT,
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  await query('ALTER TABLE high_scores ADD COLUMN IF NOT EXISTS best_time INTEGER');
 }
 
 /**
@@ -33,10 +35,11 @@ router.post('/', async (req, res) => {
     }
     const level = typeof req.body?.level === 'string' ? req.body.level.slice(0, 64) : null;
     const username = (user?.username) || (typeof req.body?.username === 'string' ? req.body.username.trim().slice(0, 32) : '') || 'Anonymous';
+    const bestTime = req.body?.best_time != null ? Number(req.body.best_time) : null;
 
     await query(
-      'INSERT INTO high_scores (user_id, username, score, level) VALUES ($1, $2, $3, $4)',
-      [user?.id ?? null, username, Math.round(score), level],
+      'INSERT INTO high_scores (user_id, username, score, best_time, level) VALUES ($1, $2, $3, $4, $5)',
+      [user?.id ?? null, username, Math.round(score), Number.isFinite(bestTime) ? Math.round(bestTime) : null, level],
     );
     res.json({ ok: true });
   } catch (err) {

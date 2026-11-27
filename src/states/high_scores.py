@@ -156,7 +156,7 @@ class HighScores(BaseState):
                 payload = self.game.web_api.leaderboard(limit=10, level=stage_id)
                 if isinstance(payload, dict) and isinstance(payload.get("scores"), list):
                     shown = [{"score": e.get("score", 0), "attempts": 1,
-                              "best_time": 0, "player_id": e.get("username", "?")}
+                              "best_time": e.get("best_time"), "player_id": e.get("username", "?")}
                              for e in payload["scores"]]
             except Exception:
                 shown = None

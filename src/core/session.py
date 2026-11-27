@@ -241,7 +241,7 @@ class GameSession:
         self.save()
         if db_manager.is_connected:
             self._sync_run_to_db(stage_id, stats)
-        self._sync_score_to_web(stage_id, best["best_score"])
+        self._sync_score_to_web(stage_id, best["best_score"], best_time=best.get("best_time"))
 
     @staticmethod
     def chapter_mission_keys(chapter_id):
@@ -349,9 +349,9 @@ class GameSession:
             entry.setdefault("missions_done", totals["missions_done"])
             entry.setdefault("missions_total", totals["missions_total"])
         board[player_id] = entry
-        self._sync_score_to_web(chapter_id, best["best_score"])
+        self._sync_score_to_web(chapter_id, best["best_score"], best_time=best.get("best_time"))
 
-    def _sync_score_to_web(self, level, score):
+    def _sync_score_to_web(self, level, score, best_time=None):
         '''Best-effort: push a score to the shared website leaderboard.'''
         try:
             from src.core.web_api import WebApiClient
@@ -359,7 +359,7 @@ class GameSession:
             api = WebApiClient()
             api.base_url = os.environ.get("BAYANSAFE_SERVER_URL", api.base_url).rstrip("/")
             name = self.player_identity() or "Anonymous"
-            api.submit_score(score, level=level, username=name)
+            api.submit_score(score, level=level, username=name, best_time=best_time)
         except Exception:
             pass
 
