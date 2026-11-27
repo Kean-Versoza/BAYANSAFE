@@ -123,6 +123,13 @@ export default function LeaderboardPage() {
               placeholder="Search..."
               style={{ width: '220px', padding: '0.3rem 0.5rem' }}
             />
+            <button
+              type="button"
+              onClick={() => { setQuery(''); setSearchColumn('all'); }}
+              style={{ padding: '0.3rem 0.6rem' }}
+            >
+              Clear
+            </button>
           </div>
 
           {loading ? (
