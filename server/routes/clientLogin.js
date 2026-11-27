@@ -10,8 +10,21 @@ const router = Router();
 
 const CODE_TTL_MS = 10 * 60 * 1000;
 
+async function ensureTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS game_device_codes (
+      code         TEXT PRIMARY KEY,
+      token        TEXT,
+      user_data    JSONB,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at   TIMESTAMPTZ NOT NULL
+    )
+  `);
+}
+
 async function sweep() {
   try {
+    await ensureTable();
     await query('DELETE FROM game_device_codes WHERE expires_at < NOW()');
   } catch (err) {
     // ignore sweep errors
@@ -37,6 +50,7 @@ function publicUser(user) {
 }
 
 router.post('/device/start', async (req, res) => {
+  await ensureTable();
   await sweep();
   const code = randomBytes(4).toString('hex').toUpperCase();
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
@@ -54,11 +68,12 @@ router.post('/device/start', async (req, res) => {
     });
   } catch (err) {
     console.error('Could not start game sign in:', describeError(err));
-    res.status(503).json({ ok: false, error: describeError(err) });
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
   }
 });
 
 router.post('/device/complete', async (req, res) => {
+  await ensureTable();
   await sweep();
   const code = typeof req.body?.code === 'string' ? req.body.code.trim().toUpperCase() : '';
 
@@ -95,6 +110,7 @@ router.post('/device/complete', async (req, res) => {
 });
 
 router.post('/device/token', async (req, res) => {
+  await ensureTable();
   await sweep();
   const code = typeof req.body?.code === 'string' ? req.body.code.trim().toUpperCase() : '';
 
