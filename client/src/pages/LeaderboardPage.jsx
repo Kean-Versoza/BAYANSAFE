@@ -40,6 +40,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [query, setQuery] = useState('');
+  const [searchColumn, setSearchColumn] = useState('all');
   const [sortKey, setSortKey] = useState('points');
   const [sortDir, setSortDir] = useState('desc');
 
@@ -62,21 +63,20 @@ export default function LeaderboardPage() {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => { setPage(0); }, [query, sortKey, sortDir]);
+  useEffect(() => { setPage(0); }, [query, searchColumn, sortKey, sortDir]);
 
   const q = query.trim().toLowerCase();
   const filteredScores = allScores
     .filter((s) => {
       if (!q) return true;
-      const haystack = [
-        s.username,
-        chapterNumber(s.chapter),
-        levelNumber(s.level),
-        s.best_time == null ? '-' : formatTime(s.best_time),
-        String(s.best_time ?? ''),
-        s.score,
-      ].map((v) => (v == null ? '' : String(v))).join(' ').toLowerCase();
-      return haystack.includes(q);
+      let haystack = '';
+      if (searchColumn === 'player') haystack = String(s.username ?? '');
+      else if (searchColumn === 'chapter') haystack = chapterNumber(s.chapter);
+      else if (searchColumn === 'level') haystack = levelNumber(s.level);
+      else if (searchColumn === 'time') haystack = (s.best_time == null ? '-' : formatTime(s.best_time)) + ' ' + String(s.best_time ?? '');
+      else if (searchColumn === 'points') haystack = String(s.score ?? '');
+      else haystack = [s.username, chapterNumber(s.chapter), levelNumber(s.level), s.best_time == null ? '-' : formatTime(s.best_time), String(s.best_time ?? ''), s.score].join(' ');
+      return haystack.toLowerCase().includes(q);
     })
     .sort((a, b) => {
       let va, vb;
@@ -108,7 +108,15 @@ export default function LeaderboardPage() {
           <h1>Leaderboards</h1>
           <p className="about-lead">Top scores from players around the world.</p>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.15rem', marginTop: '-0.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem', marginBottom: '0.15rem', marginTop: '-0.25rem' }}>
+            <select value={searchColumn} onChange={(e) => setSearchColumn(e.target.value)} style={{ padding: '0.3rem 0.5rem' }}>
+              <option value="all">All</option>
+              <option value="player">Player</option>
+              <option value="chapter">Chapter</option>
+              <option value="level">Level</option>
+              <option value="time">Best Time</option>
+              <option value="points">Points</option>
+            </select>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
