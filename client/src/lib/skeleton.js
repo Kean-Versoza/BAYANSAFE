@@ -18,7 +18,8 @@ export const FORM_LOADER_MS = 700; // ms the registration form shows a skeleton 
 /** Maps a hash / section id to the page view the skeleton should draw. */
 export function viewFor(id) {
   id = String(id || '').replace('#', '');
-  return id === 'about' || id === 'registration' ? id : 'home';
+  if (id === 'about' || id === 'registration' || id === 'leaderboard') return id === 'leaderboard' ? 'about' : id;
+  return 'home';
 }
 
 /* =========================================================

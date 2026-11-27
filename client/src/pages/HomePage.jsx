@@ -5,6 +5,7 @@ import SiteFooter from '../components/SiteFooter';
 import { useSiteConfig } from '../hooks/useSiteConfig';
 import usePageSnap from '../hooks/usePageSnap';
 import AboutSection from '../sections/AboutSection';
+import LeaderboardSection from '../sections/LeaderboardSection';
 import HomeSection from '../sections/HomeSection';
 
 import {
@@ -144,6 +145,7 @@ export default function HomePage() {
 
       <HomeSection />
       <AboutSection onJump={jumpTo} />
+      <LeaderboardSection onJump={jumpTo} />
 
       <SiteFooter config={config} onJump={jumpTo} />
       <CookieBanner />
