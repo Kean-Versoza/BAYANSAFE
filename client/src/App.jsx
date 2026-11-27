@@ -7,6 +7,7 @@ import AccountPage from './pages/AccountPage';
 import AdminPage from './pages/AdminPage';
 import HelpPage from './pages/HelpPage';
 import AboutPage from './pages/AboutPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import RegisterPage from './pages/RegisterPage';
 import GameLoginPage from './pages/GameLoginPage';
 import PullToRefresh from './components/PullToRefresh';
@@ -75,6 +76,7 @@ export default function App() {
 
         {/* The "About us" page */}
         <Route path="/about-us" element={<AboutPage />} />
+        <Route path="/leaderboards" element={<LeaderboardPage />} />
 
         {/* The "Send us a message" form on its own page */}
         <Route path="/help" element={<HelpPage />} />

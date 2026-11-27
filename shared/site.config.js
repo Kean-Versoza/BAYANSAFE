@@ -19,7 +19,7 @@ export const siteConfig = {
   nav: [
     { id: 'home', label: 'HOME' },
     { id: 'about', label: 'ABOUT' },
-    { id: 'leaderboard', label: 'LEADERBOARDS' },
+    { id: 'leaderboard', label: 'LEADERBOARDS', path: '/leaderboards' },
     { id: 'registration', label: 'REGISTER' },
     { id: 'account', label: 'ACCOUNT', path: '/account' },
   ],
