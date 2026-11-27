@@ -69,7 +69,10 @@ export default function HomePage() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) setSection(entry.target.id);
+          if (entry.isIntersecting) {
+            setSection(entry.target.id);
+            window.history.replaceState(null, '', `#${entry.target.id}`);
+          }
         });
       },
       { rootMargin: '-45% 0px -45% 0px' }
