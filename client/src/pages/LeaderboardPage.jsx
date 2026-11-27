@@ -14,6 +14,16 @@ function chapterNumber(chapter) {
   return chapter;
 }
 
+function levelNumber(level) {
+  if (!level) return '-';
+  const s = String(level);
+  const m = s.match(/_(\d+)$/);
+  if (m) return String(Number(m[1]) + 1);
+  const m2 = s.match(/level_(\d+)/);
+  if (m2) return m2[1];
+  return level;
+}
+
 function formatTime(seconds) {
   if (seconds == null) return '-';
   const s = Number(seconds);
@@ -82,7 +92,7 @@ export default function LeaderboardPage() {
                     <tr key={i}>
                       <td style={{ padding: '0.4rem' }}>{s.username}</td>
                       <td style={{ padding: '0.4rem' }}>{chapterNumber(s.chapter)}</td>
-                      <td style={{ padding: '0.4rem' }}>{s.level || '-'}</td>
+                      <td style={{ padding: '0.4rem' }}>{levelNumber(s.level)}</td>
                       <td style={{ padding: '0.4rem' }}>{formatTime(s.best_time)}</td>
                       <td style={{ padding: '0.4rem', textAlign: 'right' }}>{s.score}</td>
                     </tr>
