@@ -103,7 +103,7 @@ export default function LeaderboardPage() {
           <h1>Leaderboards</h1>
           <p className="about-lead">Top scores from players around the world.</p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
