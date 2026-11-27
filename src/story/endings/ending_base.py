@@ -131,8 +131,12 @@ class EndingState(BaseState):
         audio.play("tick", 0.4)
 
     def _exit_to_menu(self) -> None:
-        from src.states.main_menu import MainMenu
-        self.game.state_manager.change(MainMenu(self.game))
+        if not self.game.session.account_username():
+            from src.states.login_state import LoginState
+            self.game.state_manager.change(LoginState(self.game))
+        else:
+            from src.states.main_menu import MainMenu
+            self.game.state_manager.change(MainMenu(self.game))
 
     def _nav_label(self) -> str:
         return "NEXT PAGE  >" if self.page < self.max_pages - 1 else "RETURN TO TITLE"

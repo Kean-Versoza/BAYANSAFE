@@ -59,10 +59,20 @@ class MainMenu(BaseState):
                 fn()
             return run
 
+        def _exit():
+            # Playing offline (no signed-in account): go back to the sign-in
+            # page first instead of quitting the game outright.
+            if not self.game.session.account_username():
+                audio.play("confirm")
+                from src.states.login_state import LoginState
+                self.game.state_manager.change(LoginState(self.game))
+                return
+            self.game.ask_quit()
+
         actions = {"new_game": sounded(self.new_game), "continue": sounded(self.continue_game),
                    "guide": sounded(self.guide), "high_scores": sounded(self.high_scores),
                    "options": sounded(self.options), "logout": sounded(self.logout),
-                   "exit": self.game.ask_quit}          # opens the "Leave BayanSafe?" box (in Game)
+                   "exit": _exit}          # opens the "Leave BayanSafe?" box (in Game)
         # Seven planks still fit above the tip strip when the sign-out one is shown.
         seven = len(self.entries) > len(BASE_ENTRIES)
         width, height, gap = 110, (14 if seven else 15), (1 if seven else 2)

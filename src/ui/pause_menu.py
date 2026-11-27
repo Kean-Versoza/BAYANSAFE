@@ -130,8 +130,12 @@ class PauseMenu:
 
     def _go_main_menu(self) -> bool:
         self.hide()
-        from src.states.main_menu import MainMenu
-        self.game.state_manager.change(MainMenu(self.game))
+        if not self.game.session.account_username():
+            from src.states.login_state import LoginState
+            self.game.state_manager.change(LoginState(self.game))
+        else:
+            from src.states.main_menu import MainMenu
+            self.game.state_manager.change(MainMenu(self.game))
         return True
 
     def draw(self, surface: pygame.Surface):
