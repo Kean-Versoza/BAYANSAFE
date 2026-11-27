@@ -442,7 +442,13 @@ class LoginState(BaseState):
             return
 
         if event.type == pygame.TEXTINPUT:
-            self._append_text(self._focused_field(), event.text)
+            key = self._focused_field()
+            if key is None and self.widgets:
+                for item in self.widgets:
+                    if item[0] == "field":
+                        key = item[1]
+                        break
+            self._append_text(key, event.text)
             return
 
         if event.type == pygame.KEYDOWN:
@@ -458,6 +464,11 @@ class LoginState(BaseState):
             elif event.key in (pygame.K_RIGHT, pygame.K_d):
                 self._move_focus(1)
             elif event.key == pygame.K_BACKSPACE:
+                if key is None and self.widgets:
+                    for item in self.widgets:
+                        if item[0] == "field":
+                            key = item[1]
+                            break
                 if key and not self.busy:
                     self._erase(key)
                 else:
