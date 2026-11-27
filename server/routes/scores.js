@@ -53,12 +53,21 @@ router.get('/leaderboard', async (req, res) => {
   await ensureTable();
   try {
     const limit = Math.min(50, Math.max(1, Number(req.query?.limit) || 20));
+    const level = typeof req.query?.level === 'string' ? req.query.level.slice(0, 64) : null;
+    const params = [];
+    let where = '';
+    if (level) {
+      params.push(level);
+      where = 'WHERE level = $1';
+    }
+    params.push(limit);
     const { rows } = await query(
       `SELECT username, score, level, created_at
        FROM high_scores
+       ${where}
        ORDER BY score DESC, created_at ASC
-       LIMIT $1`,
-      [limit],
+       LIMIT $${params.length}`,
+      params,
     );
     res.json({ ok: true, scores: rows });
   } catch (err) {

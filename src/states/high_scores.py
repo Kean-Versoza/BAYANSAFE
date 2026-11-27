@@ -153,7 +153,7 @@ class HighScores(BaseState):
             shown = None
             # Prefer the shared (cross-device) website leaderboard when online.
             try:
-                payload = self.game.web_api.leaderboard(limit=10)
+                payload = self.game.web_api.leaderboard(limit=10, level=stage_id)
                 if isinstance(payload, dict) and isinstance(payload.get("scores"), list):
                     shown = [{"score": e.get("score", 0), "attempts": 1,
                               "best_time": 0, "player_id": e.get("username", "?")}

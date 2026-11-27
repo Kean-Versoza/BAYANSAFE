@@ -131,9 +131,12 @@ class WebApiClient:
             data["username"] = username
         return self.request("POST", "/api/scores", data)
 
-    def leaderboard(self, limit=20):
+    def leaderboard(self, limit=20, level=None):
         """Return the shared leaderboard."""
-        return self.request("GET", f"/api/scores/leaderboard?limit={limit}")
+        url = f"/api/scores/leaderboard?limit={limit}"
+        if level is not None:
+            url += f"&level={level}"
+        return self.request("GET", url)
 
     def session(self):
         """Return the signed-in user, or None when the cookie is absent/expired."""
