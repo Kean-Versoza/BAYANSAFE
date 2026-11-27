@@ -13,14 +13,16 @@ export default function GlobalLoader() {
   useEffect(() => {
     const skeleton = ref.current;
     if (!skeleton) return undefined;
-    const view = (location.pathname.split('/').filter(Boolean)[0] || 'home');
+    const pathPart = location.pathname.split('/').filter(Boolean)[0] || '';
+    const hashPart = (location.hash || '').replace(/^#/, '').split('/')[0];
+    const view = pathPart || hashPart || 'home';
     buildSkeleton(skeleton, view);
     skeleton.classList.add('is-active');
     const timer = window.setTimeout(() => {
       skeleton.classList.remove('is-active');
     }, MIN_SHOW);
     return () => window.clearTimeout(timer);
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   return <div ref={ref} className="page-skeleton" aria-hidden="true" />;
 }
