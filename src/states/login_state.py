@@ -404,7 +404,7 @@ class LoginState(BaseState):
             elif event.key == pygame.K_BACKSPACE:
                 self._erase(kb.field)
                 audio.play("tick", 0.25)
-            elif event.key in (pygame.K_ESCAPE, pygame.K_TAB, pygame.K_p):
+            elif event.key in (pygame.K_ESCAPE, pygame.K_TAB):
                 kb.close()
                 audio.play("back")
             return True
