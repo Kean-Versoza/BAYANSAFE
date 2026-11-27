@@ -130,6 +130,34 @@ router.post('/login', async (req, res) => {
 });
 
 /**
+ * POST /api/account/rfid/login
+ * Signs a player in with their RFID card (no password).
+ */
+router.post('/rfid/login', async (req, res) => {
+  const uid = typeof req.body?.uid === 'string' ? req.body.uid.trim() : '';
+  if (!uid) {
+    return res.status(400).json({ ok: false, error: 'No card was scanned.' });
+  }
+
+  try {
+    const user = await findByRfid(uid);
+    if (!user) {
+      return res.status(401).json({ ok: false, error: 'That card is not linked to an account.' });
+    }
+
+    const { token } = await createSession(user.id);
+    setUserCookie(res, token);
+    await noteSignIn(user.id);
+
+    const fresh = await findById(user.id);
+    res.json({ ok: true, user: publicUser(fresh ?? user) });
+  } catch (err) {
+    console.error('Could not sign in with card:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
+});
+
+/**
  * POST /api/account/logout
  */
 router.post('/logout', async (req, res) => {
