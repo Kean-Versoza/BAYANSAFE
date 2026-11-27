@@ -4,16 +4,17 @@ import { randomBytes } from 'node:crypto';
 import { COOKIE_NAME, getSessionUser, setUserCookie } from '../services/userAuth.js';
 import { readCookies } from '../services/cookies.js';
 import { describeError } from '../db/pool.js';
+import { query } from '../db/pool.js';
 
 const router = Router();
 
-const codes = new Map();
 const CODE_TTL_MS = 10 * 60 * 1000;
 
-function sweep() {
-  const now = Date.now();
-  for (const [code, entry] of codes) {
-    if (now - entry.createdAt > CODE_TTL_MS) codes.delete(code);
+async function sweep() {
+  try {
+    await query('DELETE FROM game_device_codes WHERE expires_at < NOW()');
+  } catch (err) {
+    // ignore sweep errors
   }
 }
 
@@ -35,29 +36,43 @@ function publicUser(user) {
   };
 }
 
-router.post('/device/start', (req, res) => {
-  sweep();
+router.post('/device/start', async (req, res) => {
+  await sweep();
   const code = randomBytes(4).toString('hex').toUpperCase();
-  codes.set(code, { code, createdAt: Date.now(), token: null, user: null });
+  const expiresAt = new Date(Date.now() + CODE_TTL_MS);
 
-  res.json({
-    ok: true,
-    code,
-    url: `${siteUrl()}/account?code=${code}`,
-    expiresAt: new Date(Date.now() + CODE_TTL_MS).toISOString(),
-  });
+  try {
+    await query(
+      'INSERT INTO game_device_codes (code, expires_at) VALUES ($1, $2)',
+      [code, expiresAt]
+    );
+    res.json({
+      ok: true,
+      code,
+      url: `${siteUrl()}/account?code=${code}`,
+      expiresAt: expiresAt.toISOString(),
+    });
+  } catch (err) {
+    console.error('Could not start game sign in:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
 });
 
 router.post('/device/complete', async (req, res) => {
-  sweep();
+  await sweep();
   const code = typeof req.body?.code === 'string' ? req.body.code.trim().toUpperCase() : '';
-  const entry = codes.get(code);
-
-  if (!entry) {
-    return res.status(404).json({ ok: false, error: 'That sign-in code is unknown or has expired.' });
-  }
 
   try {
+    const { rows } = await query('SELECT * FROM game_device_codes WHERE code = $1', [code]);
+    const entry = rows[0];
+    if (!entry) {
+      return res.status(404).json({ ok: false, error: 'That sign-in code is unknown or has expired.' });
+    }
+    if (new Date(entry.expires_at) < new Date()) {
+      await query('DELETE FROM game_device_codes WHERE code = $1', [code]);
+      return res.status(404).json({ ok: false, error: 'That sign-in code is unknown or has expired.' });
+    }
+
     const user = await getSessionUser(req);
     if (!user) {
       return res.status(401).json({ ok: false, error: 'Please sign in on the website first.' });
@@ -68,31 +83,43 @@ router.post('/device/complete', async (req, res) => {
       return res.status(401).json({ ok: false, error: 'No sign-in session was found.' });
     }
 
-    entry.token = token;
-    entry.user = publicUser(user);
-    res.json({ ok: true, user: entry.user });
+    await query(
+      'UPDATE game_device_codes SET token = $1, user_data = $2 WHERE code = $3',
+      [token, publicUser(user), code]
+    );
+    res.json({ ok: true, user: publicUser(user) });
   } catch (err) {
     console.error('Could not complete game sign in:', describeError(err));
     res.status(503).json({ ok: false, error: 'The database could not be reached.' });
   }
 });
 
-router.post('/device/token', (req, res) => {
-  sweep();
+router.post('/device/token', async (req, res) => {
+  await sweep();
   const code = typeof req.body?.code === 'string' ? req.body.code.trim().toUpperCase() : '';
-  const entry = codes.get(code);
 
-  if (!entry) {
-    return res.status(404).json({ ok: false, error: 'That sign-in code is unknown or has expired.' });
-  }
-  if (!entry.token) {
-    return res.json({ ok: false, pending: true });
-  }
+  try {
+    const { rows } = await query('SELECT * FROM game_device_codes WHERE code = $1', [code]);
+    const entry = rows[0];
+    if (!entry) {
+      return res.status(404).json({ ok: false, error: 'That sign-in code is unknown or has expired.' });
+    }
+    if (new Date(entry.expires_at) < new Date()) {
+      await query('DELETE FROM game_device_codes WHERE code = $1', [code]);
+      return res.status(404).json({ ok: false, error: 'That sign-in code is unknown or has expired.' });
+    }
+    if (!entry.token) {
+      return res.json({ ok: false, pending: true });
+    }
 
-  setUserCookie(res, entry.token);
-  const user = entry.user;
-  codes.delete(code);
-  res.json({ ok: true, user });
+    setUserCookie(res, entry.token);
+    const user = entry.user_data;
+    await query('DELETE FROM game_device_codes WHERE code = $1', [code]);
+    res.json({ ok: true, user });
+  } catch (err) {
+    console.error('Could not fetch game token:', describeError(err));
+    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+  }
 });
 
 export default router;
