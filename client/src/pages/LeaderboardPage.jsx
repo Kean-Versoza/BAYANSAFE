@@ -40,6 +40,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState({ player: '', chapter: '', level: '', time: '', points: '' });
 
   useEffect(() => {
     document.title = 'Leaderboards | BayanSafe';
@@ -62,6 +63,20 @@ export default function LeaderboardPage() {
   }, [page]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const filteredScores = scores.filter((s) => {
+    const player = String(s.username ?? '').toLowerCase();
+    const chapter = String(s.chapter ?? '').toLowerCase();
+    const level = String(s.level ?? '').toLowerCase();
+    const time = s.best_time == null ? '' : String(s.best_time);
+    const points = String(s.score ?? '');
+    if (filters.player && !player.includes(filters.player.toLowerCase())) return false;
+    if (filters.chapter && !chapter.includes(filters.chapter.toLowerCase())) return false;
+    if (filters.level && !level.includes(filters.level.toLowerCase())) return false;
+    if (filters.time && !time.includes(filters.time)) return false;
+    if (filters.points && !points.includes(filters.points)) return false;
+    return true;
+  });
 
   return (
     <>
@@ -93,9 +108,26 @@ export default function LeaderboardPage() {
                     <th style={{ textAlign: 'left', padding: '0.4rem' }}>Best Time</th>
                     <th style={{ textAlign: 'right', padding: '0.4rem' }}>Points</th>
                   </tr>
-                </thead>
+                <tr>
+                  <th style={{ padding: '0.2rem' }}>
+                    <input value={filters.player} onChange={(e) => setFilters((f) => ({ ...f, player: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
+                  </th>
+                  <th style={{ padding: '0.2rem' }}>
+                    <input value={filters.chapter} onChange={(e) => setFilters((f) => ({ ...f, chapter: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
+                  </th>
+                  <th style={{ padding: '0.2rem' }}>
+                    <input value={filters.level} onChange={(e) => setFilters((f) => ({ ...f, level: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
+                  </th>
+                  <th style={{ padding: '0.2rem' }}>
+                    <input value={filters.time} onChange={(e) => setFilters((f) => ({ ...f, time: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
+                  </th>
+                  <th style={{ padding: '0.2rem' }}>
+                    <input value={filters.points} onChange={(e) => setFilters((f) => ({ ...f, points: e.target.value }))} placeholder="filter" style={{ width: '100%' }} />
+                  </th>
+                </tr>
+              </thead>
                 <tbody>
-                  {scores.map((s, i) => (
+                  {filteredScores.map((s, i) => (
                     <tr key={i}>
                       <td style={{ padding: '0.4rem' }}>{s.username}</td>
                       <td style={{ padding: '0.4rem' }}>{chapterNumber(s.chapter)}</td>
