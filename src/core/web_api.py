@@ -19,7 +19,7 @@ from http.cookiejar import CookieJar
 
 
 ENV_URL = "BAYANSAFE_SERVER_URL"
-DEFAULT_URL = "http://localhost:3001"
+DEFAULT_URL = "https://bayansafe.vercel.app"
 
 
 class WebApiError(Exception):
