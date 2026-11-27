@@ -477,11 +477,6 @@ class LoginState(BaseState):
                 self._activate()
             elif event.key == pygame.K_ESCAPE:
                 self.cancel() if self.mode != "form" else self.game.ask_quit()
-            elif key and not self.busy and getattr(event, "unicode", ""):
-                # Fallback for synthetic key events without a TEXTINPUT event.
-                char = event.unicode
-                if len(char) == 1:
-                    self._append_text(key, char)
             return
 
         if event.type == pygame.MOUSEMOTION:
