@@ -54,7 +54,7 @@ router.post('/device/start', async (req, res) => {
     });
   } catch (err) {
     console.error('Could not start game sign in:', describeError(err));
-    res.status(503).json({ ok: false, error: 'The database could not be reached.' });
+    res.status(503).json({ ok: false, error: describeError(err) });
   }
 });
 
