@@ -108,28 +108,30 @@ export default function LeaderboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h1 style={{ margin: 0 }}>Leaderboards</h1>
             <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-              <select value={searchColumn} onChange={(e) => setSearchColumn(e.target.value)} style={{ padding: '0.3rem 0.5rem' }}>
-                <option value="all">All</option>
-                <option value="player">Player</option>
-                <option value="chapter">Chapter</option>
-                <option value="level">Level</option>
-                <option value="time">Best Time</option>
-                <option value="points">Points</option>
-              </select>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search..."
                 style={{ width: '220px', padding: '0.3rem 0.5rem' }}
               />
-              <button
-                type="button"
-                onClick={() => { setQuery(''); setSearchColumn('all'); }}
-                style={{ padding: '0.3rem 0.6rem' }}
-              >
-                Clear
-              </button>
             </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '0.3rem' }}>
+            <select value={searchColumn} onChange={(e) => setSearchColumn(e.target.value)} style={{ padding: '0.3rem 0.5rem' }}>
+              <option value="all">All</option>
+              <option value="player">Player</option>
+              <option value="chapter">Chapter</option>
+              <option value="level">Level</option>
+              <option value="time">Best Time</option>
+              <option value="points">Points</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => { setQuery(''); setSearchColumn('all'); }}
+              style={{ padding: '0.3rem 0.6rem' }}
+            >
+              Clear
+            </button>
           </div>
           <p className="about-lead">Top scores from players around the world.</p>
 
