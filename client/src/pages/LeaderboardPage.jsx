@@ -41,6 +41,8 @@ export default function LeaderboardPage() {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState({ player: '', chapter: '', level: '', time: '', points: '' });
+  const [sortKey, setSortKey] = useState('points');
+  const [sortDir, setSortDir] = useState('desc');
 
   useEffect(() => {
     document.title = 'Leaderboards | BayanSafe';
@@ -64,19 +66,31 @@ export default function LeaderboardPage() {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const filteredScores = scores.filter((s) => {
-    const player = String(s.username ?? '').toLowerCase();
-    const chapter = String(s.chapter ?? '').toLowerCase();
-    const level = String(s.level ?? '').toLowerCase();
-    const time = s.best_time == null ? '' : String(s.best_time);
-    const points = String(s.score ?? '');
-    if (filters.player && !player.includes(filters.player.toLowerCase())) return false;
-    if (filters.chapter && !chapter.includes(filters.chapter.toLowerCase())) return false;
-    if (filters.level && !level.includes(filters.level.toLowerCase())) return false;
-    if (filters.time && !time.includes(filters.time)) return false;
-    if (filters.points && !points.includes(filters.points)) return false;
-    return true;
-  });
+  const filteredScores = scores
+    .filter((s) => {
+      const player = String(s.username ?? '').toLowerCase();
+      const chapter = String(s.chapter ?? '').toLowerCase();
+      const level = String(s.level ?? '').toLowerCase();
+      const time = s.best_time == null ? '' : String(s.best_time);
+      const points = String(s.score ?? '');
+      if (filters.player && !player.includes(filters.player.toLowerCase())) return false;
+      if (filters.chapter && !chapter.includes(filters.chapter.toLowerCase())) return false;
+      if (filters.level && !level.includes(filters.level.toLowerCase())) return false;
+      if (filters.time && !time.includes(filters.time)) return false;
+      if (filters.points && !points.includes(filters.points)) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      let va, vb;
+      if (sortKey === 'player') { va = String(a.username ?? ''); vb = String(b.username ?? ''); }
+      else if (sortKey === 'chapter') { va = String(a.chapter ?? ''); vb = String(b.chapter ?? ''); }
+      else if (sortKey === 'level') { va = Number((String(a.level ?? '').match(/_(\\d+)$/) || [0, 0])[1]) || 0; vb = Number((String(b.level ?? '').match(/_(\\d+)$/) || [0, 0])[1]) || 0; }
+      else if (sortKey === 'time') { va = a.best_time == null ? Infinity : Number(a.best_time); vb = b.best_time == null ? Infinity : Number(b.best_time); }
+      else if (sortKey === 'points') { va = Number(a.score ?? 0); vb = Number(b.score ?? 0); }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   return (
     <>
@@ -102,11 +116,24 @@ export default function LeaderboardPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: 'left', padding: '0.4rem' }}>Player</th>
-                    <th style={{ textAlign: 'left', padding: '0.4rem' }}>Chapter</th>
-                    <th style={{ textAlign: 'left', padding: '0.4rem' }}>Level</th>
-                    <th style={{ textAlign: 'left', padding: '0.4rem' }}>Best Time</th>
-                    <th style={{ textAlign: 'right', padding: '0.4rem' }}>Points</th>
+                    {[
+                      { key: 'player', label: 'Player', align: 'left' },
+                      { key: 'chapter', label: 'Chapter', align: 'left' },
+                      { key: 'level', label: 'Level', align: 'left' },
+                      { key: 'time', label: 'Best Time', align: 'left' },
+                      { key: 'points', label: 'Points', align: 'right' },
+                    ].map((col) => (
+                      <th
+                        key={col.key}
+                        style={{ textAlign: col.align, padding: '0.4rem', cursor: 'pointer', userSelect: 'none' }}
+                        onClick={() => {
+                          if (sortKey === col.key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                          else { setSortKey(col.key); setSortDir('asc'); }
+                        }}
+                      >
+                        {col.label} {sortKey === col.key ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                    ))}
                   </tr>
                 <tr>
                   <th style={{ padding: '0.2rem' }}>
