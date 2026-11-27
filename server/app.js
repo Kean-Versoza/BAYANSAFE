@@ -3,6 +3,7 @@ import express from 'express';
 import footerConfig from './footerConfig.js';
 import siteConfig from './siteConfig.js';
 import registerRoutes from './routes/register.js';
+import scoreRoutes from './routes/scores.js';
 import accountRoutes from './routes/account.js';
 import googleAuthRoutes from './routes/googleAuth.js';
 import clientLoginRoutes from './routes/clientLogin.js';
@@ -80,6 +81,9 @@ export function createApiApp() {
 
   // Registration with an account, a card and the welcome email
   app.use('/api/register', registerRoutes);
+
+  // High scores / leaderboard (shared across devices)
+  app.use('/api/scores', scoreRoutes);
 
   // Unknown API routes must never fall through to the SPA shell
   app.use('/api', (req, res) => {

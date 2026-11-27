@@ -122,6 +122,19 @@ class WebApiClient:
         """Sign in with a Google ID token obtained in the browser."""
         return self._signed_in(self.request("POST", "/api/auth/google", {"token": token}))
 
+    def submit_score(self, score, level=None, username=None):
+        """Submit a high score for the signed-in player."""
+        data = {"score": score}
+        if level is not None:
+            data["level"] = level
+        if username is not None:
+            data["username"] = username
+        return self.request("POST", "/api/scores", data)
+
+    def leaderboard(self, limit=20):
+        """Return the shared leaderboard."""
+        return self.request("GET", f"/api/scores/leaderboard?limit={limit}")
+
     def session(self):
         """Return the signed-in user, or None when the cookie is absent/expired."""
         try:

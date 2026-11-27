@@ -149,11 +149,24 @@ class HighScores(BaseState):
                         (160, info_y + 9), "tiny", theme.CREAM_DIM, anchor="center")
 
         stage_id = board["key"]
-        if self.source == "database" and db_manager.is_connected:
-            entries = db_manager.get_high_scores(stage_id, limit=10)
-            shown = [{"score": e["score"], "attempts": 1, "best_time": e.get("time", 0),
-                      "player_id": e["username"]}
-                     for e in entries]
+        if self.source == "database":
+            shown = None
+            # Prefer the shared (cross-device) website leaderboard when online.
+            try:
+                payload = self.game.web_api.leaderboard(limit=10)
+                if isinstance(payload, dict) and isinstance(payload.get("scores"), list):
+                    shown = [{"score": e.get("score", 0), "attempts": 1,
+                              "best_time": 0, "player_id": e.get("username", "?")}
+                             for e in payload["scores"]]
+            except Exception:
+                shown = None
+            if shown is None and db_manager.is_connected:
+                entries = db_manager.get_high_scores(stage_id, limit=10)
+                shown = [{"score": e["score"], "attempts": 1, "best_time": e.get("time", 0),
+                          "player_id": e["username"]}
+                         for e in entries]
+            if shown is None:
+                shown = list(self.game.session.stage_high_scores(stage_id))
         else:
             shown = list(self.game.session.stage_high_scores(stage_id))
 
