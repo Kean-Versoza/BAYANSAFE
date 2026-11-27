@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
 
+function formatTime(seconds) {
+  if (seconds == null) return '-';
+  const s = Number(seconds);
+  if (!Number.isFinite(s)) return '-';
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return m > 0 ? `${m}m ${r}s` : `${r}s`;
+}
+
 /** Leaderboards view: top scores shared across all players and devices. */
 export default function LeaderboardSection({ onJump }) {
   const logoClick = (event) => {
@@ -46,14 +55,30 @@ export default function LeaderboardSection({ onJump }) {
         ) : scores.length === 0 ? (
           <p className="about-lead" style={{ textAlign: 'center' }}>No scores yet. Be the first!</p>
         ) : (
-          <ol className="about-team" style={{ listStyle: 'decimal', paddingLeft: '1.5rem' }}>
-            {scores.map((s, i) => (
-              <li key={i}>
-                <strong>{s.username}</strong>
-                <span>{s.score} pts {s.level ? `· ${s.level}` : ''}</span>
-              </li>
-            ))}
-          </ol>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: '0.4rem' }}>Player</th>
+                  <th style={{ textAlign: 'left', padding: '0.4rem' }}>Chapter</th>
+                  <th style={{ textAlign: 'left', padding: '0.4rem' }}>Level</th>
+                  <th style={{ textAlign: 'left', padding: '0.4rem' }}>Best Time</th>
+                  <th style={{ textAlign: 'right', padding: '0.4rem' }}>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scores.map((s, i) => (
+                  <tr key={i}>
+                    <td style={{ padding: '0.4rem' }}>{s.username}</td>
+                    <td style={{ padding: '0.4rem' }}>{s.chapter || '-'}</td>
+                    <td style={{ padding: '0.4rem' }}>{s.level || '-'}</td>
+                    <td style={{ padding: '0.4rem' }}>{formatTime(s.best_time)}</td>
+                    <td style={{ padding: '0.4rem', textAlign: 'right' }}>{s.score}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </section>

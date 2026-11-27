@@ -122,7 +122,7 @@ class WebApiClient:
         """Sign in with a Google ID token obtained in the browser."""
         return self._signed_in(self.request("POST", "/api/auth/google", {"token": token}))
 
-    def submit_score(self, score, level=None, username=None, best_time=None):
+    def submit_score(self, score, level=None, username=None, best_time=None, chapter=None):
         """Submit a high score for the signed-in player."""
         data = {"score": score}
         if level is not None:
@@ -131,6 +131,8 @@ class WebApiClient:
             data["username"] = username
         if best_time is not None:
             data["best_time"] = best_time
+        if chapter is not None:
+            data["chapter"] = chapter
         return self.request("POST", "/api/scores", data)
 
     def leaderboard(self, limit=20, level=None):
