@@ -108,6 +108,7 @@ class WebApiClient:
         """Sign in with a website username (or email) and password."""
         return self._signed_in(self.request("POST", "/api/account/login", {
             "username": username,
+            "email": username,
             "password": password,
         }))
 

@@ -92,9 +92,11 @@ router.get('/session', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
   const email = typeof req.body?.email === 'string' ? req.body.email.trim() : '';
+  const username = typeof req.body?.username === 'string' ? req.body.username.trim() : '';
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
+  const identifier = email || username;
 
-  if (!email || !password) {
+  if (!identifier || !password) {
     return res.status(400).json({ ok: false, error: 'Please fill in your email and your password.' });
   }
 
@@ -104,7 +106,9 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const user = await findByEmail(email);
+    const user = identifier.includes('@')
+      ? await findByEmail(identifier)
+      : await findByUsername(identifier);
     if (!user || !verifyPassword(password, user.password)) {
       noteFailedTry(key);
       return res.status(401).json({ ok: false, error: 'That email and password do not go together.' });
