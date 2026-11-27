@@ -40,10 +40,6 @@ export default function LeaderboardPage() {
     <>
       <NavPill items={config.nav} active="leaderboard" />
 
-      <nav className="nav-pill nav-pill--single">
-        <Link to="/">&larr; BACK TO BAYANSAFE</Link>
-      </nav>
-
       <div className="frame frame-inner about-page-frame">
         <header className="about-top">
           <Link className="about-logo" to="/" aria-label="Back to BAYANSAFE">
