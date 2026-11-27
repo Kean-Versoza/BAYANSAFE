@@ -65,7 +65,7 @@ router.get('/leaderboard', async (req, res) => {
     }
     params.push(limit);
     const { rows } = await query(
-      `SELECT username, score, level, created_at
+      `SELECT username, score, best_time, level, created_at
        FROM high_scores
        ${where}
        ORDER BY score DESC, created_at ASC
