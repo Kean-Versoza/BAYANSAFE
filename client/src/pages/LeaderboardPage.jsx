@@ -170,7 +170,7 @@ export default function LeaderboardPage() {
           ) : (
             <>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1rem', tableLayout: 'fixed' }}>
                   <thead>
                     <tr>
                       {[
@@ -182,7 +182,7 @@ export default function LeaderboardPage() {
                       ].map((col) => (
                         <th
                           key={col.key}
-                          style={{ textAlign: col.align, padding: '0.6rem', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ textAlign: col.align, padding: '0.6rem', cursor: 'pointer', userSelect: 'none', width: col.key === 'player' ? '30%' : col.key === 'points' ? '15%' : '18%' }}
                           onClick={() => {
                             if (sortKey === col.key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
                             else { setSortKey(col.key); setSortDir('asc'); }
