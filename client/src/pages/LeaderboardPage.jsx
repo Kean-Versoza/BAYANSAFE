@@ -69,7 +69,12 @@ export default function LeaderboardPage() {
     .filter((s) => {
       if (!q) return true;
       const haystack = [
-        s.username, s.chapter, s.level, s.best_time, s.score,
+        s.username,
+        chapterNumber(s.chapter),
+        levelNumber(s.level),
+        s.best_time == null ? '-' : formatTime(s.best_time),
+        String(s.best_time ?? ''),
+        s.score,
       ].map((v) => (v == null ? '' : String(v))).join(' ').toLowerCase();
       return haystack.includes(q);
     })
