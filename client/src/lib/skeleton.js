@@ -18,7 +18,7 @@ export const FORM_LOADER_MS = 700; // ms the registration form shows a skeleton 
 /** Maps a hash / section id to the page view the skeleton should draw. */
 export function viewFor(id) {
   id = String(id || '').replace('#', '');
-  if (id === 'about' || id === 'registration' || id === 'leaderboard') return id === 'leaderboard' ? 'about' : id;
+  if (id === 'about' || id === 'registration' || id === 'leaderboard') return id;
   return 'home';
 }
 
@@ -189,7 +189,7 @@ export function buildSkeleton(sk, id) {
 
   // brand logo (not on Home)
   if (id !== 'home') {
-    const logoImg = document.querySelector('#about .logo img') || document.querySelector('.account-frame .logo img');
+    const logoImg = document.querySelector('#about .logo img') || document.querySelector('#leaderboard .about-logo img') || document.querySelector('.account-frame .logo img');
     paintInk(sk, fixed, logoImg, '0.6rem');
   }
 
@@ -206,6 +206,11 @@ export function buildSkeleton(sk, id) {
     paintBox(sk, flow, sec.querySelector('.panel'), 'sk-card');
     sec.querySelectorAll('.disaster-icon').forEach((ic) => paintBox(sk, flow, ic, 'sk'));
     sec.querySelectorAll('.panel p, .panel li').forEach((el) => paintLines(sk, flow, el));
+  } else if (id === 'leaderboard') {
+    const panel = sec.querySelector('.panel') || sec;
+    paintBox(sk, flow, panel, 'sk-card');
+    panel.querySelectorAll('th, td').forEach((el) => paintLines(sk, flow, el));
+    panel.querySelectorAll('input, select, button').forEach((el) => paintBox(sk, flow, el, 'sk'));
   } else if (id === 'account') {
     const form = sec.querySelector('.account-card, .reg-form');
     if (form) {
