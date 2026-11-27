@@ -142,7 +142,7 @@ export default function LeaderboardPage() {
           ) : (
             <>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '1rem' }}>
                   <thead>
                     <tr>
                       {[
@@ -154,7 +154,7 @@ export default function LeaderboardPage() {
                       ].map((col) => (
                         <th
                           key={col.key}
-                          style={{ textAlign: col.align, padding: '0.4rem', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ textAlign: col.align, padding: '0.6rem', cursor: 'pointer', userSelect: 'none' }}
                           onClick={() => {
                             if (sortKey === col.key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
                             else { setSortKey(col.key); setSortDir('asc'); }
@@ -168,11 +168,11 @@ export default function LeaderboardPage() {
                   <tbody>
                     {pageScores.map((s, i) => (
                       <tr key={i}>
-                        <td style={{ padding: '0.4rem' }}>{s.username}</td>
-                        <td style={{ padding: '0.4rem' }}>{chapterNumber(s.chapter)}</td>
-                        <td style={{ padding: '0.4rem' }}>{levelNumber(s.level)}</td>
-                        <td style={{ padding: '0.4rem' }}>{formatTime(s.best_time)}</td>
-                        <td style={{ padding: '0.4rem', textAlign: 'right' }}>{s.score}</td>
+                        <td style={{ padding: '0.6rem' }}>{s.username}</td>
+                        <td style={{ padding: '0.6rem' }}>{chapterNumber(s.chapter)}</td>
+                        <td style={{ padding: '0.6rem' }}>{levelNumber(s.level)}</td>
+                        <td style={{ padding: '0.6rem' }}>{formatTime(s.best_time)}</td>
+                        <td style={{ padding: '0.6rem', textAlign: 'right' }}>{s.score}</td>
                       </tr>
                     ))}
                   </tbody>
