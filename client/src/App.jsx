@@ -23,9 +23,15 @@ function ScrollToTop() {
   }, []);
 
   useEffect(() => {
-    if (hash) return; // in-page anchors handle their own scrolling
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useEffect(() => {
+    // Never auto-scroll to a hash on (re)load; the loader plays first.
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [pathname, hash]);
+  }, [pathname]);
 
   // index.html starts with data-section="home", and the home page keeps that
   // attribute in step while it scrolls. On any other page it must not stay
