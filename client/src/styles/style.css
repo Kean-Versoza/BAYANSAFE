@@ -495,13 +495,6 @@
         padding: 1.75rem 2.4rem 2rem;
     }
 
-    /* Leaderboards page sits a bit higher on desktop */
-    @media (min-width: 769px) {
-        .leaderboard-panel {
-            margin-top: 1rem;
-        }
-    }
-
     .about-panel h1 {
         font-family: 'Pixelify Sans', sans-serif;
         font-size: 2.1rem;

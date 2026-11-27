@@ -104,7 +104,7 @@ export default function LeaderboardPage() {
           </Link>
         </header>
 
-        <main id="leaderboard" className="panel about-panel leaderboard-panel">
+        <main id="leaderboard" className="panel about-panel">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h1 style={{ margin: 0 }}>Leaderboards</h1>
             <div className="lb-search-desktop" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
